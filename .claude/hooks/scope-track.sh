@@ -44,9 +44,6 @@ case "$TRACK" in
   backend)  DIRS="$(jq -r '.tracks.backend.dirs[]? // empty' "$PROJ" 2>/dev/null)";;
   frontend) DIRS="$(jq -r '.tracks.frontend.dirs[]? // empty' "$PROJ" 2>/dev/null)";;
   test)     DIRS="$(jq -r '.testDirs[]? // empty' "$PROJ" 2>/dev/null)";;
-  userdocs) # /feat-docs: user-facing docs only — docsDir + repo-root README files.
-            DOCSDIR="$(jq -r '.docsDir // "docs"' "$PROJ" 2>/dev/null)"
-            DIRS="$DOCSDIR README.md README_zh-TW.md";;
   *)        DIRS="";;   # docs/readonly phases: only artifacts (handled above) allowed
 esac
 

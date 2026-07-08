@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feature Factory — Fable 5 版 · 團隊教育訓練</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --concrete:#F2F3F1;      /* 混凝土白 */
+  --ink:#1C1E21;           /* 碳黑 */
+  --safety:#FFC400;        /* 工安黃：人工檢查點 */
+  --signal:#6B4FD8;        /* 訊號紫：FABLE5 新增 */
+  --stop:#C63D2F;          /* 警示紅：blocked */
+  --grid:#D8DAD5;          /* 網格灰 */
+  --ok:#2E7D4F;            /* 通過綠 */
+  --display:'Chakra Petch',sans-serif;
+  --body:'Noto Sans TC',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  font-family:var(--body);color:var(--ink);background:var(--concrete);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:56px 56px;line-height:1.75;font-size:16px;
+}
+.wrap{max-width:1060px;margin:0 auto;padding:0 28px}
+a{color:inherit}
+.hazard{height:10px;background:repeating-linear-gradient(-45deg,var(--ink) 0 14px,var(--safety) 14px 28px)}
+
+/* ============ 頭版：規格牌 ============ */
+header{border-bottom:3px solid var(--ink);background:var(--concrete)}
+.mast{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;padding:40px 0 22px}
+.plate .eyebrow{font-family:var(--display);font-weight:600;letter-spacing:.28em;font-size:12px;text-transform:uppercase}
+.plate h1{font-family:var(--display);font-weight:700;font-size:clamp(42px,7vw,84px);line-height:.98;letter-spacing:-.01em;text-transform:uppercase}
+.plate h1 .tc{font-family:var(--body);font-weight:900;letter-spacing:.02em}
+.specbox{font-family:var(--mono);font-size:12.5px;border:2px solid var(--ink);background:#fff;min-width:250px}
+.specbox div{display:flex;justify-content:space-between;gap:18px;padding:5px 12px;border-bottom:1px solid var(--grid)}
+.specbox div:last-child{border-bottom:0}
+.specbox b{font-weight:600}
+.thesis{padding:20px 0 30px;max-width:760px}
+.thesis p{font-size:clamp(18px,2.4vw,23px);font-weight:500;line-height:1.6}
+.thesis strong{background:linear-gradient(transparent 62%,var(--safety) 62%)}
+/* 輸送帶 */
+.belt{border-top:2px solid var(--ink);padding:13px 0 15px;overflow:hidden;white-space:nowrap;font-family:var(--mono);font-size:13px;position:relative}
+.belt-inner{display:inline-block;animation:belt 46s linear infinite}
+@keyframes belt{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.belt span{margin-right:34px;opacity:.85}
+.belt .gate{color:#8a6d00;font-weight:600}
+.belt .f5{color:var(--signal);font-weight:600}
+
+/* ============ 區段骨架 ============ */
+section{padding:66px 0 26px}
+.sec-head{display:flex;align-items:baseline;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:34px}
+.sec-head .no{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.12em;background:var(--ink);color:var(--concrete);padding:2px 10px}
+.sec-head h2{font-family:var(--body);font-weight:900;font-size:clamp(24px,3.4vw,34px);letter-spacing:.02em}
+.sec-head .en{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.22em;text-transform:uppercase;opacity:.55;margin-left:auto}
+.lead{max-width:800px;margin-bottom:32px;font-size:17px}
+
+.tag-f5{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;color:#fff;background:var(--signal);padding:1px 8px 2px;border-radius:2px;vertical-align:2px}
+code,.cmd{font-family:var(--mono);font-size:.92em;background:#fff;border:1px solid var(--grid);padding:1px 6px;border-radius:2px}
+
+/* ============ 01 理念 ============ */
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;background:var(--ink);border:2px solid var(--ink)}
+.pillar{background:#fff;padding:24px 22px 26px}
+.pillar .pno{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.2em;opacity:.5}
+.pillar h3{font-size:19px;font-weight:900;margin:6px 0 10px}
+.pillar p{font-size:14.5px;line-height:1.8}
+.pillar p code{font-size:.9em}
+
+/* ============ 02 產線圖（signature） ============ */
+.line{position:relative;margin:8px 0 20px;padding-left:66px}
+.line::before{content:"";position:absolute;left:26px;top:8px;bottom:8px;width:4px;background:var(--ink)}
+.stage{position:relative;background:#fff;border:2px solid var(--ink);margin-bottom:14px;padding:14px 18px 15px;max-width:820px}
+.stage::before{content:attr(data-n);position:absolute;left:-66px;top:50%;transform:translateY(-50%);width:52px;height:52px;background:var(--concrete);border:3px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:15px}
+.stage .row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.stage .cmdname{font-family:var(--mono);font-weight:600;font-size:15.5px}
+.stage .out{font-family:var(--mono);font-size:12px;opacity:.6;margin-left:auto}
+.stage p{font-size:14px;margin-top:5px;line-height:1.7}
+.stage.gate{border-color:#8a6d00;background:#FFF7DE;box-shadow:6px 6px 0 var(--safety)}
+.stage.gate::before{background:var(--safety);border-color:var(--ink);content:"⏸"}
+.stage.f5{border-left:8px solid var(--signal)}
+.stage.loop{border-style:dashed}
+.badge{font-family:var(--mono);font-size:11px;font-weight:600;padding:1px 8px 2px;border-radius:2px}
+.badge.human{background:var(--safety);color:var(--ink)}
+.badge.opt{background:var(--grid);color:var(--ink)}
+.badge.red{background:var(--stop);color:#fff}
+.loopnote{position:relative;max-width:820px;margin:-4px 0 14px;padding:10px 18px;font-size:13.5px;font-family:var(--mono);border-left:4px dashed var(--stop);color:var(--stop)}
+.linefoot{font-size:14px;max-width:820px;padding-left:66px;opacity:.85}
+
+/* ============ 03 技術 ============ */
+.tech{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--ink);font-size:14.5px}
+.tech th{font-family:var(--body);font-weight:900;text-align:left;padding:12px 16px;border-bottom:2px solid var(--ink);background:var(--concrete)}
+.tech td{padding:13px 16px;border-bottom:1px solid var(--grid);vertical-align:top}
+.tech tr:last-child td{border-bottom:0}
+.tech td:first-child{white-space:nowrap;font-weight:700}
+.tech .path{font-family:var(--mono);font-size:12px;opacity:.6;display:block;margin-top:2px;font-weight:400}
+
+/* ============ 04 Fable 5 ============ */
+.f5grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.f5card{background:#fff;border:2px solid var(--ink);border-top:8px solid var(--signal);padding:22px 22px 24px}
+.f5card h3{font-size:18px;font-weight:900;margin-bottom:10px}
+.f5card p,.f5card li{font-size:14px;line-height:1.75}
+.f5card ul{padding-left:20px;margin-top:6px}
+.f5card table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.f5card table td,.f5card table th{border:1px solid var(--grid);padding:5px 9px;text-align:left}
+.f5card table th{background:var(--concrete);font-weight:700}
+.inert{margin-top:22px;border:2px solid var(--ink);background:#fff;padding:16px 20px;font-size:14.5px;max-width:100%}
+.inert b{background:linear-gradient(transparent 62%,var(--safety) 62%)}
+
+/* ============ 05 用法 ============ */
+.how{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media (max-width:840px){.how{grid-template-columns:1fr}}
+.term{background:var(--ink);color:#E8E9E6;border:2px solid var(--ink);font-family:var(--mono);font-size:13px;line-height:1.9;padding:18px 20px;overflow-x:auto}
+.term .c{color:#9aa0a6}
+.term .y{color:var(--safety)}
+.term .v{color:#B3A1F5}
+.howcol h3{font-size:17px;font-weight:900;margin:2px 0 10px}
+.howcol h3 + .term{margin-bottom:22px}
+.states{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--ink);font-size:13.5px}
+.states th{text-align:left;padding:9px 12px;border-bottom:2px solid var(--ink);background:var(--concrete);font-weight:900}
+.states td{padding:9px 12px;border-bottom:1px solid var(--grid);vertical-align:top}
+.states tr:last-child td{border-bottom:0}
+.states td:first-child{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+/* ============ 06 守則 ============ */
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px;background:var(--ink);border:2px solid var(--ink)}
+.rule{background:#fff;padding:18px 20px}
+.rule b{display:block;font-size:15px;margin-bottom:4px}
+.rule p{font-size:13.5px;line-height:1.7}
+
+footer{margin-top:70px;border-top:3px solid var(--ink)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding:20px 0 26px;font-family:var(--mono);font-size:12px;opacity:.75}
+@media (max-width:640px){
+  .line{padding-left:50px}
+  .line::before{left:18px}
+  .stage::before{left:-50px;width:38px;height:38px;font-size:12px}
+  .linefoot{padding-left:50px}
+  .stage .out{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hazard"></div>
+  <div class="wrap">
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:12px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em">
+      <span style="background:var(--ink);color:var(--concrete);padding:2px 10px">繁體中文</span>
+      <a href="factory-training_en.html" style="border:1px solid var(--ink);padding:2px 10px;text-decoration:none;background:#fff">English →</a>
+    </div>
+    <div class="mast">
+      <div class="plate">
+        <div class="eyebrow">Internal Training · Claude Code Pipeline</div>
+        <h1>Feature Factory<br><span class="tc">軟體產線</span> <span style="color:var(--signal)">Fable 5 版</span></h1>
+      </div>
+      <div class="specbox" aria-label="規格">
+        <div><span>agents</span><b>7</b></div>
+        <div><span>commands</span><b>13</b></div>
+        <div><span>hooks</span><b>3</b></div>
+        <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
+        <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
+      </div>
+    </div>
+    <div class="thesis">
+      <p>一條把「想法」加工成「已驗證程式碼」的產線。核心信念只有一句：<strong>可靠性來自系統，不是來自模型</strong>——順序由指令驅動、範圍由 hooks 硬擋、迴圈有停損、驗收由獨立的驗證者把關。Fable 5 升級讓這條產線學會了記憶與自我收斂，但沒有拆掉任何一道護欄。</p>
+    </div>
+  </div>
+  <div class="belt" aria-hidden="true">
+    <div class="belt-inner">
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span class="f5">/feat-distill → MEMORY.md</span>
+    </div>
+  </div>
+  <div class="hazard"></div>
+</header>
+
+<main class="wrap">
+
+<!-- ==================== 01 設計理念 ==================== -->
+<section id="philosophy">
+  <div class="sec-head"><span class="no">01</span><h2>設計理念</h2><span class="en">Why it works</span></div>
+  <p class="lead">產線的四根柱子。每一根都在回答同一個問題：<b>當 AI 寫程式的量遠超過人 review 的量，錯誤靠什麼被擋下來？</b></p>
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pno">PILLAR A</div>
+      <h3>確定性控制</h3>
+      <p>流程順序 = 你逐一下的 <code>/feat-*</code> 指令；寫入範圍 = <code>scope-track.sh</code> 依 <code>.active</code> 硬擋；迴圈 = <code>retries</code> 計數器在 <code>loopMaxRetries</code> 停損。凡是能用確定性程式碼保證的，絕不交給模型判斷（CLAUDE.md Rule 9）。</p>
+    </div>
+    <div class="pillar">
+      <div class="pno">PILLAR B</div>
+      <h3>檔案交接</h3>
+      <p>每個 subagent 都在<b>全新、隔離的 context</b> 啟動，唯一共享的是檔案系統。<code>story.md → brief.md → backend-summary.md → verification.md</code>——交接物便宜、可 review、可續跑，也讓每段工作的 context 小到可以放進最便宜夠用的模型。</p>
+    </div>
+    <div class="pillar">
+      <div class="pno">PILLAR C</div>
+      <h3>獨立驗證</h3>
+      <p>「自己改的考卷不算數。」validator 沒有 Edit/Bash 工具、只能讀和寫報告；test-verifier 從 story 的驗收標準<b>獨立</b>出題。評估自己輸出的模型會偏袒自己先前的推理——所以驗證者永遠是另一個 context。</p>
+    </div>
+    <div class="pillar">
+      <div class="pno">PILLAR D</div>
+      <h3>Fail-Loud 誠實</h3>
+      <p>每個 agent 的每次回報都以三段結尾：✅ Verified／⚠️ Skipped-Uncertain／❓ Needs-human-input。「tests pass」永遠不准掩蓋被跳過的測試。寧可對不確定大聲，不要對交付安靜。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 02 產線圖 ==================== -->
+<section id="pipeline">
+  <div class="sec-head"><span class="no">02</span><h2>產線圖</h2><span class="en">The pipeline</span></div>
+  <p class="lead">一個 feature 從進站到出站。<span class="badge human">⏸ 黃色閘門</span> 是人工核准，產線在此完全停止；<span class="tag-f5">FABLE5</span> 紫色標記是本次升級新增的站點，其餘與原版相同。每站的產出都是 <code>&lt;artifactsDir&gt;/&lt;slug&gt;/</code> 下的一個檔案。</p>
+
+  <div class="line">
+    <div class="stage" data-n="00">
+      <div class="row"><span class="cmdname">/feat-init</span><span class="out">→ project.json（每 repo 一次）</span></div>
+      <p>偵測技術棧與 tracks（backend／frontend），寫出 manifest。全新 repo 讀不到 build 檔時會直接問你。只寫設定，不 scaffold 程式碼。</p>
+    </div>
+    <div class="stage" data-n="01">
+      <div class="row"><span class="cmdname">/feat-new &lt;slug&gt; "描述"</span><span class="out">→ idea.md + state.json</span></div>
+      <p>開一個 feature 的工作資料夾，記下原始需求。</p>
+    </div>
+    <div class="stage f5" data-n="02">
+      <div class="row"><span class="cmdname">/feat-research</span><span class="tag-f5">FABLE5 強化</span><span class="out">→ research.md</span></div>
+      <p>先讀 <code>MEMORY.md</code> 把過往教訓帶成「Prior knowledge」（是待驗證的線索，不是可信的事實），再用唯讀 Explore 掃碼庫：相關檔案、既有模式、風險。</p>
+    </div>
+    <div class="stage gate" data-n="">
+      <div class="row"><span class="cmdname">/feat-story</span><span class="badge human">⏸ 人工核准</span><span class="out">→ story.md</span></div>
+      <p>story-writer 產出使用者故事＋可測試的驗收標準。<b>你必須親自看過並核准</b>，產線才會繼續——這是第一道判斷閘門。</p>
+    </div>
+    <div class="stage gate" data-n="">
+      <div class="row"><span class="cmdname">/feat-spec</span><span class="badge human">⏸ 人工核准</span><span class="out">→ brief.md</span></div>
+      <p>spec-writer 把已核准的故事轉成技術簡報：資料模型、API 契約、要動的檔案、風險。第二道判斷閘門。</p>
+    </div>
+    <div class="stage" data-n="03">
+      <div class="row"><span class="cmdname">/feat-backend</span><span class="out">→ 程式碼 + backend-summary.md</span></div>
+      <p>backend-builder 依 brief 實作＋單元測試，並寫出 API 契約摘要給前端。hook 把它鎖在 backend 目錄內。（無 backend track 則自動跳過）</p>
+    </div>
+    <div class="stage" data-n="04">
+      <div class="row"><span class="cmdname">/feat-frontend</span><span class="out">→ UI + 元件測試</span></div>
+      <p>frontend-builder 依契約實作。契約缺什麼就<b>回報缺口</b>，絕不自己發明 endpoint。</p>
+    </div>
+    <div class="stage f5" data-n="05">
+      <div class="row"><span class="cmdname">/feat-ship</span><span class="tag-f5">FABLE5 新增</span><span class="badge opt">選用</span><span class="out">搭配 /goal</span></div>
+      <p>把 06→08 的機械循環交給 <code>/goal</code> 自動收斂：指令會印出一條精確的 goal 條件讓你貼上，獨立評估者（預設 Haiku）逐回合判定是否達標。不想用就照舊手動跑 06→08。</p>
+    </div>
+    <div class="stage" data-n="06">
+      <div class="row"><span class="cmdname">/feat-verify</span><span class="out">→ verification.md</span></div>
+      <p>test-verifier 從 story 的每條驗收標準寫驗收測試並執行，逐條記 pass／fail。寫不出會失敗的測試 = 不准寫。</p>
+    </div>
+    <div class="stage" data-n="07">
+      <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
+      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。乾淨 → 解除 <code>.active</code>，交還給你 review 與 commit。</p>
+    </div>
+    <div class="stage loop" data-n="08">
+      <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">有界迴圈</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
+      <p>把 🔴🟠 與紅測試派回<b>所屬 track 的 builder</b> 外科手術式修復，然後回到 06 重驗。觸頂即標 <code>blocked</code> 停手交人——迴圈永遠不會失控。</p>
+    </div>
+  </div>
+  <div class="loopnote">↺ fix 完成後回流 /feat-verify → /feat-validate；達 3 次上限 → blocked，交人工判斷</div>
+
+  <div class="line" style="margin-top:26px">
+    <div class="stage f5" data-n="09">
+      <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 新增</span><span class="out">→ MEMORY.md 更新</span></div>
+      <p>memory-distiller 把這個 feature「實際發生過」的教訓蒸餾進跨 feature 的 <code>MEMORY.md</code>（Verified facts／General rules／Watchlist）。<b>失敗也要蒸餾</b>：blocked 的開放問題進 Watchlist，下個 feature 不重踩。零新教訓是合法結果，禁止硬湊。</p>
+    </div>
+  </div>
+  <p class="linefoot">隨時可用 <code>/feat-status &lt;slug&gt;</code> 查詢任何 feature 在產線上的位置與下一步。</p>
+</section>
+
+<!-- ==================== 03 使用技術 ==================== -->
+<section id="tech">
+  <div class="sec-head"><span class="no">03</span><h2>使用技術</h2><span class="en">Under the hood</span></div>
+  <table class="tech">
+    <tr><th style="width:190px">機制</th><th>做什麼</th><th style="width:300px">關鍵事實</th></tr>
+    <tr>
+      <td>Subagents<span class="path">.claude/agents/*.md（7 個）</span></td>
+      <td>每個角色一個 agent 檔：frontmatter 宣告工具與模型，body 是它的系統提示。啟動時 context 全新隔離，只透過檔案交接。</td>
+      <td>工具即權限——validator 沒有 Edit/Bash，想改也改不了。</td>
+    </tr>
+    <tr>
+      <td>Model 路由 <span class="tag-f5">FABLE5</span><span class="path">frontmatter · model: sonnet</span></td>
+      <td>編排 session 用貴的模型（Fable 5），worker 全數釘在 Sonnet。切換 subagent 模型<b>不會</b>重讀 context——本來就從零開始。</td>
+      <td>同樣的檔案讀取量，用 Sonnet 費率計價；主 session 的 cache 不受影響。</td>
+    </tr>
+    <tr>
+      <td>Hooks<span class="path">.claude/hooks/*.sh（3 個）</span></td>
+      <td><code>scope-track.sh</code> 依 <code>.active</code> 硬擋越界寫入；<code>protect-secrets.sh</code> 擋 .env／金鑰的寫入與 commit；<code>quality-gate.sh</code> 依 manifest 跑 typecheck→lint→test。</td>
+      <td>需要 <code>jq</code>；缺 jq 時 hooks fail-safe 放行並提示（＝強制沒開）。無 <code>.active</code> 時日常編輯永不受限。</td>
+    </tr>
+    <tr>
+      <td>Manifest<span class="path">.claude/factory/project.json</span></td>
+      <td>每 repo 一份：tracks、目錄、指令、protectedDirs、loopMaxRetries。所有指令／agent／hook 都讀它——同一套 template 通吃全端、純前端、純後端。</td>
+      <td>由 <code>/feat-init</code> 產生；沒有的 script（如 lint）留空，quality-gate 自動跳過。</td>
+    </tr>
+    <tr>
+      <td>/goal 收斂 <span class="tag-f5">FABLE5</span><span class="path">Claude Code 內建 · /feat-ship 配套</span></td>
+      <td>由使用者設定目標條件；每回合結束後獨立評估者（預設 Haiku）判定達標與否，未達標帶理由續跑。</td>
+      <td>評估者只看對話，不碰檔案系統——所以每輪都必須貼出證據。/goal 屬 hooks 系統：<code>disableAllHooks</code> 會連 scope 強制一起殺掉，<b>絕不在 hooks 停用下跑產線</b>。</td>
+    </tr>
+    <tr>
+      <td>記憶層 <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
+      <td>跨 feature 的長期記憶，只由 memory-distiller 寫入、由 /feat-research 開場讀取。條目必須可追溯到實際發生的事，硬上限 ~150 行。</td>
+      <td>放在 repo 裡、進版本控制——<b>記憶的 diff 要像程式碼一樣 review</b>，壞記憶的複利跟好記憶一樣快。</td>
+    </tr>
+  </table>
+</section>
+
+<!-- ==================== 04 Fable 5 升級了什麼 ==================== -->
+<section id="fable5">
+  <div class="sec-head"><span class="no">04</span><h2>Fable 5 升級了什麼</h2><span class="en">The upgrade</span></div>
+  <p class="lead">四件事，全部以 <code>FABLE5</code> 標記散落在檔案裡，<code>git diff</code> 一眼可見。原則：<b>演進，不重建</b>——兩道 ⏸ 閘門、hook 硬擋、有界迴圈一個都沒動。</p>
+  <div class="f5grid">
+    <div class="f5card">
+      <h3>① Model 路由</h3>
+      <p>編排者與工人分開計價：</p>
+      <table>
+        <tr><th>角色</th><th>模型</th></tr>
+        <tr><td>編排 session（你操作的）</td><td>Fable 5</td></tr>
+        <tr><td>全部 7 個 agents</td><td>sonnet（frontmatter 釘死）</td></tr>
+        <tr><td>/goal 評估者</td><td>Haiku（內建預設）</td></tr>
+        <tr><td>安全敏感工作</td><td>該 agent 改 <code>model: opus</code></td></tr>
+      </table>
+    </div>
+    <div class="f5card">
+      <h3>② Classifier 拒絕 ≠ 缺陷</h3>
+      <p>Fable 5 內建安全分類器可能拒絕請求（API 回 <code>stop_reason: "refusal"</code>）。分不清「分類器說不」和「程式碼有錯」的迴圈，會把 retry 額度燒在換句話說上。因此：</p>
+      <ul>
+        <li>agents 遇拒絕記 <code>classifier-refusal</code>，禁止改寫繞過</li>
+        <li>validator 另立 ⛔ 分類（owner: human）</li>
+        <li><code>/feat-fix</code> 第 0 步分流：全是拒絕 → <code>blocked-classifier</code>，<b>不消耗 retry</b></li>
+      </ul>
+    </div>
+    <div class="f5card">
+      <h3>③ 記憶層</h3>
+      <p>沒有它，每個 feature 的教訓都隨 artifacts 過期而蒸發。<code>/feat-distill</code> 在驗證通過後（或 blocked 時）把教訓入庫；<code>/feat-research</code> 開場查閱。產線從「每次歸零」變成「續跑」——這是文章說的「複利」真正落地的地方。</p>
+    </div>
+    <div class="f5card">
+      <h3>④ /goal 收斂迴圈</h3>
+      <p><code>/feat-ship</code> 讓 verify→validate→fix 自動收斂，goal 條件內建三個硬限制：</p>
+      <ul>
+        <li>每項達標條件都要求「對話中實際展示的輸出」為證</li>
+        <li>條件自帶回合上限（軟）；<code>loopMaxRetries</code> 仍是硬停損</li>
+        <li><code>blocked</code>／<code>blocked-classifier</code>／⛔ 明文定義為「無法達標」，大聲終止而非空轉</li>
+      </ul>
+    </div>
+  </div>
+  <div class="inert"><b>惰性無害設計</b>：這些升級在其他模型（Opus、Sonnet）的 session 下照常可用或自然閒置——model 欄位是一般路由（省錢）、記憶與 /goal 模型無關、classifier 路徑在非 Fable 模型下永不觸發。所以<b>全團隊只維護這一套 template</b>，模型用 <code>/model</code> 選，不用換 template 選。</div>
+</section>
+
+<!-- ==================== 05 使用方法 ==================== -->
+<section id="howto">
+  <div class="sec-head"><span class="no">05</span><h2>使用方法</h2><span class="en">How to run it</span></div>
+  <div class="how">
+    <div class="howcol">
+      <h3>安裝（每個 repo 一次）</h3>
+      <div class="term"><span class="c"># 1. 從升級版 template 複製進你的 repo</span>
+./install.sh /path/to/your/repo
+<span class="c"># Windows：./install.ps1 C:\path\to\repo（用 Git Bash/WSL 跑 Claude Code）</span>
+
+<span class="c"># 2. 確認環境：bash + jq 在 PATH 上</span>
+jq --version
+
+<span class="c"># 3. 在 repo 開 Claude Code，初始化 manifest</span>
+<span class="y">/feat-init</span>   <span class="c"># 偵測技術棧或直接問你；只寫 project.json</span>
+
+<span class="c"># 4. 已有 CLAUDE.md → 合併兩個 &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; 區塊</span>
+<span class="c">#    全新 repo → snippet 已自動成為起始 CLAUDE.md，免合併</span>
+<span class="c"># 5. 把 .claude/ + CLAUDE.md 一起 commit</span></div>
+      <h3>跑一個 feature（標準路徑）</h3>
+      <div class="term"><span class="y">/feat-new</span> user-invite "邀請成員加入工作區"
+<span class="y">/feat-research</span> user-invite
+<span class="y">/feat-story</span> user-invite    <span class="c"># ⏸ 看過 story.md 再往下</span>
+<span class="y">/feat-spec</span> user-invite     <span class="c"># ⏸ 看過 brief.md 再往下</span>
+<span class="y">/feat-backend</span> user-invite  <span class="c"># 有 backend track 才有這步</span>
+<span class="y">/feat-frontend</span> user-invite
+
+<span class="c"># A 路線：手動收斂</span>
+<span class="y">/feat-verify</span> user-invite → <span class="y">/feat-validate</span> user-invite
+<span class="c">#   有 findings → /feat-fix，再回 verify/validate</span>
+
+<span class="c"># B 路線（FABLE5）：自動收斂</span>
+<span class="v">/feat-ship</span> user-invite     <span class="c"># 照它印出的 /goal 貼上執行</span>
+
+<span class="c"># 收尾：教訓入庫，然後自己 review + commit</span>
+<span class="v">/feat-distill</span> user-invite  <span class="c"># 產線不代你 commit、不開 PR</span></div>
+    </div>
+    <div class="howcol">
+      <h3>狀態對照：卡住時看這裡</h3>
+      <table class="states">
+        <tr><th>你看到的</th><th>意思／怎麼辦</th></tr>
+        <tr><td><span class="dot" style="background:var(--ok)"></span>validate 乾淨</td><td>產線完工。跑 <code>/feat-distill</code>，然後自己 review、自己 commit。</td></tr>
+        <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>fix 迴圈達 3 次上限，需要人的判斷。先 <code>/feat-distill</code> 把開放問題入 Watchlist，再人工處理。</td></tr>
+        <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>被安全分類器拒絕，<b>不是程式碼壞了</b>。把該步驟的 agent 換 <code>model: opus</code> 重跑，或改人工處理。</td></tr>
+        <tr><td><span class="dot" style="background:#8a6d00"></span>寫入被 hook 擋下</td><td>設計如此——當前 track 不准碰那個路徑。不要繞過；真有需要，<code>rm .claude/factory/.active</code> 解除（等於離開產線模式）。</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>「jq not found」</td><td>強制機制其實沒開（fail-safe 放行）。裝好 jq 再繼續。</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>quality-gate 顯示 (none configured, skipped)</td><td>manifest 裡該指令留空。專案補上 test/lint script 後回填 project.json。</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 06 團隊守則 ==================== -->
+<section id="rules">
+  <div class="sec-head"><span class="no">06</span><h2>團隊守則</h2><span class="en">House rules</span></div>
+  <div class="rules">
+    <div class="rule"><b>產線 = Default Mode</b><p>進工廠的是「決定要出貨」的 feature。prototype／spike／POC 走 EXPLORE Mode，<b>不進</b> <code>/feat-*</code>——所以測試紀律永遠不會跟探索打架。</p></div>
+    <div class="rule"><b>閘門是給人守的</b><p>⏸ story 和 spec 一定要真的看。哪天你發現自己每次都不看直接核准——那是重新設計節拍的訊號，不是省時間的技巧。</p></div>
+    <div class="rule"><b>MEMORY.md 是程式碼</b><p>它進版本控制、它的 diff 要 review。壞記憶會被每個後續 feature 讀到——複利是雙向的。</p></div>
+    <div class="rule"><b>不繞過、不美化</b><p>hook 擋你是刻意的；「tests pass」不准掩蓋跳過的測試；goal 靠證據達標，不靠敘述達標。對不確定大聲，是這條產線唯一的信仰。</p></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="hazard"></div>
+  <div class="wrap">
+    <div class="foot">
+      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-07</span>
+      <span>詳細設計：.claude/factory/CONVENTIONS.md（含 Fable 5 addendum）</span>
+      <span>行為契約：CLAUDE.md</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -2,6 +2,8 @@
 name: spec-writer
 description: Converts an APPROVED user story into a concrete technical brief — data model, API, frontend, tests, risks, and which tracks (backend/frontend) are affected. Runs after the story checkpoint, before building.
 tools: Read, Grep, Glob, Write
+# FABLE5 routing: spec authoring — run on Sonnet; keep Fable 5 for the orchestrating session.
+model: sonnet
 ---
 
 You are the Spec Writer. The story has already been approved by a human.

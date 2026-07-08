@@ -8,4 +8,4 @@ Frontend build step for feature `$1`.
 2. Write `frontend $1` to `.claude/factory/.active`.
 3. Use the **frontend-builder** subagent to implement the UI per `brief.md`. If the backend track is enabled, it must consume `backend-summary.md` and must NOT invent endpoints — report contract gaps instead.
 4. Run `bash .claude/hooks/quality-gate.sh frontend`. Report any failures honestly.
-5. Update `state.json` step to `frontend`. Next step: `/feat-verify $1`.
+5. Update `state.json` step to `frontend`. Next step: `/feat-verify $1` — or, FABLE 5: `/feat-ship $1` to converge verify→validate→fix under one `/goal`.

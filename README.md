@@ -1,8 +1,16 @@
 # Feature Factory template (Plan A: per-repo, version-controlled)
 
+**Language 語言:** English · [繁體中文](docs/README_zh-tw.md)
+
 A reusable, language-agnostic Claude Code pipeline. One template, copied into each repo;
 behaviour is driven by a per-repo manifest (`.claude/factory/project.json`). Works for
 full-stack, frontend-only, or backend-only projects.
+
+## Learn more
+- **[Training guide](docs/factory-training_en.html)** — one-page walkthrough of the design
+  philosophy, the assembly line, the mechanisms, and the Fable 5 upgrade (for onboarding).
+- **[Cheatsheet](docs/factory-cheatsheet_en.md)** — one-screen quick reference: install,
+  command flow, stuck-state table, non-negotiables (for daily use).
 
 ## Requirements
 - Claude Code (CLI). Agents / commands / hooks only take effect there.
@@ -20,14 +28,13 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 7 agents, 12 commands, 3 hooks.
+snippet is copied as a starter.
 
 ## First-time setup in the repo (3 steps)
-1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
-   the top — `CONVENTIONS.md` and `terminology-zh-tw.md`; paste the block into
-   "Project-Specific Rules"). Skip if you let it be the starter.
+1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the `@import` line near the
+   top; paste the block into "Project-Specific Rules"). Skip if you let it be the starter.
 2. Open Claude Code in the repo and run `/feat-init` (detects stack or asks; writes
-   `project.json` including `docsDir`; does NOT scaffold code).
+   `project.json`; does NOT scaffold code).
 3. Confirm the manifest.
 
 ## Run a feature
@@ -41,22 +48,14 @@ snippet is copied as a starter. Expected counts after install: 7 agents, 12 comm
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # only if findings; bounded by loopMaxRetries
-/feat-docs <slug>       # after a clean validate: README + guides/examples (EN, then zh-TW)
+/feat-distill <slug>    # FABLE 5: bank this feature's verified lessons into MEMORY.md
+/feat-ship <slug>       # FABLE 5 (optional): converge verify→validate→fix under one /goal
 /feat-status <slug>     # any time
 ```
+FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
+loop) are documented in the "Fable 5 addendum" of `.claude/factory/CONVENTIONS.md`. They
+are inert-but-harmless when the session runs another model.
 See `.claude/factory/CONVENTIONS.md` for the full design.
-
-## Comments, documentation & TW terminology
-`.claude/factory/terminology-zh-tw.md` (imported by `CLAUDE.md`) is the single source of truth for:
-- **Bilingual comments** — every comment is an English line followed by a Traditional Chinese (Taiwan) line.
-- **Document language policy** — pipeline artifacts under `.claude/factory/<slug>/` are English only;
-  user-facing docs (`README.md` + everything under `docsDir`) are English first, then a `_zh-TW`
-  translation, each with a language-switch link at the top.
-- **TW term dictionary** — Taiwan mainstream terms only (no Mainland China variants).
-
-`/feat-docs` (the **doc-writer** agent) produces those user-facing docs with **Mermaid** diagrams
-(flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
-artifacts — they stay in place as the pipeline's record.
 
 
 This template does not auto-commit or open PRs by design.

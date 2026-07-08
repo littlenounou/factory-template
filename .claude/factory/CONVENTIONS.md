@@ -7,10 +7,9 @@ hooks, and the fix loop is bounded. Nothing relies on a single prompt "running o
 ## Tracks & the manifest
 Each repo has `.claude/factory/project.json` (created once by `/feat-init`). It declares
 which tracks exist — `backend`, `frontend`, or both — with their source `dirs`, build
-`commands`, and `protectedDirs`. It also declares `artifactsDir` (pipeline hand-off files)
-and `docsDir` (user-facing documentation, default `docs`). Every command, agent, and hook
-reads this file, so the SAME template works for a full-stack app, a pure-frontend app
-(e.g. Vite), or a pure backend (.NET / Java / C). Disabled tracks are skipped automatically.
+`commands`, and `protectedDirs`. Every command, agent, and hook reads this file, so the
+SAME template works for a full-stack app, a pure-frontend app (e.g. Vite), or a pure
+backend (.NET / Java / C). Disabled tracks are skipped automatically.
 
 ## The pipeline
 ```
@@ -21,10 +20,11 @@ reads this file, so the SAME template works for a full-stack app, a pure-fronten
 /feat-spec      <slug>            -> brief.md      ⏸ human approves
 /feat-backend   <slug>            -> code + backend-summary.md   (if backend enabled)
 /feat-frontend  <slug>            -> UI            (if frontend enabled; reads the contract)
+/feat-ship      <slug>            -> FABLE 5: converge verify→validate→fix under one /goal
 /feat-verify    <slug>            -> verification.md
 /feat-validate  <slug>            -> validation.md (read-only review)
+/feat-distill   <slug>            -> MEMORY.md update (FABLE 5; after a clean validate)
 /feat-fix       <slug>            -> bounded loop back to the owning builder
-/feat-docs      <slug>            -> README + guides/examples (EN, then zh-TW)  [after a clean validate]
 /feat-status    <slug>            -> where am I
 ```
 Each step writes its output as a file under `<artifactsDir>/<slug>/`. The next step reads
@@ -41,21 +41,9 @@ fresh, isolated context window and shares only the filesystem). State lives in `
 While a build step runs, the command writes `<track> <slug>` to `.claude/factory/.active`.
 `scope-track.sh` then allows writes only inside that track's dirs (plus the artifacts dir),
 and always blocks build output / deps / vendored libs. With NO `.active` file, normal
-editing is never blocked. `/feat-validate` (when clean), `/feat-docs` (on finish), and
-`/feat-fix` (at cap) remove `.active`. You may `rm .claude/factory/.active` at any time to
-disable enforcement. Requires `jq`; if `jq` is absent, hooks fail safe (allow) and print a
-notice. Scope tokens: `backend` / `frontend` → track dirs; `test` → testDirs; `docs`
-(research/story/spec/validate authoring) → artifacts only; `userdocs` (the `/feat-docs`
-step) → `docsDir` + repo-root `README.md` / `README_zh-TW.md` only.
-
-## User-facing documentation (the /feat-docs step)
-`/feat-docs` runs AFTER a clean `/feat-validate`, via the **doc-writer** agent. It does NOT
-move or archive artifacts — they stay in `<artifactsDir>/<slug>/`, already separated per
-slug, and remain the source of truth for `/feat-status` and resume/fix. It only AUTHORS new
-user-facing docs: English `README.md` + guides/examples under `docsDir` (with **Mermaid**
-diagrams), then their Traditional Chinese (Taiwan) translations with the `_zh-TW` suffix and
-a language-switch link at the top of every version. See `terminology-zh-tw.md` for the
-comment rule, the document-language policy, and the TW term dictionary.
+editing is never blocked. `/feat-validate` (when clean) and `/feat-fix` (at cap) remove
+`.active`. You may `rm .claude/factory/.active` at any time to disable enforcement.
+Requires `jq`; if `jq` is absent, hooks fail safe (allow) and print a notice.
 
 ## Mode contract
 **Running the factory == Default Mode** of the project's CLAUDE.md. The factory is for
@@ -66,3 +54,60 @@ never conflicts with EXPLORE Mode's relaxed rules).
 ## Honesty
 Every agent ends with the project's Fail-Loud format: ✅ Verified / ⚠️ Skipped-Uncertain /
 ❓ Needs-human-input. "Tests pass" is never used to mask skipped tests.
+
+## Fable 5 addendum (marked FABLE5 in the files it touches)
+Applies when the orchestrating session runs Claude Fable 5. On other models these changes
+are inert-but-harmless: the `model:` fields are plain Claude Code subagent routing, and the
+classifier path simply never triggers.
+
+**Model routing.** The orchestrating (main) session carries the expensive model; workers do
+not need to. Pinned via agent frontmatter:
+
+| Agent | model | Why |
+|---|---|---|
+| story-writer, spec-writer | sonnet | authoring, no code execution |
+| backend-builder, frontend-builder | sonnet | workers; switch to `opus` per-feature if the brief touches an Off-Limits / security area |
+| test-verifier | sonnet | writes real tests — Haiku is a grader, not an author |
+| validator | sonnet | its value is independence (a different context), not cheapness |
+
+**Classifier refusals are not defects.** Fable 5 ships safety classifiers that can decline a
+request (the API reports `stop_reason: "refusal"`; a fallback to another Claude model exists
+but is opt-in, not automatic). Factory semantics:
+- Agents record a refusal as `classifier-refusal: <what>` in ⚠️ — never rephrase around it.
+- The validator files these under a separate ⛔ heading, owner: human.
+- `/feat-fix` step 0 sets refusal-only features to `blocked-classifier` WITHOUT consuming
+  retries; mixed findings proceed normally with refusals carried forward untouched.
+- Rationale: a loop that cannot tell "classifier said no" from "my code is wrong" will burn
+  its retry budget rephrasing a refusal — the failure mode this addendum exists to prevent.
+- Security-sensitive work (anything under an Off-Limits area such as `src/security/`) is the
+  most classifier-prone; prefer `model: opus` for it, or keep it outside the factory.
+
+**Memory layer.** Without it, every feature's lessons evaporate when its artifacts go stale.
+- `<artifactsDir>/MEMORY.md` is the single cross-feature memory: Verified facts / General
+  rules / Watchlist. It lives in the repo, so memory changes are reviewable in PRs.
+- Written ONLY by the **memory-distiller** agent via `/feat-distill`, which runs after a
+  clean `/feat-validate`. Entries must trace to something that actually happened (a
+  failed-then-fixed test, a validator finding); speculation is rejected. Hard cap ~150
+  lines — the distiller merges and drops to stay under it.
+- Read at the start of `/feat-research`, which copies relevant entries into research.md as
+  **Prior knowledge** (leads to verify, not facts to trust).
+- Classifier refusals: the distiller may bank the operational lesson ("task shape X trips
+  the classifier — route to opus up front") but never the refused content itself.
+
+**Convergence loop (`/feat-ship` + `/goal`).** Automates ONLY the mechanical tail
+(verify → validate → fix); the two ⏸ human checkpoints (story, spec) are untouched.
+- The user sets the goal (Claude cannot); `/feat-ship <slug>` prints the exact `/goal`
+  line. Its condition follows three hard constraints: (1) every condition is provable
+  from output actually shown in the transcript — the evaluator (a separate small model,
+  default Haiku) sees only the conversation, never the filesystem; (2) the condition
+  carries its own turn cap, because /goal has no built-in hard iteration limit; (3) the
+  condition names the failure states (`blocked`, `blocked-classifier`, ⛔) as
+  goal-cannot-be-met, so a refusal or a capped loop ends the run loudly instead of
+  spinning.
+- What stays deterministic: `loopMaxRetries` inside `/feat-fix` is the binding hard stop
+  (the turn cap in the goal text is advisory — it is judged by a model). Scope
+  enforcement via `.active` and all hooks apply unchanged inside the loop.
+- `/goal` is part of the hooks system: setting `disableAllHooks` disables BOTH scope
+  enforcement and /goal. Never run the factory with hooks disabled.
+- Anti-reward-hacking (Rule 7): the goal is met by the code satisfying the story — never
+  by weakening tests or narrating success without pasted evidence.
