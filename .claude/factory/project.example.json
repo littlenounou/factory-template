@@ -1,0 +1,22 @@
+{
+  "name": "REPLACE_ME",
+  "artifactsDir": ".claude/factory",
+  "docsDir": "docs",
+  "loopMaxRetries": 3,
+  "testDirs": ["tests", "src"],
+  "tracks": {
+    "backend": {
+      "enabled": false,
+      "framework": "",
+      "dirs": [],
+      "commands": { "typecheck": "", "lint": "", "test": "", "build": "" }
+    },
+    "frontend": {
+      "enabled": false,
+      "framework": "",
+      "dirs": [],
+      "protectedDirs": ["dist", "build", "node_modules", "wwwroot/lib"],
+      "commands": { "typecheck": "", "lint": "", "test": "", "build": "" }
+    }
+  }
+}
