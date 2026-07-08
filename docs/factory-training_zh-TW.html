@@ -159,8 +159,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
         <h1>Feature Factory<br><span class="tc">軟體產線</span> <span style="color:var(--signal)">Fable 5 版</span></h1>
       </div>
       <div class="specbox" aria-label="規格">
-        <div><span>agents</span><b>7</b></div>
-        <div><span>commands</span><b>13</b></div>
+        <div><span>agents</span><b>8</b></div>
+        <div><span>commands</span><b>14</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
         <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
@@ -172,8 +172,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   </div>
   <div class="belt" aria-hidden="true">
     <div class="belt-inner">
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span class="f5">/feat-distill → MEMORY.md</span>
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
     </div>
   </div>
   <div class="hazard"></div>
@@ -253,7 +253,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage" data-n="07">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
-      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。乾淨 → 解除 <code>.active</code>，交還給你 review 與 commit。</p>
+      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。乾淨 → 解除 <code>.active</code>，下一站 <code>/feat-docs</code> 產出使用者文件。</p>
     </div>
     <div class="stage loop" data-n="08">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">有界迴圈</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
@@ -263,7 +263,11 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   <div class="loopnote">↺ fix 完成後回流 /feat-verify → /feat-validate；達 3 次上限 → blocked，交人工判斷</div>
 
   <div class="line" style="margin-top:26px">
-    <div class="stage f5" data-n="09">
+    <div class="stage" data-n="09">
+      <div class="row"><span class="cmdname">/feat-docs</span><span class="out">→ README + docs/（EN → zh-TW）</span></div>
+      <p>doc-writer 依「實際做出來的東西」撰寫使用者文件：更新 README、在 docsDir 下產出使用／範例指南（含 Mermaid 圖），先英文、再 <code>_zh-TW</code> 翻譯，兩版頂部皆有語言切換連結。hook 限制它只能寫 docsDir 與根目錄 README。</p>
+    </div>
+    <div class="stage f5" data-n="10">
       <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 新增</span><span class="out">→ MEMORY.md 更新</span></div>
       <p>memory-distiller 把這個 feature「實際發生過」的教訓蒸餾進跨 feature 的 <code>MEMORY.md</code>（Verified facts／General rules／Watchlist）。<b>失敗也要蒸餾</b>：blocked 的開放問題進 Watchlist，下個 feature 不重踩。零新教訓是合法結果，禁止硬湊。</p>
     </div>
@@ -277,7 +281,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   <table class="tech">
     <tr><th style="width:190px">機制</th><th>做什麼</th><th style="width:300px">關鍵事實</th></tr>
     <tr>
-      <td>Subagents<span class="path">.claude/agents/*.md（7 個）</span></td>
+      <td>Subagents<span class="path">.claude/agents/*.md（8 個）</span></td>
       <td>每個角色一個 agent 檔：frontmatter 宣告工具與模型，body 是它的系統提示。啟動時 context 全新隔離，只透過檔案交接。</td>
       <td>工具即權限——validator 沒有 Edit/Bash，想改也改不了。</td>
     </tr>
@@ -320,7 +324,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <table>
         <tr><th>角色</th><th>模型</th></tr>
         <tr><td>編排 session（你操作的）</td><td>Fable 5</td></tr>
-        <tr><td>全部 7 個 agents</td><td>sonnet（frontmatter 釘死）</td></tr>
+        <tr><td>全部 8 個 agents</td><td>sonnet（frontmatter 釘死）</td></tr>
         <tr><td>/goal 評估者</td><td>Haiku（內建預設）</td></tr>
         <tr><td>安全敏感工作</td><td>該 agent 改 <code>model: opus</code></td></tr>
       </table>
@@ -349,6 +353,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
   </div>
   <div class="inert"><b>惰性無害設計</b>：這些升級在其他模型（Opus、Sonnet）的 session 下照常可用或自然閒置——model 欄位是一般路由（省錢）、記憶與 /goal 模型無關、classifier 路徑在非 Fable 模型下永不觸發。所以<b>全團隊只維護這一套 template</b>，模型用 <code>/model</code> 選，不用換 template 選。</div>
+  <p style="margin-top:14px;font-size:13px;opacity:.75">參考來源：本次升級的設計靈感來自 <a href="https://x.com/0xCodez/status/2065089060104720776" style="text-decoration:underline">@0xCodez 的 self-improving agent 討論串</a>（<a href="https://www.blocktempo.com/self-improving-agent-fable-5-2/" style="text-decoration:underline">動區 BlockTempo 中譯版</a>）。文章屬靈感而非規格——所有產品行為主張均已對照 Anthropic 官方文件查證後才採用。</p>
 </section>
 
 <!-- ==================== 05 使用方法 ==================== -->
@@ -385,14 +390,15 @@ jq --version
 <span class="c"># B 路線（FABLE5）：自動收斂</span>
 <span class="v">/feat-ship</span> user-invite     <span class="c"># 照它印出的 /goal 貼上執行</span>
 
-<span class="c"># 收尾：教訓入庫，然後自己 review + commit</span>
+<span class="c"># 收尾：使用者文件 → 教訓入庫 → 自己 review + commit</span>
+<span class="y">/feat-docs</span> user-invite     <span class="c"># README + docs/ 指南（英文→繁中，含 Mermaid）</span>
 <span class="v">/feat-distill</span> user-invite  <span class="c"># 產線不代你 commit、不開 PR</span></div>
     </div>
     <div class="howcol">
       <h3>狀態對照：卡住時看這裡</h3>
       <table class="states">
         <tr><th>你看到的</th><th>意思／怎麼辦</th></tr>
-        <tr><td><span class="dot" style="background:var(--ok)"></span>validate 乾淨</td><td>產線完工。跑 <code>/feat-distill</code>，然後自己 review、自己 commit。</td></tr>
+        <tr><td><span class="dot" style="background:var(--ok)"></span>validate 乾淨</td><td>跑 <code>/feat-docs</code> 產出使用者文件，收尾 <code>/feat-distill</code>，然後自己 review、自己 commit。</td></tr>
         <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>fix 迴圈達 3 次上限，需要人的判斷。先 <code>/feat-distill</code> 把開放問題入 Watchlist，再人工處理。</td></tr>
         <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>被安全分類器拒絕，<b>不是程式碼壞了</b>。把該步驟的 agent 換 <code>model: opus</code> 重跑，或改人工處理。</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>寫入被 hook 擋下</td><td>設計如此——當前 track 不准碰那個路徑。不要繞過；真有需要，<code>rm .claude/factory/.active</code> 解除（等於離開產線模式）。</td></tr>

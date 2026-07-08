@@ -1,6 +1,6 @@
 # Feature Factory Cheatsheet (Fable 5 Edition)
 
-**Language 語言:** [繁體中文](factory-cheatsheet_zh-tw.md) · English
+**Language 語言:** [繁體中文](factory-cheatsheet_zh-TW.md) · English
 
 > Full training: `docs/factory-training_en.html` · Design details: `.claude/factory/CONVENTIONS.md`
 > Core belief: reliability comes from the system, not the model — sequence via commands, scope via hooks, bounded loops, independent verification.
@@ -30,7 +30,8 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 /feat-validate <slug>            → paste the /goal line it prints; evaluator judges each turn
   findings → /feat-fix (cap: loopMaxRetries=3) → back to verify
 
-/feat-distill <slug>            → bank lessons into MEMORY.md (distill failures too)
+/feat-docs <slug>               → user docs: README + docsDir guides (EN → zh-TW, Mermaid)
+/feat-distill <slug>            → closing step: bank lessons into MEMORY.md (distill failures too)
 /feat-status <slug>             → check progress any time
 ```
 
@@ -40,7 +41,7 @@ The line never commits or opens PRs for you — review and commit yourself at th
 
 | State | Meaning / what to do |
 |---|---|
-| validate clean | Done. Run `/feat-distill`, then review + commit yourself |
+| validate clean | Run `/feat-docs` for user docs, close with `/feat-distill`, then review + commit yourself |
 | `blocked` | Fix loop hit the 3-retry cap; needs a human. Distill first so open findings enter the Watchlist |
 | `blocked-classifier` | Safety classifier declined — **the code is not broken**. Switch that agent to `model: opus` and re-run, or handle manually |
 | Write blocked by a hook | By design — don't work around it. If truly needed: `rm .claude/factory/.active` (= leaving factory mode) |

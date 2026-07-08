@@ -149,7 +149,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   <div class="hazard"></div>
   <div class="wrap">
     <div style="display:flex;justify-content:flex-end;gap:10px;padding:12px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em">
-      <a href="factory-training_zh-tw.html" style="border:1px solid var(--ink);padding:2px 10px;text-decoration:none;background:#fff">繁體中文 →</a>
+      <a href="factory-training_zh-TW.html" style="border:1px solid var(--ink);padding:2px 10px;text-decoration:none;background:#fff">繁體中文 →</a>
       <span style="background:var(--ink);color:var(--concrete);padding:2px 10px">English</span>
     </div>
     <div class="mast">
@@ -158,8 +158,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
         <h1>Feature Factory<br>Software Assembly Line · <span style="color:var(--signal)">Fable 5 Edition</span></h1>
       </div>
       <div class="specbox" aria-label="Specs">
-        <div><span>agents</span><b>7</b></div>
-        <div><span>commands</span><b>13</b></div>
+        <div><span>agents</span><b>8</b></div>
+        <div><span>commands</span><b>14</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>human checkpoints</span><b>2 (⏸ story / spec)</b></div>
         <div><span>fix-loop hard cap</span><b>loopMaxRetries = 3</b></div>
@@ -171,8 +171,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   </div>
   <div class="belt" aria-hidden="true">
     <div class="belt-inner">
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span class="f5">/feat-distill → MEMORY.md</span>
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
     </div>
   </div>
   <div class="hazard"></div>
@@ -252,7 +252,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage" data-n="07">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
-      <p>The validator reviews read-only: acceptance, security, scope, conventions. Findings are graded 🔴 Critical / 🟠 Important / ⚪ Minor, each with <code>path:line</code>. Clean → <code>.active</code> is removed and the feature is handed back to you for review and commit.</p>
+      <p>The validator reviews read-only: acceptance, security, scope, conventions. Findings are graded 🔴 Critical / 🟠 Important / ⚪ Minor, each with <code>path:line</code>. Clean → <code>.active</code> is removed; next stop is <code>/feat-docs</code> for user-facing documentation.</p>
     </div>
     <div class="stage loop" data-n="08">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">bounded loop</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
@@ -262,7 +262,11 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   <div class="loopnote">↺ after a fix, flow returns to /feat-verify → /feat-validate; at the 3-retry cap → blocked, handed to a human</div>
 
   <div class="line" style="margin-top:26px">
-    <div class="stage f5" data-n="09">
+    <div class="stage" data-n="09">
+      <div class="row"><span class="cmdname">/feat-docs</span><span class="out">→ README + docs/ (EN → zh-TW)</span></div>
+      <p>The doc-writer authors user-facing documentation from what was <em>actually built</em>: updates the README, writes usage/example guides under docsDir (with Mermaid diagrams), English first then <code>_zh-TW</code> translations, language-switch links atop both. Hooks confine it to docsDir and the root README files.</p>
+    </div>
+    <div class="stage f5" data-n="10">
       <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 new</span><span class="out">→ MEMORY.md updated</span></div>
       <p>The memory-distiller banks the lessons that <em>actually happened</em> in this feature into the cross-feature <code>MEMORY.md</code> (Verified facts / General rules / Watchlist). <b>Failures get distilled too</b>: a blocked feature's open findings go to the Watchlist so the next feature doesn't rediscover them. Zero new lessons is a legitimate result — padding is forbidden.</p>
     </div>
@@ -276,7 +280,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   <table class="tech">
     <tr><th style="width:190px">Mechanism</th><th>What it does</th><th style="width:300px">Key facts</th></tr>
     <tr>
-      <td>Subagents<span class="path">.claude/agents/*.md (7 files)</span></td>
+      <td>Subagents<span class="path">.claude/agents/*.md (8 files)</span></td>
       <td>One agent file per role: frontmatter declares tools and model, the body is its system prompt. Each starts in a fresh isolated context and hands off only through files.</td>
       <td>Tools are permissions — the validator has no Edit/Bash, so it cannot modify code even if it wanted to.</td>
     </tr>
@@ -319,7 +323,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <table>
         <tr><th>Role</th><th>Model</th></tr>
         <tr><td>Orchestrating session (yours)</td><td>Fable 5</td></tr>
-        <tr><td>All 7 agents</td><td>sonnet (pinned in frontmatter)</td></tr>
+        <tr><td>All 8 agents</td><td>sonnet (pinned in frontmatter)</td></tr>
         <tr><td>/goal evaluator</td><td>Haiku (built-in default)</td></tr>
         <tr><td>Security-sensitive work</td><td>switch that agent to <code>model: opus</code></td></tr>
       </table>
@@ -348,6 +352,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
   </div>
   <div class="inert"><b>Inert-but-harmless by design</b>: these upgrades work — or idle safely — under any other model's session (Opus, Sonnet). The model field is plain routing (saves money), memory and /goal are model-agnostic, and the classifier path simply never triggers off Fable. So <b>the whole team maintains exactly one template</b> — pick the model with <code>/model</code>, not by swapping templates.</div>
+  <p style="margin-top:14px;font-size:13px;opacity:.75">References: this upgrade was inspired by <a href="https://x.com/0xCodez/status/2065089060104720776" style="text-decoration:underline">@0xCodez's self-improving-agent thread</a> (<a href="https://www.blocktempo.com/self-improving-agent-fable-5-2/" style="text-decoration:underline">BlockTempo zh-TW translation</a>). The thread is inspiration, not specification — every product-behavior claim was verified against Anthropic's official documentation before adoption.</p>
 </section>
 
 <!-- ==================== 05 How to run it ==================== -->
@@ -384,14 +389,15 @@ jq --version
 <span class="c"># Path B (FABLE5): autonomous convergence</span>
 <span class="v">/feat-ship</span> user-invite     <span class="c"># paste the /goal line it prints</span>
 
-<span class="c"># Wrap up: bank the lessons, then review + commit yourself</span>
+<span class="c"># Wrap up: user docs → bank the lessons → review + commit yourself</span>
+<span class="y">/feat-docs</span> user-invite     <span class="c"># README + docs/ guides (EN → zh-TW, Mermaid)</span>
 <span class="v">/feat-distill</span> user-invite  <span class="c"># the line never commits or opens PRs for you</span></div>
     </div>
     <div class="howcol">
       <h3>Stuck? Read this table</h3>
       <table class="states">
         <tr><th>What you see</th><th>Meaning / what to do</th></tr>
-        <tr><td><span class="dot" style="background:var(--ok)"></span>validate clean</td><td>Line complete. Run <code>/feat-distill</code>, then review and commit yourself.</td></tr>
+        <tr><td><span class="dot" style="background:var(--ok)"></span>validate clean</td><td>Run <code>/feat-docs</code> for user docs, close with <code>/feat-distill</code>, then review and commit yourself.</td></tr>
         <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>The fix loop hit its 3-retry cap; human judgment needed. Run <code>/feat-distill</code> first to bank open findings into the Watchlist, then handle manually.</td></tr>
         <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>Declined by the safety classifier — <b>the code is not broken</b>. Re-run that step with the agent switched to <code>model: opus</code>, or handle manually.</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>write blocked by a hook</td><td>By design — the active track may not touch that path. Don't work around it; if truly needed, <code>rm .claude/factory/.active</code> (= leaving factory mode).</td></tr>

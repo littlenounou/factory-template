@@ -34,7 +34,7 @@ fi
 
 echo
 echo "Installed (counts):"
-echo "  agents:   $(ls -1 "$TARGET/.claude/agents"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 7)"
-echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 13)"
+echo "  agents:   $(ls -1 "$TARGET/.claude/agents"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 8)"
+echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 14)"
 echo "  hooks:    $(ls -1 "$TARGET/.claude/hooks"/*.sh 2>/dev/null | wc -l | tr -d ' ')  (expect 3)"
 echo "Done. Next: cd \"$TARGET\", open Claude Code, run /feat-init"

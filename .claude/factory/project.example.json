@@ -1,6 +1,7 @@
 {
   "name": "REPLACE_ME",
   "artifactsDir": ".claude/factory",
+  "docsDir": "docs",
   "loopMaxRetries": 3,
   "testDirs": ["tests", "src"],
   "tracks": {

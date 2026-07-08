@@ -20,7 +20,7 @@ Ship-convergence step for feature `$1` (FABLE 5 — pairs with the built-in `/go
 2. While the goal is active, iterate the pipeline's own steps IN ORDER — do not invent a different loop:
    a. VERIFY — follow `.claude/commands/feat-verify.md` for `$1`; show the test run output.
    b. VALIDATE — follow `.claude/commands/feat-validate.md` for `$1`; show the findings summary.
-   c. If verification is all-pass AND validation is clean: run `bash .claude/hooks/quality-gate.sh all`, paste its output, restate conditions (1)(2)(3) each with its evidence, and let the evaluator close the goal. Then suggest `/feat-distill $1`.
+   c. If verification is all-pass AND validation is clean: run `bash .claude/hooks/quality-gate.sh all`, paste its output, restate conditions (1)(2)(3) each with its evidence, and let the evaluator close the goal. Then suggest `/feat-docs $1` (user-facing documentation, EN then zh-TW), closing with `/feat-distill $1`.
    d. Otherwise FIX — follow `.claude/commands/feat-fix.md` for `$1`. Its rules are BINDING inside this loop: the FABLE 5 classifier guard (step 0) and the retry cap (step 2) apply unchanged. If it ends in `blocked` or `blocked-classifier`, report per the goal condition that the goal cannot be met, suggest `/feat-distill $1` to bank the open findings, and tell the user to run `/goal clear`.
 
 3. Non-negotiables while converging (restated because autonomous loops drift):

@@ -4,7 +4,7 @@
 <!--   as-is. You get the full behavioural contract + factory rules.      -->
 <!-- • EXISTING CLAUDE.md: do NOT overwrite it. Lift only the two blocks  -->
 <!--   marked  <<< FEATURE FACTORY >>>  into your own file:               -->
-<!--     (1) the @import line near the top, and                          -->
+<!--     (1) the two @import lines near the top, and                      -->
 <!--     (2) the "### Feature Factory" subsection under Project-Specific. -->
 <!-- Then fill in Tech Stack + Test and Build Commands (or run /feat-init).-->
 <!-- =================================================================== -->
@@ -15,8 +15,9 @@
 >
 > Rules are inspired by [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) and [forrestchang/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills), adapted and layered for our team's needs. Each rule includes a **why** note so team members understand the design rationale rather than following blindly.
 
-<!-- <<< FEATURE FACTORY (1/2): import shared pipeline conventions >>> -->
+<!-- <<< FEATURE FACTORY (1/2): import shared pipeline conventions + doc/term policy >>> -->
 @.claude/factory/CONVENTIONS.md
+@.claude/factory/terminology-zh-tw.md
 <!-- <<< /FEATURE FACTORY (1/2) >>> -->
 
 ---
@@ -282,13 +283,26 @@ AI cannot reliably count its own token usage, but **some signals are observable*
   is unaffected by EXPLORE Mode. (This resolves the only real tension between this contract
   and the pipeline: Rule 7's test discipline always applies inside the factory.)
 - **Track config lives in `.claude/factory/project.json`** (run `/feat-init` once). Agents,
-  commands, and hooks read it; do not hardcode paths or commands elsewhere.
+  commands, and hooks read it; do not hardcode paths or commands elsewhere. It includes
+  `docsDir` (default `docs`) for the user-facing documentation step.
 - **Scope is hook-enforced** via `.claude/factory/.active`; do not work around a blocked
   write — it is intentional (aligns with Rule 5: surgical, in-track changes only).
 - **Every factory agent ends with Fail-Loud** ✅ / ⚠️ / ❓ (Rule 0).
 - **Deterministic flow control (order, branching, the fix loop) lives in commands + hooks,
   not in the model's judgement** (Rule 9). The pipeline sequence is driven by you invoking
   one `/feat-*` command per step.
+- **Comments are thorough and bilingual — English line, then a Traditional Chinese (Taiwan)
+  line** (see the imported `terminology-zh-tw.md`). This applies to all code, in any mode.
+- **Document language policy** (also in `terminology-zh-tw.md`): development-process artifacts
+  under `.claude/factory/<slug>/` are **English only**; user-facing docs (`README.md` and
+  everything under `docsDir`) are **English first, then a `_zh-TW` Traditional Chinese
+  translation** with a language-switch link at the top of each version.
+- **`/feat-docs <slug>`** is the final step (after a clean `/feat-validate`): the
+  **doc-writer** agent authors the README + guides/examples with **Mermaid** diagrams, then
+  the zh-TW translations. It does NOT move or archive the per-slug artifacts — those stay in
+  place as the pipeline's record.
+- **Traditional Chinese terms follow Taiwan mainstream usage** per the dictionary in
+  `terminology-zh-tw.md`; never use Mainland China variants.
 <!-- <<< /FEATURE FACTORY (2/2) >>> -->
 
 ### Tech Stack
@@ -327,7 +341,8 @@ AI cannot reliably count its own token usage, but **some signals are observable*
 |------|--------|--------|
 | 2026-05-20 | Robert | Initial version: 12-rule framework with EXPLORE Mode layering |
 | 2026-06-05 | Robert | Merged Feature Factory pipeline (@import CONVENTIONS + project-specific block) |
-| 2026-07-06 | (fill in) | Fable 5 upgrade: agent model routing, classifier-refusal handling (`blocked-classifier`), memory layer (`/feat-distill` + MEMORY.md), convergence loop (`/feat-ship` + `/goal`). Marked FABLE5 throughout; inert on other models. |
+| 2026-06-08 | Robert | Added bilingual-comment / doc-language policy, TW terminology import, and the `/feat-docs` user-documentation step |
+| 2026-07-08 | (fill in) | Fable 5 upgrade: agent model routing, classifier-refusal handling (`blocked-classifier`), memory layer (`/feat-distill` + MEMORY.md), convergence loop (`/feat-ship` + `/goal`). Marked FABLE5 throughout; inert on other models. Closing order: validate → docs → distill. |
 
 ---
 

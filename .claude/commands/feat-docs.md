@@ -29,4 +29,6 @@ This step does NOT move or archive the development artifacts. They stay in
    - Follow the TW terminology in `terminology-zh-tw.md` for the Chinese versions.
 4. Update `state.json` step to `docs`, then set it to `done`.
 5. Remove `.claude/factory/.active` (re-enable normal editing). Tell the user the docs are
-   written (list the files created), ready for their own review/commit.
+   written (list the files created), ready for their own review/commit. FABLE 5: suggest
+   `/feat-distill $1` as the closing step — bank this feature's verified lessons into
+   MEMORY.md while the artifacts are fresh.

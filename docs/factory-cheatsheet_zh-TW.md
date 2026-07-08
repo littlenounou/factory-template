@@ -2,7 +2,7 @@
 
 **語言 Language:** 繁體中文 · [English](factory-cheatsheet_en.md)
 
-> 完整教材:`docs/factory-training_zh-tw.html` · 設計細節:`.claude/factory/CONVENTIONS.md`
+> 完整教材:`docs/factory-training_zh-TW.html` · 設計細節:`.claude/factory/CONVENTIONS.md`
 > 核心信念:可靠性來自系統,不是模型——順序靠指令、範圍靠 hooks、迴圈有停損、驗收靠獨立驗證者。
 
 ## 安裝(每 repo 一次)
@@ -30,7 +30,8 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 /feat-validate <slug>          → 貼上它印出的 /goal,評估者逐回合判定
   有 findings → /feat-fix(上限 loopMaxRetries=3)→ 回 verify
 
-/feat-distill <slug>           → 教訓入 MEMORY.md(失敗也要蒸餾)
+/feat-docs <slug>              → 使用者文件:README + docsDir 指南(英文→繁中,Mermaid)
+/feat-distill <slug>           → 收尾:教訓入 MEMORY.md(失敗也要蒸餾)
 /feat-status <slug>            → 隨時查進度
 ```
 
@@ -40,7 +41,7 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 
 | 狀態 | 意思 / 處置 |
 |---|---|
-| validate 乾淨 | 完工。跑 `/feat-distill`,然後自己 review + commit |
+| validate 乾淨 | 跑 `/feat-docs` 產出使用者文件,收尾 `/feat-distill`,然後自己 review + commit |
 | `blocked` | fix 迴圈觸頂(3 次),交人工。先 distill 把開放問題入 Watchlist |
 | `blocked-classifier` | 安全分類器拒絕,**不是程式碼壞了**。該 agent 改 `model: opus` 重跑或人工處理 |
 | 寫入被 hook 擋下 | 設計如此,不要繞過。真有需要:`rm .claude/factory/.active` 離開產線模式 |
