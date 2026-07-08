@@ -9,4 +9,4 @@ Validate step for feature `$1`.
 3. Update `state.json` step to `validate`.
 4. Decide:
    - If there are any 🔴 or 🟠 findings, or any failing acceptance test → tell the user to run `/feat-fix $1`.
-   - If clean → remove `.claude/factory/.active` (re-enable normal editing). The implementation is review-clean; tell the user the next step is `/feat-docs $1` to generate the user-facing documentation (README + guides/examples, English then Traditional Chinese). If the user does not want docs generated, the feature is ready for their own review/commit. (This template does not auto-commit or open PRs.)
+   - If clean → remove `.claude/factory/.active` (re-enable normal editing). The implementation is review-clean; tell the user the next step is `/feat-docs $1` to generate the user-facing documentation (README + guides/examples, English then Traditional Chinese). If the user does not want docs generated, the feature is ready for their own review/commit. (This template does not auto-commit or open PRs.) FABLE 5: in both cases, suggest closing with `/feat-distill $1` to bank this feature's verified lessons into MEMORY.md.

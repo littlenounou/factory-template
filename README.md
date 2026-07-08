@@ -1,8 +1,16 @@
 # Feature Factory template (Plan A: per-repo, version-controlled)
 
+**Language 語言:** English · [繁體中文](docs/README_zh-TW.md)
+
 A reusable, language-agnostic Claude Code pipeline. One template, copied into each repo;
 behaviour is driven by a per-repo manifest (`.claude/factory/project.json`). Works for
 full-stack, frontend-only, or backend-only projects.
+
+## Learn more
+- **[Training guide](docs/factory-training_en.html)** — one-page walkthrough of the design
+  philosophy, the assembly line, the mechanisms, and the Fable 5 upgrade (for onboarding).
+- **[Cheatsheet](docs/factory-cheatsheet_en.md)** — one-screen quick reference: install,
+  command flow, stuck-state table, non-negotiables (for daily use).
 
 ## Requirements
 - Claude Code (CLI). Agents / commands / hooks only take effect there.
@@ -20,7 +28,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 7 agents, 12 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 14 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
@@ -38,12 +46,17 @@ snippet is copied as a starter. Expected counts after install: 7 agents, 12 comm
 /feat-spec <slug>       # review brief.md, then:
 /feat-backend <slug>    # if backend enabled
 /feat-frontend <slug>   # if frontend enabled
+/feat-ship <slug>       # FABLE 5 (optional): converge verify→validate→fix under one /goal
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # only if findings; bounded by loopMaxRetries
 /feat-docs <slug>       # after a clean validate: README + guides/examples (EN, then zh-TW)
+/feat-distill <slug>    # FABLE 5: closing step — bank verified lessons into MEMORY.md
 /feat-status <slug>     # any time
 ```
+FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
+loop) are documented in the "Fable 5 addendum" of `.claude/factory/CONVENTIONS.md`. They
+are inert-but-harmless when the session runs another model.
 See `.claude/factory/CONVENTIONS.md` for the full design.
 
 ## Comments, documentation & TW terminology

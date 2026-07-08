@@ -32,7 +32,7 @@ $c = (Get-ChildItem (Join-Path $Target ".claude\commands") -Filter *.md -EA Sile
 $h = (Get-ChildItem (Join-Path $Target ".claude\hooks") -Filter *.sh -EA SilentlyContinue).Count
 Write-Host ""
 Write-Host "Installed (counts):"
-Write-Host "  agents:   $a  (expect 7)"
-Write-Host "  commands: $c  (expect 12)"
+Write-Host "  agents:   $a  (expect 8)"
+Write-Host "  commands: $c  (expect 14)"
 Write-Host "  hooks:    $h  (expect 3)"
 Write-Host "Done. Next: cd `"$Target`", open Claude Code, run /feat-init"

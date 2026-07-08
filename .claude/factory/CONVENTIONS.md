@@ -21,10 +21,12 @@ reads this file, so the SAME template works for a full-stack app, a pure-fronten
 /feat-spec      <slug>            -> brief.md      ⏸ human approves
 /feat-backend   <slug>            -> code + backend-summary.md   (if backend enabled)
 /feat-frontend  <slug>            -> UI            (if frontend enabled; reads the contract)
+/feat-ship      <slug>            -> FABLE 5 (optional): converge verify→validate→fix under one /goal
 /feat-verify    <slug>            -> verification.md
 /feat-validate  <slug>            -> validation.md (read-only review)
 /feat-fix       <slug>            -> bounded loop back to the owning builder
 /feat-docs      <slug>            -> README + guides/examples (EN, then zh-TW)  [after a clean validate]
+/feat-distill   <slug>            -> FABLE 5: bank verified lessons into MEMORY.md  [closing step]
 /feat-status    <slug>            -> where am I
 ```
 Each step writes its output as a file under `<artifactsDir>/<slug>/`. The next step reads
@@ -66,3 +68,65 @@ never conflicts with EXPLORE Mode's relaxed rules).
 ## Honesty
 Every agent ends with the project's Fail-Loud format: ✅ Verified / ⚠️ Skipped-Uncertain /
 ❓ Needs-human-input. "Tests pass" is never used to mask skipped tests.
+
+## Fable 5 addendum (marked FABLE5 in the files it touches)
+Applies when the orchestrating session runs Claude Fable 5. On other models these changes
+are inert-but-harmless: the `model:` fields are plain Claude Code subagent routing, and the
+classifier path simply never triggers.
+
+**Model routing.** The orchestrating (main) session carries the expensive model; workers do
+not need to. Pinned via agent frontmatter:
+
+| Agent | model | Why |
+|---|---|---|
+| story-writer, spec-writer, doc-writer | sonnet | authoring, no code execution |
+| backend-builder, frontend-builder | sonnet | workers; switch to `opus` per-feature if the brief touches an Off-Limits / security area |
+| test-verifier | sonnet | writes real tests — Haiku is a grader, not an author |
+| validator | sonnet | its value is independence (a different context), not cheapness |
+| memory-distiller | sonnet | judgment task, no code execution |
+
+**Classifier refusals are not defects.** Fable 5 ships safety classifiers that can decline a
+request (the API reports `stop_reason: "refusal"`; a fallback to another Claude model exists
+but is opt-in, not automatic). Factory semantics:
+- Agents record a refusal as `classifier-refusal: <what>` in ⚠️ — never rephrase around it.
+- The validator files these under a separate ⛔ heading, owner: human.
+- `/feat-fix` step 0 sets refusal-only features to `blocked-classifier` WITHOUT consuming
+  retries; mixed findings proceed normally with refusals carried forward untouched.
+- Rationale: a loop that cannot tell "classifier said no" from "my code is wrong" will burn
+  its retry budget rephrasing a refusal.
+- Security-sensitive work (anything under an Off-Limits area such as `src/security/`) is the
+  most classifier-prone; prefer `model: opus` for it, or keep it outside the factory.
+
+**Memory layer.** `<artifactsDir>/MEMORY.md` is the factory's cross-feature memory:
+verified facts, general rules, dated Watchlist. `/feat-distill <slug>` (memory-distiller)
+is the CLOSING step of a feature — after `/feat-docs`, or straight after a clean
+`/feat-validate` if docs are skipped, or after a `blocked` outcome (where open findings go
+to the Watchlist as open risks, never to General rules). `/feat-research` reads MEMORY.md
+before exploring, as leads to verify rather than facts. Only evidence-backed entries are
+recorded; the file is capped (~150 lines), lives in `artifactsDir` (English only, per the
+document language policy), and is version-controlled — review its diffs like code.
+
+**Convergence loop (`/feat-ship` + `/goal`).** Automates ONLY the mechanical tail
+(verify → validate → fix); the two ⏸ human checkpoints (story, spec) are untouched.
+- The user sets the goal (Claude cannot); `/feat-ship <slug>` prints the exact `/goal`
+  line. Its condition follows three hard constraints: (1) every condition is provable from
+  output actually shown in the transcript — the evaluator (a separate small model, default
+  Haiku) sees only the conversation, never the filesystem; (2) the condition carries its
+  own turn cap, because /goal has no built-in hard iteration limit; (3) the condition names
+  the failure states (`blocked`, `blocked-classifier`, ⛔) as goal-cannot-be-met, so a
+  refusal or a capped loop ends the run loudly instead of spinning.
+- What stays deterministic: `loopMaxRetries` inside `/feat-fix` is the binding hard stop
+  (the turn cap in the goal text is advisory — it is judged by a model). Scope enforcement
+  via `.active` and all hooks apply unchanged inside the loop.
+- On success the loop hands off to `/feat-docs`, then `/feat-distill`.
+- `/goal` is part of the hooks system: setting `disableAllHooks` disables BOTH scope
+  enforcement and /goal. Never run the factory with hooks disabled.
+- Anti-reward-hacking (Rule 7): the goal is met by the code satisfying the story — never
+  by weakening tests or narrating success without pasted evidence.
+
+**References.** This addendum was motivated by 0xCodez's self-improving-agent thread and
+its BlockTempo zh-TW translation. They are inspiration, not specification: every
+product-behavior claim (routing, refusal signal, /goal mechanics) was re-verified against
+Anthropic's official documentation before adoption.
+- Original thread: https://x.com/0xCodez/status/2065089060104720776
+- zh-TW translation: https://www.blocktempo.com/self-improving-agent-fable-5-2/

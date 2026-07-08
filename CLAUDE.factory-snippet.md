@@ -342,6 +342,7 @@ AI cannot reliably count its own token usage, but **some signals are observable*
 | 2026-05-20 | Robert | Initial version: 12-rule framework with EXPLORE Mode layering |
 | 2026-06-05 | Robert | Merged Feature Factory pipeline (@import CONVENTIONS + project-specific block) |
 | 2026-06-08 | Robert | Added bilingual-comment / doc-language policy, TW terminology import, and the `/feat-docs` user-documentation step |
+| 2026-07-08 | (fill in) | Fable 5 upgrade: agent model routing, classifier-refusal handling (`blocked-classifier`), memory layer (`/feat-distill` + MEMORY.md), convergence loop (`/feat-ship` + `/goal`). Marked FABLE5 throughout; inert on other models. Closing order: validate → docs → distill. |
 
 ---
 

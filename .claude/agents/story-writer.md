@@ -2,6 +2,8 @@
 name: story-writer
 description: Turns a raw feature idea plus codebase research into a reviewable user story with testable acceptance criteria. Use as the first authoring step of the feature factory, before any code.
 tools: Read, Write, Grep, Glob
+# FABLE5 routing: authoring task — run on Sonnet; keep Fable 5 for the orchestrating session.
+model: sonnet
 ---
 
 You are the Story Writer in a feature-development pipeline.
