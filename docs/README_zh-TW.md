@@ -1,8 +1,8 @@
-# Feature Factory 樣版(Plan A:逐 repo 安裝、版本控制)
+# Feature Factory 樣板(Plan A:逐 repo 安裝、版本控制)
 
 **語言 Language:** [English](../README.md) · 繁體中文
 
-一套可重複使用、語言無關的 Claude Code 開發管線。同一份樣版複製進每個 repo,
+一套可重複使用、語言無關的 Claude Code 開發管線。同一份樣板複製進每個 repo,
 行為由各 repo 自己的 manifest(`.claude/factory/project.json`)驅動。全端、
 純前端、純後端專案皆適用。
 
@@ -28,6 +28,9 @@
 安裝器會把 `.claude/` 複製進 repo 並把 hooks 設為可執行。若 repo 已有
 `CLAUDE.md`,安裝器**不會**修改它——只把 `CLAUDE.factory-snippet.md` 放在旁邊
 供你自行合併;若沒有 `CLAUDE.md`,snippet 會直接複製為起始版。
+subagent 的模型路由由 `.claude/settings.json` 的 `env` 強制(`CLAUDE_CODE_SUBAGENT_MODEL`)——
+它會覆蓋使用者層設定,但 shell 直接 export 的變數優先於它,首跑前請先
+`echo $CLAUDE_CODE_SUBAGENT_MODEL` 確認。
 安裝後的預期數量:8 個 agents、14 個 commands、3 個 hooks。
 
 ## repo 內首次設定(3 步)
@@ -72,5 +75,4 @@ session 下,這些新增功能惰性無害。
 圖表(流程圖 / 循序圖 / 甘特圖 / 心智圖 / 類別圖 / 狀態圖)。它**不會**搬移或
 封存各 slug 的 artifacts——那些檔案留在原地,作為管線的紀錄。
 
-
-本樣版刻意不自動 commit、不自動開 PR。
+本樣板刻意不自動 commit、不自動開 PR。

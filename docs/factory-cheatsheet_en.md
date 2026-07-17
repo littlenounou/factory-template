@@ -46,6 +46,7 @@ The line never commits or opens PRs for you — review and commit yourself at th
 | `blocked-classifier` | Safety classifier declined — **the code is not broken**. Switch that agent to `model: opus` and re-run, or handle manually |
 | Write blocked by a hook | By design — don't work around it. If truly needed: `rm .claude/factory/.active` (= leaving factory mode) |
 | `jq not found` | Enforcement is actually OFF. Install jq, then continue |
+| `/usage` shows orchestrator + Haiku only, zero Sonnet | Routing overridden by env. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL` and settings.json at each scope (see CONVENTIONS "Known issues") |
 | gate shows `(none configured, skipped)` | That command is blank in the manifest; add the script, then fill project.json back in |
 
 ## Non-negotiables

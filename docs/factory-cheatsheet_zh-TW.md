@@ -46,6 +46,7 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 | `blocked-classifier` | 安全分類器拒絕,**不是程式碼壞了**。該 agent 改 `model: opus` 重跑或人工處理 |
 | 寫入被 hook 擋下 | 設計如此,不要繞過。真有需要:`rm .claude/factory/.active` 離開產線模式 |
 | `jq not found` | 強制其實沒開。裝 jq 再繼續 |
+| `/usage` 只見編排模型+Haiku,Sonnet 掛零 | 路由被 env 覆蓋。查 `echo $CLAUDE_CODE_SUBAGENT_MODEL` 與各層 settings.json(見 CONVENTIONS「Known issues」) |
 | gate 顯示 `(none configured, skipped)` | manifest 該指令留空;補上 script 後回填 project.json |
 
 ## 鐵則

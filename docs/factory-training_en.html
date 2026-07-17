@@ -401,6 +401,7 @@ jq --version
         <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>The fix loop hit its 3-retry cap; human judgment needed. Run <code>/feat-distill</code> first to bank open findings into the Watchlist, then handle manually.</td></tr>
         <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>Declined by the safety classifier — <b>the code is not broken</b>. Re-run that step with the agent switched to <code>model: opus</code>, or handle manually.</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>write blocked by a hook</td><td>By design — the active track may not touch that path. Don't work around it; if truly needed, <code>rm .claude/factory/.active</code> (= leaving factory mode).</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>Zero Sonnet in /usage</td><td>Routing overridden by an env variable (<code>CLAUDE_CODE_SUBAGENT_MODEL</code> at any scope beats frontmatter). Check <code>echo $CLAUDE_CODE_SUBAGENT_MODEL</code>; see CONVENTIONS "Known issues".</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>"jq not found"</td><td>Enforcement is actually OFF (fail-safe allow). Install jq, then continue.</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>gate shows (none configured, skipped)</td><td>That command is blank in the manifest. Add the test/lint script to the project, then fill project.json back in.</td></tr>
       </table>

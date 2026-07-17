@@ -343,6 +343,7 @@ AI cannot reliably count its own token usage, but **some signals are observable*
 | 2026-06-05 | Robert | Merged Feature Factory pipeline (@import CONVENTIONS + project-specific block) |
 | 2026-06-08 | Robert | Added bilingual-comment / doc-language policy, TW terminology import, and the `/feat-docs` user-documentation step |
 | 2026-07-08 | (fill in) | Fable 5 upgrade: agent model routing, classifier-refusal handling (`blocked-classifier`), memory layer (`/feat-distill` + MEMORY.md), convergence loop (`/feat-ship` + `/goal`). Marked FABLE5 throughout; inert on other models. Closing order: validate → docs → distill. |
+| 2026-07-17 | (fill in) | Worker model bump: subagent env pin claude-sonnet-4-6 → claude-sonnet-5 (released 2026-06-30; stronger agentic performance at equal-or-lower price; note: new tokenizer ≈1.0–1.35× tokens, cyber safeguards on by default). Frontmatter aliases unchanged. |
 
 ---
 
