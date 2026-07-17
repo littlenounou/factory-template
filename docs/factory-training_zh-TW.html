@@ -402,6 +402,7 @@ jq --version
         <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>fix 迴圈達 3 次上限，需要人的判斷。先 <code>/feat-distill</code> 把開放問題入 Watchlist，再人工處理。</td></tr>
         <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>被安全分類器拒絕，<b>不是程式碼壞了</b>。把該步驟的 agent 換 <code>model: opus</code> 重跑，或改人工處理。</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>寫入被 hook 擋下</td><td>設計如此——當前 track 不准碰那個路徑。不要繞過；真有需要，<code>rm .claude/factory/.active</code> 解除（等於離開產線模式）。</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>/usage 中 Sonnet 掛零</td><td>路由被 env 變數覆蓋(任何層級的 <code>CLAUDE_CODE_SUBAGENT_MODEL</code> 都會壓過 frontmatter)。查 <code>echo $CLAUDE_CODE_SUBAGENT_MODEL</code>;詳見 CONVENTIONS「Known issues」。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>「jq not found」</td><td>強制機制其實沒開（fail-safe 放行）。裝好 jq 再繼續。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>quality-gate 顯示 (none configured, skipped)</td><td>manifest 裡該指令留空。專案補上 test/lint script 後回填 project.json。</td></tr>
       </table>

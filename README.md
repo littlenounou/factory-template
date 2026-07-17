@@ -28,7 +28,10 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 14 commands, 3 hooks.
+snippet is copied as a starter. Subagent model routing is enforced by the `env` pin in
+`.claude/settings.json` (`CLAUDE_CODE_SUBAGENT_MODEL`) — it overrides any user-level
+setting, but a shell-exported variable beats it, so check `echo $CLAUDE_CODE_SUBAGENT_MODEL`
+before your first run. Expected counts after install: 8 agents, 14 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
@@ -70,6 +73,5 @@ See `.claude/factory/CONVENTIONS.md` for the full design.
 `/feat-docs` (the **doc-writer** agent) produces those user-facing docs with **Mermaid** diagrams
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
 artifacts — they stay in place as the pipeline's record.
-
 
 This template does not auto-commit or open PRs by design.

@@ -96,6 +96,11 @@ but is opt-in, not automatic). Factory semantics:
   its retry budget rephrasing a refusal.
 - Security-sensitive work (anything under an Off-Limits area such as `src/security/`) is the
   most classifier-prone; prefer `model: opus` for it, or keep it outside the factory.
+  Note (2026-07): Sonnet 5 ships cyber safeguards ON BY DEFAULT (mirroring Opus 4.7/4.8,
+  less restrictive than Fable 5) — so refusal triage now applies to the WORKER tier too,
+  not only the Fable 5 orchestrator. And since Opus 4.8 carries safeguards as well,
+  "escape to opus" may not escape for security-flavored work: weigh the "outside the
+  factory, by a human" option more heavily there.
 
 **Memory layer.** `<artifactsDir>/MEMORY.md` is the factory's cross-feature memory:
 verified facts, general rules, dated Watchlist. `/feat-distill <slug>` (memory-distiller)
@@ -123,6 +128,24 @@ document language policy), and is version-controlled — review its diffs like c
   enforcement and /goal. Never run the factory with hooks disabled.
 - Anti-reward-hacking (Rule 7): the goal is met by the code satisfying the story — never
   by weakening tests or narrating success without pasted evidence.
+
+**Known issues (model routing).** The frontmatter `model:` pins are belt-and-braces, not
+the enforcement mechanism. What actually enforces routing is the project-level env pin in
+`.claude/settings.json` (`CLAUDE_CODE_SUBAGENT_MODEL: claude-sonnet-5`), because:
+- claude-code#44385: the frontmatter `model:` field can be ignored entirely — subagents
+  inherit the parent model unless a model is passed explicitly on the Agent tool call.
+- `CLAUDE_CODE_SUBAGENT_MODEL` set at ANY scope overrides frontmatter for every subagent.
+  A user-level (`~/.claude/settings.json`) or shell-exported value silently rewrites the
+  whole routing table — e.g. a global `haiku` cost cap puts the validator and
+  test-verifier on Haiku, which this file explicitly warns against. Project settings
+  override user settings, so the template's pin wins — EXCEPT against a shell-exported
+  variable, which beats settings.json env: check `echo $CLAUDE_CODE_SUBAGENT_MODEL`
+  before a factory run.
+- Per-feature `model: opus` escape hatch: under the env pin, frontmatter opus is also
+  overridden. For that run, set the value in `.claude/settings.local.json` (gitignored,
+  outranks project settings) and remove it afterwards.
+- Symptom signature if routing is broken: `/usage` shows the orchestrator model + Haiku
+  only, with Sonnet at zero.
 
 **References.** This addendum was motivated by 0xCodez's self-improving-agent thread and
 its BlockTempo zh-TW translation. They are inspiration, not specification: every

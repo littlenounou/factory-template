@@ -21,7 +21,8 @@
 <!-- Reusable do/don't patterns distilled from fixes and findings, written so the NEXT
      feature can apply them without context.
      e.g. - [2026-07-06 csv-export] Streaming responses bypass the global error handler; wrap them explicitly. -->
-(none yet)
+- [2026-07-17 template] Worker tier bumped to claude-sonnet-5 (env pin). Expect ~1.0–1.35× token counts vs 4.6 (new tokenizer) and possible safety refusals from workers (cyber safeguards default-on) — refusal triage in /feat-fix covers this. Lessons above this line were produced under Sonnet 4.6-or-earlier behavior.
+- [2026-07-09 template] Subagent model routing is enforced by the project settings env pin (`CLAUDE_CODE_SUBAGENT_MODEL`), not by frontmatter (claude-code#44385; any-scope env overrides it). Before a factory run, `echo $CLAUDE_CODE_SUBAGENT_MODEL` — a shell export beats settings. Broken-routing signature: /usage shows orchestrator + Haiku only, Sonnet at zero.
 
 ## Watchlist
 <!-- Known-flaky things, deferred cleanups surfaced under Rule 5, and open risks that are
