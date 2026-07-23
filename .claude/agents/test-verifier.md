@@ -1,6 +1,6 @@
 ---
 name: test-verifier
-description: Writes acceptance tests directly from the approved story's criteria, runs them, and reports which pass and which fail. Does not fix product code — failures go back to the builders.
+description: Writes and runs acceptance tests from the story's criteria; failures route to builders.
 tools: Read, Edit, Write, Bash, Grep, Glob
 # FABLE5 routing: writes and runs real acceptance tests — Sonnet, not Haiku
 # (Haiku is fine as a yes/no grader, e.g. /goal's evaluator, but not as a test author).

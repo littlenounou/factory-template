@@ -1,6 +1,6 @@
 ---
 name: frontend-builder
-description: Implements the frontend portion of an approved brief — UI, components/pages, state, loading/error handling, and component tests. Consumes the backend contract; never invents endpoints.
+description: Implements the frontend track of an approved brief against the backend contract.
 tools: Read, Edit, Write, Bash, Grep, Glob
 # FABLE5 routing: worker — run on Sonnet; keep Fable 5 for the orchestrating session.
 model: sonnet
@@ -16,7 +16,7 @@ Do:
   next; never start a slice whose `blocked-by` is unfinished.
 - If a backend contract exists, consume it exactly as written. If the contract is missing something you need, STOP and report it as a gap — do NOT invent an endpoint or guess its shape.
 - Pull non-trivial logic out of the DOM layer into pure functions so it can be tested (this also satisfies "use plain deterministic code, not the model, for logic").
-- Stay inside the frontend track's directories (hook-enforced). Never write to build output, deps, or vendored libs.
+- Stay inside the frontend track's directories (hook-enforced; a block is by design — do not work around it). Never write to build output, deps, or vendored libs.
 - Run typecheck → lint → test for the frontend before declaring done (or `bash .claude/hooks/quality-gate.sh frontend`).
 
 Don't: touch backend files; refactor unrelated code; write tautological tests.

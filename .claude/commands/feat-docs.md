@@ -9,24 +9,11 @@ This step does NOT move or archive the development artifacts. They stay in
 `/feat-status` and any resume/fix. This step only AUTHORS new user-facing docs.
 
 1. Read `docsDir` from `.claude/factory/project.json` (default `docs`).
-2. Write `userdocs $1` to `.claude/factory/.active`. (This is a distinct scope token from the
-   `docs` phase used by research/story/spec/validate. The `scope-track.sh` hook allows the
-   `userdocs` step to write only inside `<docsDir>/`, the repo-root `README.md`, and
-   `README_zh-TW.md`. It still cannot touch source, build output, deps, or vendored libs.)
-3. Use the **doc-writer** subagent to:
-   - Read `story.md`, `brief.md`, `backend-summary.md` (if present), the actual implemented
-     source, and `.claude/factory/terminology-zh-tw.md`.
-   - Author the ENGLISH docs first: update/create the repo-root `README.md`, plus
-     operation/usage and example documents under `<docsDir>/`. Use **Mermaid** for any
-     flowchart / sequence / Gantt / mindmap / class / state diagram where a diagram is
-     clearer than prose.
-   - Then produce the Traditional Chinese (Taiwan) translation of each English doc with the
-     `_zh-TW` filename suffix (e.g. `README.md` → `README_zh-TW.md`,
-     `<docsDir>/usage.md` → `<docsDir>/usage_zh-TW.md`).
-   - Put a language-switch line at the TOP of BOTH versions of every doc (relative links),
-     e.g. English: `> 🌐 **English** | [繁體中文](./README_zh-TW.md)` and
-     zh-TW: `> 🌐 [English](./README.md) | **繁體中文**`.
-   - Follow the TW terminology in `terminology-zh-tw.md` for the Chinese versions.
+2. Write `userdocs $1` to `.claude/factory/.active` — a distinct scope token: the hook
+   allows writes only inside `<docsDir>/`, root `README.md`, and `README_zh-TW.md`.
+3. Use the **doc-writer** subagent for feature `$1`. Its agent file is the full authoring
+   contract: English docs first (README + guides under `<docsDir>/`, Mermaid diagrams), then
+   `_zh-TW` translations, language-switch links atop every doc, TW terminology.
 4. Update `state.json` step to `docs`, then set it to `done`.
 5. Remove `.claude/factory/.active` (re-enable normal editing). Tell the user the docs are
    written (list the files created), ready for their own review/commit. FABLE 5: suggest

@@ -32,9 +32,22 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 - **install.sh / install.ps1** — expected commands 14 → 15.
 - **README.md / README_zh-TW.md** — pipeline lists include `/feat-grill`; counts updated.
 
+## Pruning pass (style-only, zero behaviour change) — same day, round 2
+Applied the Prompt style rules retroactively:
+- All 8 agent frontmatter descriptions cut to one line (249 → 103 words, −58%).
+  Factory agents are only name-invoked by commands; rich trigger descriptions were
+  pure context load on the orchestrating session.
+- feat-docs.md no longer restates the doc-writer agent file (which IS the subagent's
+  system prompt): 304 → 194 words. The checklist survives as leading words.
+- Minor no-op prunes in story-writer / validator / doc-writer bodies; backend and
+  frontend builders' hook-block wording converged (deliberate cross-context duplication
+  kept, phrasing unified).
+- Deliberately untouched: feat-ship (goal text is precision machinery), feat-fix,
+  and all remaining commands — no no-ops found worth the diff noise.
+
 ## Follow-ups (not in this pass)
 - Regenerate `factory-cheatsheet_{en,zh-TW}.md` and `factory-training_{en,zh-TW}.html`
   (they still describe the 14-command flow).
-- Optional maintenance pass: prune all 8 agents / 15 commands per the new Prompt style rules.
 - Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); periodic deep-module
-  sweep as an explore-mode tool.
+  sweep as an explore-mode tool (`/arch-sweep`: read-only detection outside the factory,
+  execution re-enters via /feat-new).

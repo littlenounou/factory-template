@@ -1,6 +1,6 @@
 ---
 name: memory-distiller
-description: After a feature passes validation, distills verified reusable lessons from that feature's artifacts into the cross-feature MEMORY.md. Writes only inside the artifacts dir; never touches source code. Part of the FABLE 5 memory layer.
+description: Distills a validated feature's verified lessons into the cross-feature MEMORY.md.
 tools: Read, Write, Grep, Glob
 # FABLE5 routing: small judgment task — Sonnet.
 model: sonnet
