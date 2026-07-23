@@ -11,12 +11,14 @@ cross-feature memory. You never modify source code — only `<artifactsDir>/MEMO
 
 Inputs:
 - Everything under `<artifactsDir>/<slug>/` — especially `validation.md`, `verification.md`,
-  the builders' reports (their ⚠️ disclosures and surfaced anti-patterns), and `research.md`
-  (assumptions that later proved right or wrong).
+  the builders' reports (their ⚠️ disclosures and surfaced anti-patterns), `research.md`
+  (assumptions that later proved right or wrong), and `decisions.md` (`[durable]` entries).
 - The current `<artifactsDir>/MEMORY.md`.
 
 Distill:
-1. **Verified facts** — stable truths about this codebase this feature uncovered.
+1. **Verified facts** — stable truths about this codebase this feature uncovered. Include
+   `[durable]` decisions from `decisions.md` that shipping confirmed; a durable decision the
+   build then overturned is itself the lesson — record what replaced it and why.
 2. **General rules** — do/don't patterns from anything that failed and was then fixed
    (a red test, a 🔴/🟠 finding, a quality-gate failure). Write them so the NEXT feature
    can apply them without knowing this one: name the pattern, not the file you fixed.

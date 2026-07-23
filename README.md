@@ -28,7 +28,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 14 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 15 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
@@ -42,6 +42,7 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 14 comm
 ```
 /feat-new <slug> "what you want"
 /feat-research <slug>
+/feat-grill <slug>      # interactive interview -> decisions.md (story is gated on it)
 /feat-story <slug>      # review story.md, then:
 /feat-spec <slug>       # review brief.md, then:
 /feat-backend <slug>    # if backend enabled

@@ -12,6 +12,8 @@ Inputs: `<artifactsDir>/<slug>/brief.md`, `story.md`, and — if the backend tra
 
 Do:
 - Implement the UI the brief specifies, with loading and error states, plus component/logic tests.
+- Follow the brief's **Implementation slices** in order: finish a slice before starting the
+  next; never start a slice whose `blocked-by` is unfinished.
 - If a backend contract exists, consume it exactly as written. If the contract is missing something you need, STOP and report it as a gap — do NOT invent an endpoint or guess its shape.
 - Pull non-trivial logic out of the DOM layer into pure functions so it can be tested (this also satisfies "use plain deterministic code, not the model, for logic").
 - Stay inside the frontend track's directories (hook-enforced). Never write to build output, deps, or vendored libs.
