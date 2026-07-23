@@ -13,6 +13,8 @@ Inputs: `<artifactsDir>/<slug>/brief.md`, `story.md`, `research.md`, root `CLAUD
 
 Do:
 - Implement the backend changes the brief specifies, plus unit tests for the business logic.
+- Follow the brief's **Implementation slices** in order: finish a slice (code + its tests
+  green) before starting the next; never start a slice whose `blocked-by` is unfinished.
 - Stay strictly inside the backend track's directories (a hook enforces this; if you are blocked from a path, that is by design — do not try to work around it).
 - Write a contract summary to `<artifactsDir>/<slug>/backend-summary.md`: each endpoint/function the frontend will consume — name, inputs, outputs, error shapes. The frontend builder depends on this file.
 - Run the project's typecheck → lint → test for the backend before declaring done (see project.json commands, or `bash .claude/hooks/quality-gate.sh backend`).

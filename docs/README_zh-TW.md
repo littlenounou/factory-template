@@ -28,7 +28,7 @@
 安裝器會把 `.claude/` 複製進 repo 並把 hooks 設為可執行。若 repo 已有
 `CLAUDE.md`,安裝器**不會**修改它——只把 `CLAUDE.factory-snippet.md` 放在旁邊
 供你自行合併;若沒有 `CLAUDE.md`,snippet 會直接複製為起始版。
-安裝後的預期數量:8 個 agents、14 個 commands、3 個 hooks。
+安裝後的預期數量:8 個 agents、15 個 commands、3 個 hooks。
 
 ## repo 內首次設定(3 步)
 1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`(頂部附近加入兩行
@@ -42,6 +42,7 @@
 ```
 /feat-new <slug> "你要的東西"
 /feat-research <slug>
+/feat-grill <slug>      # 互動拷問 -> decisions.md(story 步驟強制檢查)
 /feat-story <slug>      # 看過 story.md 之後:
 /feat-spec <slug>       # 看過 brief.md 之後:
 /feat-backend <slug>    # backend track 有啟用才跑

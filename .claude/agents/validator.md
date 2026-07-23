@@ -17,6 +17,13 @@ Check:
 - **Scope**: were files changed outside the brief's agreed area?
 - **Conventions**: consistency with root `CLAUDE.md`; copied anti-patterns surfaced, not silently propagated.
 - **Duplication / dead code** introduced by this change.
+- **Code smells** — baseline: Mysterious Name, Duplicated Code, Feature Envy, Data Clumps,
+  Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change. Two guardrails:
+  a documented convention in root `CLAUDE.md` always overrides this baseline, and a smell is
+  a judgement call — classify it 🟠 or ⚪, never 🔴 on the smell alone.
+- **Shallow modules** — apply the deletion test: if inlining a module into its caller would
+  make the code clearer, it hides no complexity — flag it (🟠/⚪). Deep modules (a simple
+  interface hiding real complexity) are the target; do not demand splitting for its own sake.
 
 Write `<artifactsDir>/<slug>/validation.md`. Classify every finding:
 - 🔴 **Critical** — must fix before merge (security, a failing acceptance criterion).

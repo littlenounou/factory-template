@@ -17,7 +17,8 @@ reads this file, so the SAME template works for a full-stack app, a pure-fronten
 /feat-init      (once per repo: write project.json)
 /feat-new       <slug> "<desc>"   -> idea.md + state.json
 /feat-research  <slug>            -> research.md   (built-in Explore, read-only)
-/feat-story     <slug>            -> story.md      ⏸ human approves
+/feat-grill     <slug>            -> decisions.md  ⏸ interactive interview (main session)
+/feat-story     <slug>            -> story.md      ⏸ human approves (GATED on decisions.md)
 /feat-spec      <slug>            -> brief.md      ⏸ human approves
 /feat-backend   <slug>            -> code + backend-summary.md   (if backend enabled)
 /feat-frontend  <slug>            -> UI            (if frontend enabled; reads the contract)
@@ -38,6 +39,27 @@ fresh, isolated context window and shares only the filesystem). State lives in `
 - **Scope** = hooks (`scope-track.sh`) hard-block writes, not just `tools:` hints.
 - **Loop** = `/feat-fix` increments `retries` and STOPS at `loopMaxRetries` (default 3).
 - **Handoff** = files on disk (cheap, reviewable, resumable), not re-pasted context.
+
+## Grill step (/feat-grill)
+Runs in the MAIN session (subagents cannot hold a multi-turn interview). It interviews the
+human relentlessly about the plan until shared understanding: one question per turn, each
+with a recommended answer, walking the decision tree and resolving dependencies one-by-one.
+Questions `research.md` or the codebase can answer are answered by reading, not asking.
+Output: `<artifactsDir>/<slug>/decisions.md` (settled decisions, glossary, declined
+alternatives). `/feat-story` is GATED on this file. Hard-to-reverse decisions are marked
+`[durable]` — candidates for MEMORY.md, banked only by `/feat-distill` (the single-writer
+contract on MEMORY.md is unchanged). "No open decisions" is a valid fast outcome.
+
+## Prompt style (agents & commands)
+Binding when editing anything under `.claude/agents/` or `.claude/commands/`:
+- **Prune no-ops** — delete sentences that do not change agent behaviour (restated
+  defaults, motivational filler). Every retained sentence must earn its context load.
+- **Leading words over paraphrase** — prefer canonical terms deep in training data
+  ("Data Clumps", "tracer bullet", "deletion test") to hundred-word explanations; the
+  term IS the compressed instruction.
+- **Completion criteria** — every agent ends with the Fail-Loud block; every command names
+  its output file and the next command. An agent that cannot say when it is done will not
+  stop predictably.
 
 ## Scope enforcement (.active)
 While a build step runs, the command writes `<track> <slug>` to `.claude/factory/.active`.
@@ -130,3 +152,11 @@ product-behavior claim (routing, refusal signal, /goal mechanics) was re-verifie
 Anthropic's official documentation before adoption.
 - Original thread: https://x.com/0xCodez/status/2065089060104720776
 - zh-TW translation: https://www.blocktempo.com/self-improving-agent-fable-5-2/
+
+## Pocock addendum — provenance
+The grill step, Implementation slices, the validator's smells baseline + deletion test, and
+the Prompt style rules are adapted from mattpocock/skills (MIT):
+https://github.com/mattpocock/skills — verified against the repo and the author's own
+posts (2026-07) before adoption. Deliberately NOT adopted: CONTEXT.md (duties covered by
+MEMORY.md + per-slug decisions.md, preserving the single-writer contract) and the setup
+skill (covered by /feat-init + project.json).
