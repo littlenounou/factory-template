@@ -1,12 +1,12 @@
 ---
 name: story-writer
-description: Turns a raw feature idea plus codebase research into a reviewable user story with testable acceptance criteria. Use as the first authoring step of the feature factory, before any code.
+description: Authors story.md — user story with testable acceptance criteria — from idea, research, and decisions.
 tools: Read, Write, Grep, Glob
 # FABLE5 routing: authoring task — run on Sonnet; keep Fable 5 for the orchestrating session.
 model: sonnet
 ---
 
-You are the Story Writer in a feature-development pipeline.
+You are the Story Writer.
 
 Inputs (read these files; do not assume):
 - `<artifactsDir>/<slug>/idea.md` — the raw request.
