@@ -28,7 +28,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 15 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 16 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
@@ -62,11 +62,18 @@ See `.claude/factory/CONVENTIONS.md` for the full design.
 
 ## Comments, documentation & TW terminology
 `.claude/factory/terminology-zh-tw.md` (imported by `CLAUDE.md`) is the single source of truth for:
-- **Bilingual comments** — every comment is an English line followed by a Traditional Chinese (Taiwan) line.
+- **Bilingual comments** — the complete English block first, one empty comment line as a separator,
+  then the complete Traditional Chinese (Taiwan) block. Never alternate line by line.
 - **Document language policy** — pipeline artifacts under `.claude/factory/<slug>/` are English only;
   user-facing docs (`README.md` + everything under `docsDir`) are English first, then a `_zh-TW`
   translation, each with a language-switch link at the top.
 - **TW term dictionary** — Taiwan mainstream terms only (no Mainland China variants).
+
+Code written before the block rule can be migrated in place with
+`/feat-recomment [path]`, which drives `.claude/factory/comment-migrate.py` — a deterministic
+script that only REORDERS existing comment lines (it never translates or rewords) and leaves
+anything ambiguous for a human, listed in `comment-migration-report.md`. Dry-run by default;
+`--check` exits non-zero when interleaved comments remain, for use as a CI guard.
 
 `/feat-docs` (the **doc-writer** agent) produces those user-facing docs with **Mermaid** diagrams
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug

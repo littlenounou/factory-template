@@ -20,6 +20,7 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 ```
 /feat-new <slug> "描述"        → idea.md
 /feat-research <slug>          → research.md(先讀 MEMORY.md 帶入 Prior knowledge)
+/feat-grill <slug>             → decisions.md  ⏸ 互動拷問(/feat-story 的前置關卡)
 /feat-story <slug>             → story.md      ⏸ 人工核准才繼續
 /feat-spec <slug>              → brief.md      ⏸ 人工核准才繼續
 /feat-backend <slug>           → 程式碼 + backend-summary.md(該 track 啟用才跑)
@@ -37,6 +38,17 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 
 產線不代你 commit、不開 PR——最後自己 review、自己 commit。
 
+## 維護指令(產線之外)
+
+```
+/feat-recomment [path]         → 把舊的交錯式雙語註解轉成區塊形式
+```
+
+沒有 slug、不產 artifacts。先確認 git working tree 乾淨、先跑 dry run,再驅動
+`.claude/factory/comment-migrate.py`——該腳本只「重排」註解行,絕不翻譯或改寫措辭。
+它不敢動的區塊(混著被註解掉的程式碼、單行中英夾雜)會列進
+`comment-migration-report.md` 交給人處理。加 `--check` 時只要還有交錯就回傳非零 exit code。
+
 ## 卡住時看這裡
 
 | 狀態 | 意思 / 處置 |
@@ -53,6 +65,7 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 1. **產線 = Default Mode**:prototype/spike 走 EXPLORE,不進 `/feat-*`。
 2. **⏸ 閘門要真的看**:story 與 spec 是僅有的兩個人工判斷點。
 3. **MEMORY.md 是程式碼**:diff 要 review,壞記憶的複利跟好記憶一樣快。
-4. **Fail-Loud**:每步以 ✅/⚠️/❓ 收尾;「tests pass」不准掩蓋跳過的測試;絕不在 `disableAllHooks` 下跑產線。
+4. **註解一律區塊制**:先寫完整段英文 → 一行空註解 → 再寫完整段繁中。不可一行英一行中交錯;舊程式碼用 `/feat-recomment` 轉,不要手動逐檔改。
+5. **Fail-Loud**:每步以 ✅/⚠️/❓ 收尾;「tests pass」不准掩蓋跳過的測試;絕不在 `disableAllHooks` 下跑產線。
 
 <sub>FABLE5 升級(model 路由 / classifier 分流 / 記憶層 / /goal 收斂)在其他模型下惰性無害——全團隊只維護這一套,模型用 `/model` 選。</sub>

@@ -305,6 +305,11 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>The evaluator sees only the conversation, never the filesystem — so every cycle must paste its evidence. /goal is part of the hooks system: <code>disableAllHooks</code> kills it AND scope enforcement — <b>never run the factory with hooks disabled</b>.</td>
     </tr>
     <tr>
+      <td>Comment &amp; doc contract<span class="path">.claude/factory/terminology-zh-tw.md</span></td>
+      <td>Imported by <code>CLAUDE.md</code>, so every agent reads it. Comments are <b>block-after-block</b>: the full English block, one empty comment line, then the full Traditional Chinese block — never alternating line by line. It also fixes the doc-language split (pipeline artifacts English-only; user docs EN + <code>_zh-TW</code>) and the Taiwan term dictionary.</td>
+      <td>Legacy code is migrated by <code>/feat-recomment</code> → <code>comment-migrate.py</code>, which only REORDERS comment lines (never translates or rewords) and refuses anything ambiguous. Mechanical diff, idempotent, dry-run by default.</td>
+    </tr>
+    <tr>
       <td>Memory layer <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
       <td>Cross-feature long-term memory, written only by the memory-distiller and read by /feat-research at the start of every feature. Every entry must trace to something that actually happened; hard cap ~150 lines.</td>
       <td>Lives in the repo, under version control — <b>review memory diffs like code</b>: bad memory compounds exactly as fast as good memory.</td>
@@ -392,6 +397,12 @@ jq --version
 <span class="c"># Wrap up: user docs → bank the lessons → review + commit yourself</span>
 <span class="y">/feat-docs</span> user-invite     <span class="c"># README + docs/ guides (EN → zh-TW, Mermaid)</span>
 <span class="v">/feat-distill</span> user-invite  <span class="c"># the line never commits or opens PRs for you</span></div>
+      <h3>Maintenance (outside the line)</h3>
+      <div class="term"><span class="c"># One-off: migrate legacy interleaved bilingual comments to block form</span>
+<span class="y">/feat-recomment</span>            <span class="c"># no slug; needs a clean git tree; dry-runs first</span>
+<span class="c"># It only REORDERS comment lines — never translates or rewords.</span>
+<span class="c"># Refused blocks land in comment-migration-report.md for a human.</span>
+python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional CI guard</span></div>
     </div>
     <div class="howcol">
       <h3>Stuck? Read this table</h3>
@@ -415,6 +426,7 @@ jq --version
     <div class="rule"><b>The line = Default Mode</b><p>Only features you've decided to ship enter the factory. Prototypes/spikes/POCs run in EXPLORE Mode and <b>never</b> go through <code>/feat-*</code> — so test discipline never fights exploration.</p></div>
     <div class="rule"><b>Gates are for humans to hold</b><p>Actually read story and spec at the ⏸ gates. The day you notice yourself approving without reading — that's the signal to redesign the cadence, not a time-saving trick.</p></div>
     <div class="rule"><b>MEMORY.md is code</b><p>It's version-controlled and its diffs get reviewed. Bad memory is read by every subsequent feature — compounding cuts both ways.</p></div>
+    <div class="rule"><b>Comments are block-after-block</b><p>Full English block → one empty comment line → full Traditional Chinese block. Never alternate line by line — it forces the reader to skip every other line. Legacy code gets migrated by <code>/feat-recomment</code>, not hand-edited file by file.</p></div>
     <div class="rule"><b>No workarounds, no varnish</b><p>Hooks blocking you is intentional; "tests pass" never masks skipped tests; goals are met by evidence, not narration. Being loud about uncertainty is this line's only religion.</p></div>
   </div>
 </section>
@@ -425,7 +437,7 @@ jq --version
   <div class="hazard"></div>
   <div class="wrap">
     <div class="foot">
-      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-07</span>
+      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-08</span>
       <span>Full design: .claude/factory/CONVENTIONS.md (incl. Fable 5 addendum)</span>
       <span>Behavioral contract: CLAUDE.md</span>
     </div>

@@ -306,6 +306,11 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>評估者只看對話，不碰檔案系統——所以每輪都必須貼出證據。/goal 屬 hooks 系統：<code>disableAllHooks</code> 會連 scope 強制一起殺掉，<b>絕不在 hooks 停用下跑產線</b>。</td>
     </tr>
     <tr>
+      <td>註解與文件契約<span class="path">.claude/factory/terminology-zh-tw.md</span></td>
+      <td>由 <code>CLAUDE.md</code> @import，每個 agent 都會讀到。註解一律<b>區塊制</b>：先寫完整段英文，一行空註解分隔，再寫完整段繁體中文——不可一行英一行中交錯。它同時界定文件語言分工（產線 artifacts 只用英文；使用者文件英文 + <code>_zh-TW</code>）與台灣用詞字典。</td>
+      <td>舊程式碼由 <code>/feat-recomment</code> → <code>comment-migrate.py</code> 轉換，該腳本只「重排」註解行（絕不翻譯、不改寫措辭），無法判斷的一律不動。diff 是機械性的、具冪等性、預設 dry run。</td>
+    </tr>
+    <tr>
       <td>記憶層 <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
       <td>跨 feature 的長期記憶，只由 memory-distiller 寫入、由 /feat-research 開場讀取。條目必須可追溯到實際發生的事，硬上限 ~150 行。</td>
       <td>放在 repo 裡、進版本控制——<b>記憶的 diff 要像程式碼一樣 review</b>，壞記憶的複利跟好記憶一樣快。</td>
@@ -393,6 +398,12 @@ jq --version
 <span class="c"># 收尾：使用者文件 → 教訓入庫 → 自己 review + commit</span>
 <span class="y">/feat-docs</span> user-invite     <span class="c"># README + docs/ 指南（英文→繁中，含 Mermaid）</span>
 <span class="v">/feat-distill</span> user-invite  <span class="c"># 產線不代你 commit、不開 PR</span></div>
+      <h3>維護指令（產線之外）</h3>
+      <div class="term"><span class="c"># 一次性：把舊的交錯式雙語註解轉成區塊形式</span>
+<span class="y">/feat-recomment</span>            <span class="c"># 沒有 slug；需 git tree 乾淨；先跑 dry run</span>
+<span class="c"># 它只「重排」註解行——絕不翻譯、不改寫措辭。</span>
+<span class="c"># 不敢動的區塊會列進 comment-migration-report.md 交給人處理。</span>
+python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 CI 檢查</span></div>
     </div>
     <div class="howcol">
       <h3>狀態對照：卡住時看這裡</h3>
@@ -416,6 +427,7 @@ jq --version
     <div class="rule"><b>產線 = Default Mode</b><p>進工廠的是「決定要出貨」的 feature。prototype／spike／POC 走 EXPLORE Mode，<b>不進</b> <code>/feat-*</code>——所以測試紀律永遠不會跟探索打架。</p></div>
     <div class="rule"><b>閘門是給人守的</b><p>⏸ story 和 spec 一定要真的看。哪天你發現自己每次都不看直接核准——那是重新設計節拍的訊號，不是省時間的技巧。</p></div>
     <div class="rule"><b>MEMORY.md 是程式碼</b><p>它進版本控制、它的 diff 要 review。壞記憶會被每個後續 feature 讀到——複利是雙向的。</p></div>
+    <div class="rule"><b>註解一律區塊制</b><p>先寫完整段英文 → 一行空註解 → 再寫完整段繁體中文。不可一行英一行中交錯——那會逼讀者跳行閱讀。舊程式碼交給 <code>/feat-recomment</code> 轉換，不要手動逐檔改。</p></div>
     <div class="rule"><b>不繞過、不美化</b><p>hook 擋你是刻意的；「tests pass」不准掩蓋跳過的測試；goal 靠證據達標，不靠敘述達標。對不確定大聲，是這條產線唯一的信仰。</p></div>
   </div>
 </section>
@@ -426,7 +438,7 @@ jq --version
   <div class="hazard"></div>
   <div class="wrap">
     <div class="foot">
-      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-07</span>
+      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-08</span>
       <span>詳細設計：.claude/factory/CONVENTIONS.md（含 Fable 5 addendum）</span>
       <span>行為契約：CLAUDE.md</span>
     </div>
