@@ -291,8 +291,11 @@ AI cannot reliably count its own token usage, but **some signals are observable*
 - **Deterministic flow control (order, branching, the fix loop) lives in commands + hooks,
   not in the model's judgement** (Rule 9). The pipeline sequence is driven by you invoking
   one `/feat-*` command per step.
-- **Comments are thorough and bilingual — English line, then a Traditional Chinese (Taiwan)
-  line** (see the imported `terminology-zh-tw.md`). This applies to all code, in any mode.
+- **Comments are thorough and bilingual — the complete English block first, then the complete
+  Traditional Chinese (Taiwan) block**, separated by one empty comment line. Never alternate
+  line by line (see the imported `terminology-zh-tw.md`). Applies to all code, in any mode.
+  Legacy interleaved comments are migrated in place by `/feat-recomment` — do not hand-rewrite
+  them file by file.
 - **Document language policy** (also in `terminology-zh-tw.md`): development-process artifacts
   under `.claude/factory/<slug>/` are **English only**; user-facing docs (`README.md` and
   everything under `docsDir`) are **English first, then a `_zh-TW` Traditional Chinese
@@ -343,6 +346,7 @@ AI cannot reliably count its own token usage, but **some signals are observable*
 | 2026-06-05 | Robert | Merged Feature Factory pipeline (@import CONVENTIONS + project-specific block) |
 | 2026-06-08 | Robert | Added bilingual-comment / doc-language policy, TW terminology import, and the `/feat-docs` user-documentation step |
 | 2026-07-08 | (fill in) | Fable 5 upgrade: agent model routing, classifier-refusal handling (`blocked-classifier`), memory layer (`/feat-distill` + MEMORY.md), convergence loop (`/feat-ship` + `/goal`). Marked FABLE5 throughout; inert on other models. Closing order: validate → docs → distill. |
+| 2026-08-12 | (fill in) | Bilingual comments switched from line-interleaved to block-after-block (full English block, separator, full zh-TW block); `/feat-recomment` + `comment-migrate.py` added to migrate existing code |
 
 ---
 

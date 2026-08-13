@@ -20,6 +20,7 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 ```
 /feat-new <slug> "description"  → idea.md
 /feat-research <slug>           → research.md (reads MEMORY.md first as Prior knowledge)
+/feat-grill <slug>              → decisions.md  ⏸ interactive interview (gates /feat-story)
 /feat-story <slug>              → story.md      ⏸ human approval before continuing
 /feat-spec <slug>               → brief.md      ⏸ human approval before continuing
 /feat-backend <slug>            → code + backend-summary.md (only if track enabled)
@@ -37,6 +38,17 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 
 The line never commits or opens PRs for you — review and commit yourself at the end.
 
+## Maintenance (outside the line)
+
+```
+/feat-recomment [path]          → migrate legacy interleaved bilingual comments to block form
+```
+
+No slug, no artifacts. Guards on a clean git tree, dry-runs first, then drives
+`.claude/factory/comment-migrate.py`, which only REORDERS comment lines — never translates or
+rewords. Blocks it refuses (commented-out code, lines mixing both languages) land in
+`comment-migration-report.md` for a human. `--check` exits non-zero while interleaving remains.
+
 ## When you're stuck
 
 | State | Meaning / what to do |
@@ -53,6 +65,7 @@ The line never commits or opens PRs for you — review and commit yourself at th
 1. **The line = Default Mode**: prototypes/spikes run in EXPLORE and never enter `/feat-*`.
 2. **Actually read the ⏸ gates**: story and spec are the only two human judgment points.
 3. **MEMORY.md is code**: review its diffs — bad memory compounds as fast as good memory.
-4. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
+4. **Comments are block-after-block**: full English block → one empty comment line → full zh-TW block. Never alternate line by line; migrate legacy code with `/feat-recomment`, not by hand.
+5. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
 
 <sub>The FABLE5 upgrades (model routing / classifier triage / memory layer / /goal convergence) are inert-but-harmless on other models — maintain one template for the whole team; pick the model with `/model`.</sub>

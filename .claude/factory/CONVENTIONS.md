@@ -81,6 +81,21 @@ diagrams), then their Traditional Chinese (Taiwan) translations with the `_zh-TW
 a language-switch link at the top of every version. See `terminology-zh-tw.md` for the
 comment rule, the document-language policy, and the TW term dictionary.
 
+## Legacy comment migration (the /feat-recomment command)
+A one-off MAINTENANCE command, outside the per-feature pipeline: no slug, no artifacts.
+`/feat-recomment [path]` drives `.claude/factory/comment-migrate.py`, a stdlib-only Python
+script that converts legacy line-interleaved bilingual comments into the block-after-block
+form required by `terminology-zh-tw.md` §1. The script only REORDERS whole comment lines and
+inserts one separator — it never translates, rewords, adds, or deletes text, so the diff is
+mechanical and reviewable. It handles line comments, `*`-continuation blocks (JSDoc /
+Javadoc / Doxygen), and Python docstrings; it preserves indentation, comment token, and line
+endings; it is idempotent. It refuses to touch a block containing commented-out code or a
+line mixing both languages, listing those in `comment-migration-report.md` for a human.
+Dry-run by default, and it refuses `--apply` on a dirty git tree so the migration lands as
+one standalone commit. `--check` exits non-zero while interleaved comments remain (optional
+CI guard; deliberately NOT wired into `quality-gate.sh`, since comment style is not a build
+failure).
+
 ## Mode contract
 **Running the factory == Default Mode** of the project's CLAUDE.md. The factory is for
 features you have decided to ship. `explore` / `prototype` / `spike` / POC work is a

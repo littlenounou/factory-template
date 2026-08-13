@@ -28,7 +28,7 @@
 安裝器會把 `.claude/` 複製進 repo 並把 hooks 設為可執行。若 repo 已有
 `CLAUDE.md`,安裝器**不會**修改它——只把 `CLAUDE.factory-snippet.md` 放在旁邊
 供你自行合併;若沒有 `CLAUDE.md`,snippet 會直接複製為起始版。
-安裝後的預期數量:8 個 agents、15 個 commands、3 個 hooks。
+安裝後的預期數量:8 個 agents、16 個 commands、3 個 hooks。
 
 ## repo 內首次設定(3 步)
 1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`(頂部附近加入兩行
@@ -63,11 +63,18 @@ session 下,這些新增功能惰性無害。
 ## 註解、文件與台灣用詞
 `.claude/factory/terminology-zh-tw.md`(由 `CLAUDE.md` @import)是以下三件事的
 單一事實來源:
-- **雙語註解** — 每則註解為一行英文、緊接一行繁體中文(台灣)。
+- **雙語註解** — 先寫完整段英文,以一行空註解分隔,再寫完整段繁體中文(台灣);
+  不可一行英文、一行中文交錯。
 - **文件語言政策** — `.claude/factory/<slug>/` 底下的開發過程產物一律英文;
   使用者文件(`README.md` 與 `docsDir` 底下所有檔案)先寫英文,再產出 `_zh-TW`
   翻譯版,兩版頂部都要有語言切換連結。
 - **台灣用詞字典** — 一律使用台灣主流用詞(不用中國大陸用詞)。
+
+在區塊規則之前寫的程式碼,可用 `/feat-recomment [path]` 就地轉換。它背後是
+`.claude/factory/comment-migrate.py` —— 一支確定性腳本,只「重排」既有的註解行
+(絕不翻譯、不改寫措辭),無法判斷的區塊一律不動,列在
+`comment-migration-report.md` 交給人處理。預設為 dry run;加 `--check` 時,
+只要還有交錯格式的註解就會回傳非零 exit code,可當 CI 檢查。
 
 `/feat-docs`(**doc-writer** agent)產出上述使用者文件,並以 **Mermaid** 繪製
 圖表(流程圖 / 循序圖 / 甘特圖 / 心智圖 / 類別圖 / 狀態圖)。它**不會**搬移或
