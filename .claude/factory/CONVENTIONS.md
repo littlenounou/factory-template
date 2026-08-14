@@ -26,6 +26,7 @@ reads this file, so the SAME template works for a full-stack app, a pure-fronten
 /feat-verify    <slug>            -> verification.md
 /feat-validate  <slug>            -> validation.md (read-only review)
 /feat-fix       <slug>            -> bounded loop back to the owning builder
+/feat-unblock   <slug>            -> human-authorized resume after `blocked` (resets retries)
 /feat-docs      <slug>            -> README + guides/examples (EN, then zh-TW)  [after a clean validate]
 /feat-distill   <slug>            -> FABLE 5: bank verified lessons into MEMORY.md  [closing step]
 /feat-status    <slug>            -> where am I
@@ -38,25 +39,71 @@ fresh, isolated context window and shares only the filesystem). State lives in `
 - **Order** = you invoking discrete commands, not a model deciding the sequence.
 - **Scope** = hooks (`scope-track.sh`) hard-block writes, not just `tools:` hints.
 - **Loop** = `/feat-fix` increments `retries` and STOPS at `loopMaxRetries` (default 3).
+  Re-entry after a stop is itself a command (`/feat-unblock`), never a silent state edit.
 - **Handoff** = files on disk (cheap, reviewable, resumable), not re-pasted context.
 
 ## Grill step (/feat-grill)
-Runs in the MAIN session (subagents cannot hold a multi-turn interview). It interviews the
-human relentlessly about the plan until shared understanding: one question per turn, each
-with a recommended answer, walking the decision tree and resolving dependencies one-by-one.
-Questions `research.md` or the codebase can answer are answered by reading, not asking.
+Runs in the MAIN session (subagents cannot hold a multi-turn interview). It maps the plan
+as a design tree and asks round by round: each round is the whole FRONTIER — every question
+whose prerequisites are already settled — as one numbered list, each question with a
+recommended answer; the frontier is recomputed from the answers. Fact-finding that
+`research.md` or the codebase can answer runs as background read-only exploration and
+never blocks a round.
 Output: `<artifactsDir>/<slug>/decisions.md` (settled decisions, glossary, declined
 alternatives). `/feat-story` is GATED on this file. Hard-to-reverse decisions are marked
 `[durable]` — candidates for MEMORY.md, banked only by `/feat-distill` (the single-writer
 contract on MEMORY.md is unchanged). "No open decisions" is a valid fast outcome.
 
+## Blocked handling (/feat-unblock)
+What actually happens when `/feat-fix` hits the cap, and the only supported way back.
+
+**Semantics of the cap.** `/feat-fix` increments `retries` BEFORE checking, so with
+`loopMaxRetries = 3` the 1st-3rd invocations perform real fixes and the 4th stops without
+fixing. Classifier refusals never consume retries (see the Fable 5 addendum).
+
+**At the cap, `/feat-fix`:** writes a summary of the still-open findings, sets `state.json`
+step to `blocked`, removes `.active` (you regain normal editing), and ends. Inside a
+`/feat-ship` convergence run, `blocked` is defined in the goal condition as
+goal-cannot-be-met — the loop terminates loudly and the user runs `/goal clear`.
+
+**The handling flow, in order:**
+1. `/feat-distill <slug>` — open findings go to MEMORY.md's Watchlist (never to General
+   rules) while the artifacts are fresh, so the next feature doesn't rediscover them.
+2. Human intervention — fix manually, revise story/spec at the ⏸ gates (blocks are often
+   spec problems, not code problems), accept the findings as risk, or split the slug.
+3. `/feat-unblock <slug>` — the supported re-entry. It shows the open findings, asks how
+   the block was handled, appends an audit entry to `<slug>/unblock.md`, resets `retries`
+   to 0, and sets step back to `validate`. Next: `/feat-verify` → `/feat-validate` to
+   re-prove with fresh runs.
+4. If the same feature blocks twice, `/feat-unblock` warns and pushes upstream: revise the
+   gates or split the slug rather than resetting the budget again.
+
+**Hard guardrails.** `retries` is persisted and only `/feat-unblock` resets it — a
+hand-edited `state.json` bypasses the audit trail. `/feat-unblock` is a human judgment run
+in the main session; an autonomous loop (`/feat-ship` + `/goal`) leaves both unblocking and
+the retry budget to the human. Findings in `validation.md` / `verification.md` stay as
+written — re-running verify/validate regenerates them.
+
+## Maintenance commands (outside the per-feature pipeline)
+Not pipeline steps: no slug, no artifacts. `/feat-recomment [path]` migrates legacy
+line-interleaved bilingual comments to the block-after-block form (see below).
+
 ## Prompt style (agents & commands)
 Binding when editing anything under `.claude/agents/` or `.claude/commands/`:
 - **Prune no-ops** — delete sentences that do not change agent behaviour (restated
   defaults, motivational filler). Every retained sentence must earn its context load.
+- **Prompt the positive** — state the target behaviour rather than banning its opposite: a
+  prohibition drags the forbidden behaviour into context and makes it more available, not
+  less. Reserve a ban for a hard guardrail that cannot be phrased positively, and pair it
+  with the positive target.
 - **Leading words over paraphrase** — prefer canonical terms deep in training data
   ("Data Clumps", "tracer bullet", "deletion test") to hundred-word explanations; the
   term IS the compressed instruction.
+- **Cache test** — the environment is a source of truth (project.json, build files, the
+  directory layout, --help output). A sentence that restates what a cheap lookup would
+  find is a cache of that lookup, and it goes stale; keep only what the agent cannot find
+  by looking — the unwritten convention, the reason behind a choice, the edge case no
+  config confesses.
 - **Completion criteria** — every agent ends with the Fail-Loud block; every command names
   its output file and the next command. An agent that cannot say when it is done will not
   stop predictably.
@@ -66,8 +113,8 @@ While a build step runs, the command writes `<track> <slug>` to `.claude/factory
 `scope-track.sh` then allows writes only inside that track's dirs (plus the artifacts dir),
 and always blocks build output / deps / vendored libs. With NO `.active` file, normal
 editing is never blocked. `/feat-validate` (when clean), `/feat-docs` (on finish), and
-`/feat-fix` (at cap) remove `.active`. You may `rm .claude/factory/.active` at any time to
-disable enforcement. Requires `jq`; if `jq` is absent, hooks fail safe (allow) and print a
+`/feat-fix` (at cap), and `/feat-unblock` remove `.active`. `rm .claude/factory/.active` disables enforcement at
+any time. Requires `jq`; if `jq` is absent, hooks fail safe (allow) and print a
 notice. Scope tokens: `backend` / `frontend` → track dirs; `test` → testDirs; `docs`
 (research/story/spec/validate authoring) → artifacts only; `userdocs` (the `/feat-docs`
 step) → `docsDir` + repo-root `README.md` / `README_zh-TW.md` only.
@@ -95,6 +142,17 @@ Dry-run by default, and it refuses `--apply` on a dirty git tree so the migratio
 one standalone commit. `--check` exits non-zero while interleaved comments remain (optional
 CI guard; deliberately NOT wired into `quality-gate.sh`, since comment style is not a build
 failure).
+
+## Disclosed reference (reached by pointer, never @imported)
+
+Three companion files sit outside the always-loaded context and are reached only when
+their branch fires. Keeping them out of `CLAUDE.md` protects the top of the hierarchy:
+
+| File | Reached when |
+|---|---|
+| `.claude/factory/EXPLORE-MODE.md` | the user opens exploratory work (`explore mode` / `spike` / POC) |
+| `.claude/factory/PHASE-BOUNDARIES.md` | you are at a phase boundary deciding what to do with the context |
+| `.claude/factory/CLAUDE-rationale.md` | a human is deciding whether a rule still earns its place — the agent never reads it |
 
 ## Mode contract
 **Running the factory == Default Mode** of the project's CLAUDE.md. The factory is for
@@ -172,6 +230,10 @@ Anthropic's official documentation before adoption.
 The grill step, Implementation slices, the validator's smells baseline + deletion test, and
 the Prompt style rules are adapted from mattpocock/skills (MIT):
 https://github.com/mattpocock/skills — verified against the repo and the author's own
-posts (2026-07) before adoption. Deliberately NOT adopted: CONTEXT.md (duties covered by
+posts (2026-07) before adoption. Re-synced against upstream v1.2.0 (2026-08): grill moved
+to round-by-round frontier interviewing, the Prompt style gained the cache test, the smells
+baseline grew 8 → 12, and the root CLAUDE.md's Context Health section was rewritten around
+upstream's phase-boundary ordering (continue → clear → hand off → subagent → compact).
+Deliberately NOT adopted: CONTEXT.md (duties covered by
 MEMORY.md + per-slug decisions.md, preserving the single-writer contract) and the setup
 skill (covered by /feat-init + project.json).

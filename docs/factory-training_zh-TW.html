@@ -160,7 +160,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="規格">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>14</b></div>
+        <div><span>commands</span><b>17</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
         <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
@@ -172,8 +172,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   </div>
   <div class="belt" aria-hidden="true">
     <div class="belt-inner">
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ 人工核准</span><span>/feat-spec</span><span class="gate">⏸ 人工核准</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
     </div>
   </div>
   <div class="hazard"></div>
@@ -227,6 +227,10 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-research</span><span class="tag-f5">FABLE5 強化</span><span class="out">→ research.md</span></div>
       <p>先讀 <code>MEMORY.md</code> 把過往教訓帶成「Prior knowledge」（是待驗證的線索，不是可信的事實），再用唯讀 Explore 掃碼庫：相關檔案、既有模式、風險。</p>
     </div>
+    <div class="stage" data-n="03">
+      <div class="row"><span class="cmdname">/feat-grill</span><span class="badge human">⏸ 訪談</span><span class="out">→ decisions.md</span></div>
+      <p>在主 session 執行，因為子代理無法進行多輪訪談。它把待決事項攤成決策樹，<b>逐輪次</b>發問：每一輪就是整個 <em>frontier</em>——所有前置條件都已定案的問題——以單一編號清單一次問完，每題附上建議答案，你可以直接用編號回答。碼庫查得到答案的問題改為背景查證，不佔用你的回合。<code>/feat-story</code> 以本步驟的產出為前置關卡：故事消費的是已定案的決策，不是開放問題。</p>
+    </div>
     <div class="stage gate" data-n="">
       <div class="row"><span class="cmdname">/feat-story</span><span class="badge human">⏸ 人工核准</span><span class="out">→ story.md</span></div>
       <p>story-writer 產出使用者故事＋可測試的驗收標準。<b>你必須親自看過並核准</b>，產線才會繼續——這是第一道判斷閘門。</p>
@@ -235,39 +239,39 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-spec</span><span class="badge human">⏸ 人工核准</span><span class="out">→ brief.md</span></div>
       <p>spec-writer 把已核准的故事轉成技術簡報：資料模型、API 契約、要動的檔案、風險。第二道判斷閘門。</p>
     </div>
-    <div class="stage" data-n="03">
+    <div class="stage" data-n="04">
       <div class="row"><span class="cmdname">/feat-backend</span><span class="out">→ 程式碼 + backend-summary.md</span></div>
       <p>backend-builder 依 brief 實作＋單元測試，並寫出 API 契約摘要給前端。hook 把它鎖在 backend 目錄內。（無 backend track 則自動跳過）</p>
     </div>
-    <div class="stage" data-n="04">
+    <div class="stage" data-n="05">
       <div class="row"><span class="cmdname">/feat-frontend</span><span class="out">→ UI + 元件測試</span></div>
       <p>frontend-builder 依契約實作。契約缺什麼就<b>回報缺口</b>，絕不自己發明 endpoint。</p>
     </div>
-    <div class="stage f5" data-n="05">
+    <div class="stage f5" data-n="06">
       <div class="row"><span class="cmdname">/feat-ship</span><span class="tag-f5">FABLE5 新增</span><span class="badge opt">選用</span><span class="out">搭配 /goal</span></div>
-      <p>把 06→08 的機械循環交給 <code>/goal</code> 自動收斂：指令會印出一條精確的 goal 條件讓你貼上，獨立評估者（預設 Haiku）逐回合判定是否達標。不想用就照舊手動跑 06→08。</p>
+      <p>把 07→09 的機械循環交給 <code>/goal</code> 自動收斂：指令會印出一條精確的 goal 條件讓你貼上，獨立評估者（預設 Haiku）逐回合判定是否達標。不想用就照舊手動跑 07→09。</p>
     </div>
-    <div class="stage" data-n="06">
+    <div class="stage" data-n="07">
       <div class="row"><span class="cmdname">/feat-verify</span><span class="out">→ verification.md</span></div>
       <p>test-verifier 從 story 的每條驗收標準寫驗收測試並執行，逐條記 pass／fail。寫不出會失敗的測試 = 不准寫。</p>
     </div>
-    <div class="stage" data-n="07">
+    <div class="stage" data-n="08">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
       <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。乾淨 → 解除 <code>.active</code>，下一站 <code>/feat-docs</code> 產出使用者文件。</p>
     </div>
-    <div class="stage loop" data-n="08">
+    <div class="stage loop" data-n="09">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">有界迴圈</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
-      <p>把 🔴🟠 與紅測試派回<b>所屬 track 的 builder</b> 外科手術式修復，然後回到 06 重驗。觸頂即標 <code>blocked</code> 停手交人——迴圈永遠不會失控。</p>
+      <p>把 🔴🟠 與紅測試派回<b>所屬 track 的 builder</b> 外科手術式修復，然後回到 07 重驗。觸頂即標 <code>blocked</code> 停手交人——迴圈永遠不會失控。之後回產線的途徑是 <code>/feat-unblock</code>：記錄處置方式、把 <code>retries</code> 歸零、回到 verify 重驗。</p>
     </div>
   </div>
-  <div class="loopnote">↺ fix 完成後回流 /feat-verify → /feat-validate；達 3 次上限 → blocked，交人工判斷</div>
+  <div class="loopnote">↺ fix 完成後回流 /feat-verify → /feat-validate；達 3 次上限 → blocked，交人工判斷 · 復工路徑：/feat-distill → 人工處理 → /feat-unblock（重置 retries，回到 verify）</div>
 
   <div class="line" style="margin-top:26px">
-    <div class="stage" data-n="09">
+    <div class="stage" data-n="10">
       <div class="row"><span class="cmdname">/feat-docs</span><span class="out">→ README + docs/（EN → zh-TW）</span></div>
       <p>doc-writer 依「實際做出來的東西」撰寫使用者文件：更新 README、在 docsDir 下產出使用／範例指南（含 Mermaid 圖），先英文、再 <code>_zh-TW</code> 翻譯，兩版頂部皆有語言切換連結。hook 限制它只能寫 docsDir 與根目錄 README。</p>
     </div>
-    <div class="stage f5" data-n="10">
+    <div class="stage f5" data-n="11">
       <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 新增</span><span class="out">→ MEMORY.md 更新</span></div>
       <p>memory-distiller 把這個 feature「實際發生過」的教訓蒸餾進跨 feature 的 <code>MEMORY.md</code>（Verified facts／General rules／Watchlist）。<b>失敗也要蒸餾</b>：blocked 的開放問題進 Watchlist，下個 feature 不重踩。零新教訓是合法結果，禁止硬湊。</p>
     </div>
@@ -309,6 +313,11 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>註解與文件契約<span class="path">.claude/factory/terminology-zh-tw.md</span></td>
       <td>由 <code>CLAUDE.md</code> @import，每個 agent 都會讀到。註解一律<b>區塊制</b>：先寫完整段英文，一行空註解分隔，再寫完整段繁體中文——不可一行英一行中交錯。它同時界定文件語言分工（產線 artifacts 只用英文；使用者文件英文 + <code>_zh-TW</code>）與台灣用詞字典。</td>
       <td>舊程式碼由 <code>/feat-recomment</code> → <code>comment-migrate.py</code> 轉換，該腳本只「重排」註解行（絕不翻譯、不改寫措辭），無法判斷的一律不動。diff 是機械性的、具冪等性、預設 dry run。</td>
+    </tr>
+    <tr>
+      <td>契約檔案結構<span class="path">CLAUDE.md + .claude/factory/*.md</span></td>
+      <td><code>CLAUDE.md</code> 承載行為契約並 <code>@import</code> 兩份檔案，這三份每一輪都載入。另有三份伴隨文件放在旁邊，只在對應分支觸發時才取用：<code>EXPLORE-MODE.md</code>（探索性工作）、<code>PHASE-BOUNDARIES.md</code>（在接縫處決定 context 怎麼處理）、<code>CLAUDE-rationale.md</code>（每條規則的理由——只給人讀）。</td>
+      <td>漸進式揭露讓恆常載入的預算保持精簡：只在 1% 回合會觸發的禁令或理由，不該在其餘 99% 的回合佔用 context。安裝程式會驗證五份都有隨附——pointer 的目標檔缺席是無聲失敗。</td>
     </tr>
     <tr>
       <td>記憶層 <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
@@ -383,6 +392,7 @@ jq --version
       <h3>跑一個 feature（標準路徑）</h3>
       <div class="term"><span class="y">/feat-new</span> user-invite "邀請成員加入工作區"
 <span class="y">/feat-research</span> user-invite
+<span class="y">/feat-grill</span> user-invite    <span class="c"># ⏸ 逐輪次訪談 → decisions.md</span>
 <span class="y">/feat-story</span> user-invite    <span class="c"># ⏸ 看過 story.md 再往下</span>
 <span class="y">/feat-spec</span> user-invite     <span class="c"># ⏸ 看過 brief.md 再往下</span>
 <span class="y">/feat-backend</span> user-invite  <span class="c"># 有 backend track 才有這步</span>
@@ -410,9 +420,10 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
       <table class="states">
         <tr><th>你看到的</th><th>意思／怎麼辦</th></tr>
         <tr><td><span class="dot" style="background:var(--ok)"></span>validate 乾淨</td><td>跑 <code>/feat-docs</code> 產出使用者文件，收尾 <code>/feat-distill</code>，然後自己 review、自己 commit。</td></tr>
-        <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>fix 迴圈達 3 次上限，需要人的判斷。先 <code>/feat-distill</code> 把開放問題入 Watchlist，再人工處理。</td></tr>
-        <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>被安全分類器拒絕，<b>不是程式碼壞了</b>。把該步驟的 agent 換 <code>model: opus</code> 重跑，或改人工處理。</td></tr>
+        <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>fix 迴圈達 3 次上限，需要人的判斷。流程：先 <code>/feat-distill</code>（開放問題入 Watchlist）→ 人工修／回 ⏸ 閘門改 story-spec／接受風險 → <code>/feat-unblock</code>（重置 retries，回到 verify）。<code>state.json</code> 由該指令改，不手改。</td></tr>
+        <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>被安全分類器拒絕，<b>不是程式碼壞了</b>。把該步驟的 agent 換 <code>model: opus</code> 重跑，或改人工處理；之後用 <code>/feat-unblock</code> 回產線。同一 feature 第二次 blocked 代表問題在上游——改 story/spec 或拆 slug。</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>寫入被 hook 擋下</td><td>設計如此——當前 track 不准碰那個路徑。不要繞過；真有需要，<code>rm .claude/factory/.active</code> 解除（等於離開產線模式）。</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>context 感覺臃腫／自己在重複發問</td><td>你正在階段中途——先把它做完。到下一個 <code>/feat-*</code> 步驟之間的邊界時，照 <code>.claude/factory/PHASE-BOUNDARIES.md</code> 的階梯走：continue → <code>/clear</code> → 交接 → 子代理 → <code>/compact</code> 墊底。這裡的預設是 <code>/clear</code>：磁碟上的 artifacts 會把 context 重建起來。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>「jq not found」</td><td>強制機制其實沒開（fail-safe 放行）。裝好 jq 再繼續。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>quality-gate 顯示 (none configured, skipped)</td><td>manifest 裡該指令留空。專案補上 test/lint script 後回填 project.json。</td></tr>
       </table>
@@ -428,6 +439,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
     <div class="rule"><b>閘門是給人守的</b><p>⏸ story 和 spec 一定要真的看。哪天你發現自己每次都不看直接核准——那是重新設計節拍的訊號，不是省時間的技巧。</p></div>
     <div class="rule"><b>MEMORY.md 是程式碼</b><p>它進版本控制、它的 diff 要 review。壞記憶會被每個後續 feature 讀到——複利是雙向的。</p></div>
     <div class="rule"><b>註解一律區塊制</b><p>先寫完整段英文 → 一行空註解 → 再寫完整段繁體中文。不可一行英一行中交錯——那會逼讀者跳行閱讀。舊程式碼交給 <code>/feat-recomment</code> 轉換，不要手動逐檔改。</p></div>
+    <div class="rule"><b>在邊界決定 context</b><p>兩個 <code>/feat-*</code> 步驟之間的接縫，才是你決定這份 context 怎麼處理的地方——而 <code>/compact</code> 在那裡是最後一個選項，不是第一個。階段中途沒有東西可決定：要嘛繼續，要嘛把剩下的拆給子代理。</p></div>
     <div class="rule"><b>不繞過、不美化</b><p>hook 擋你是刻意的；「tests pass」不准掩蓋跳過的測試；goal 靠證據達標，不靠敘述達標。對不確定大聲，是這條產線唯一的信仰。</p></div>
   </div>
 </section>

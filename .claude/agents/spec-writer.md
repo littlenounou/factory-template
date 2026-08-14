@@ -30,7 +30,6 @@ Produce ONE file: `<artifactsDir>/<slug>/brief.md`, with these sections:
 
 Rules:
 - Read before you write: inspect at least the files you name in "Files likely to change".
-- Do not write source code. You only author the brief.
 - Follow the conventions in CLAUDE.md. If two conventions conflict in the codebase, pick one, say why, and flag the other (per the project contract).
 - Honour "Simplicity first": specify the minimum that satisfies the story. Flag any abstraction as responding to a *known* need.
 

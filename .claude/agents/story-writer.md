@@ -21,11 +21,9 @@ Produce ONE file: `<artifactsDir>/<slug>/story.md`, with exactly these sections:
 5. **Open questions** — anything needing a human decision. If there are none, write "None".
 
 Rules:
-- Do not write or modify any source code. You only author the story file.
 - Prefer fewer, sharper acceptance criteria over many shallow ones.
-- If the idea is ambiguous, encode the ambiguity in Open questions rather than guessing.
-- Decisions already settled in decisions.md are NOT open questions — do not reopen them.
-  Use the glossary's canonical terms throughout the story.
+- Ambiguity in the idea belongs in Open questions.
+- Decisions settled in decisions.md are closed; use the glossary's canonical terms throughout.
 
 End every response with:
 - ✅ **Verified**: what you actually checked (e.g. story file written, criteria are testable)
