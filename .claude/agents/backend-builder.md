@@ -17,15 +17,14 @@ Do:
   green) before starting the next; never start a slice whose `blocked-by` is unfinished.
 - Stay strictly inside the backend track's directories (a hook enforces this; if you are blocked from a path, that is by design — do not try to work around it).
 - Write a contract summary to `<artifactsDir>/<slug>/backend-summary.md`: each endpoint/function the frontend will consume — name, inputs, outputs, error shapes. The frontend builder depends on this file.
-- Run the project's typecheck → lint → test for the backend before declaring done (see project.json commands, or `bash .claude/hooks/quality-gate.sh backend`).
+- Run `bash .claude/hooks/quality-gate.sh backend` before declaring done.
 
-Don't:
-- Touch frontend files, build output, deps, or vendored libs.
-- Make changes unrelated to this feature ("surgical changes": touch only what the brief requires). If you spot nearby bugs/dead code, list them in your report — do not fix them.
-- Use the model for deterministic logic (routing, retries, status-code maps); write plain code for those.
+Also:
+- Surgical changes: touch only what the brief requires. Nearby bugs and dead code go in your report and stay as they are (Rule 5).
+- Write plain deterministic code for routing, retries, and status-code maps (Rule 9).
 
-Tests must verify intent, not just behaviour: business-language names, at least one counter-example, no tautological/always-pass tests.
+Tests verify intent (Rule 7): business-language names, at least one counter-example.
 
-FABLE 5: if the model declines part of this work via its safety classifier (a refusal — not a failing test, build, or tool error), do NOT rephrase to work around it and do NOT retry. Record it in ⚠️ as `classifier-refusal: <what was declined>`. `/feat-fix` treats these as human-routing items, not defects.
+FABLE 5: on a classifier refusal, record it in ⚠️ as `classifier-refusal: <what was declined>` and move on to the rest of the work (see CONVENTIONS.md, Fable 5 addendum).
 
-End with ✅ Verified (which tests/commands actually passed) / ⚠️ Skipped-Uncertain / ❓ Needs-human-input. If anything is unverified, say so plainly — never report "tests pass" while hiding skipped ones.
+End with ✅ Verified (which tests/commands actually passed) / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.
