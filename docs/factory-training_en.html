@@ -159,7 +159,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="Specs">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>14</b></div>
+        <div><span>commands</span><b>17</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>human checkpoints</span><b>2 (⏸ story / spec)</b></div>
         <div><span>fix-loop hard cap</span><b>loopMaxRetries = 3</b></div>
@@ -171,8 +171,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   </div>
   <div class="belt" aria-hidden="true">
     <div class="belt-inner">
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
     </div>
   </div>
   <div class="hazard"></div>
@@ -226,6 +226,10 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-research</span><span class="tag-f5">FABLE5 enhanced</span><span class="out">→ research.md</span></div>
       <p>First reads <code>MEMORY.md</code> and carries past lessons in as "Prior knowledge" (leads to verify, not facts to trust), then maps the codebase with the read-only Explore agent: relevant files, existing patterns, risks.</p>
     </div>
+    <div class="stage" data-n="03">
+      <div class="row"><span class="cmdname">/feat-grill</span><span class="badge human">⏸ interview</span><span class="out">→ decisions.md</span></div>
+      <p>Runs in the main session, because a subagent cannot hold a multi-turn interview. It maps the open decisions as a design tree and asks <b>round by round</b>: each round is the whole <em>frontier</em> — every question whose prerequisites are already settled — as one numbered list, each with a recommended answer, so you can reply by number. Questions the codebase can answer are researched in the background instead of asked. <code>/feat-story</code> is gated on the output: the story consumes settled decisions, never open questions.</p>
+    </div>
     <div class="stage gate" data-n="">
       <div class="row"><span class="cmdname">/feat-story</span><span class="badge human">⏸ human approval</span><span class="out">→ story.md</span></div>
       <p>The story-writer produces a user story with testable acceptance criteria. <b>You must personally review and approve</b> before the line continues — the first judgment gate.</p>
@@ -234,39 +238,39 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-spec</span><span class="badge human">⏸ human approval</span><span class="out">→ brief.md</span></div>
       <p>The spec-writer turns the approved story into a technical brief: data model, API contract, files to change, risks. The second judgment gate.</p>
     </div>
-    <div class="stage" data-n="03">
+    <div class="stage" data-n="04">
       <div class="row"><span class="cmdname">/feat-backend</span><span class="out">→ code + backend-summary.md</span></div>
       <p>The backend-builder implements per the brief with unit tests, and writes the API contract summary the frontend will consume. Hooks lock it inside the backend directories. (Skipped automatically if no backend track.)</p>
     </div>
-    <div class="stage" data-n="04">
+    <div class="stage" data-n="05">
       <div class="row"><span class="cmdname">/feat-frontend</span><span class="out">→ UI + component tests</span></div>
       <p>The frontend-builder implements against the contract. Anything the contract is missing gets <b>reported as a gap</b> — never an invented endpoint.</p>
     </div>
-    <div class="stage f5" data-n="05">
+    <div class="stage f5" data-n="06">
       <div class="row"><span class="cmdname">/feat-ship</span><span class="tag-f5">FABLE5 new</span><span class="badge opt">optional</span><span class="out">pairs with /goal</span></div>
-      <p>Hands the mechanical 06→08 loop to <code>/goal</code> for autonomous convergence: the command prints an exact goal condition for you to paste; an independent evaluator (default: Haiku) judges each turn. Prefer manual? Just run 06→08 yourself as before.</p>
+      <p>Hands the mechanical 07→09 loop to <code>/goal</code> for autonomous convergence: the command prints an exact goal condition for you to paste; an independent evaluator (default: Haiku) judges each turn. Prefer manual? Just run 07→09 yourself as before.</p>
     </div>
-    <div class="stage" data-n="06">
+    <div class="stage" data-n="07">
       <div class="row"><span class="cmdname">/feat-verify</span><span class="out">→ verification.md</span></div>
       <p>The test-verifier writes an acceptance test for every story criterion and runs them, recording pass/fail per criterion. A test that cannot fail is not allowed to exist.</p>
     </div>
-    <div class="stage" data-n="07">
+    <div class="stage" data-n="08">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
       <p>The validator reviews read-only: acceptance, security, scope, conventions. Findings are graded 🔴 Critical / 🟠 Important / ⚪ Minor, each with <code>path:line</code>. Clean → <code>.active</code> is removed; next stop is <code>/feat-docs</code> for user-facing documentation.</p>
     </div>
-    <div class="stage loop" data-n="08">
+    <div class="stage loop" data-n="09">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">bounded loop</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
-      <p>Routes 🔴🟠 findings and red tests back to the <b>owning track's builder</b> for surgical fixes, then returns to 06 for re-verification. At the cap it marks <code>blocked</code> and stops for human judgment — the loop can never run away.</p>
+      <p>Routes 🔴🟠 findings and red tests back to the <b>owning track's builder</b> for surgical fixes, then returns to 07 for re-verification. At the cap it marks <code>blocked</code> and stops for human judgment — the loop can never run away. The way back on the line afterwards is <code>/feat-unblock</code>: it records how the block was handled, resets <code>retries</code> to 0, and re-enters at verify.</p>
     </div>
   </div>
-  <div class="loopnote">↺ after a fix, flow returns to /feat-verify → /feat-validate; at the 3-retry cap → blocked, handed to a human</div>
+  <div class="loopnote">↺ after a fix, flow returns to /feat-verify → /feat-validate; at the 3-retry cap → blocked, handed to a human · resume path: /feat-distill → human handles it → /feat-unblock (resets retries, re-enters at verify)</div>
 
   <div class="line" style="margin-top:26px">
-    <div class="stage" data-n="09">
+    <div class="stage" data-n="10">
       <div class="row"><span class="cmdname">/feat-docs</span><span class="out">→ README + docs/ (EN → zh-TW)</span></div>
       <p>The doc-writer authors user-facing documentation from what was <em>actually built</em>: updates the README, writes usage/example guides under docsDir (with Mermaid diagrams), English first then <code>_zh-TW</code> translations, language-switch links atop both. Hooks confine it to docsDir and the root README files.</p>
     </div>
-    <div class="stage f5" data-n="10">
+    <div class="stage f5" data-n="11">
       <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 new</span><span class="out">→ MEMORY.md updated</span></div>
       <p>The memory-distiller banks the lessons that <em>actually happened</em> in this feature into the cross-feature <code>MEMORY.md</code> (Verified facts / General rules / Watchlist). <b>Failures get distilled too</b>: a blocked feature's open findings go to the Watchlist so the next feature doesn't rediscover them. Zero new lessons is a legitimate result — padding is forbidden.</p>
     </div>
@@ -308,6 +312,11 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>Comment &amp; doc contract<span class="path">.claude/factory/terminology-zh-tw.md</span></td>
       <td>Imported by <code>CLAUDE.md</code>, so every agent reads it. Comments are <b>block-after-block</b>: the full English block, one empty comment line, then the full Traditional Chinese block — never alternating line by line. It also fixes the doc-language split (pipeline artifacts English-only; user docs EN + <code>_zh-TW</code>) and the Taiwan term dictionary.</td>
       <td>Legacy code is migrated by <code>/feat-recomment</code> → <code>comment-migrate.py</code>, which only REORDERS comment lines (never translates or rewords) and refuses anything ambiguous. Mechanical diff, idempotent, dry-run by default.</td>
+    </tr>
+    <tr>
+      <td>Contract file layout<span class="path">CLAUDE.md + .claude/factory/*.md</span></td>
+      <td><code>CLAUDE.md</code> holds the behavioural contract and <code>@import</code>s two files, so those three load every turn. Three companions sit beside them and are reached only when their branch fires: <code>EXPLORE-MODE.md</code> (exploratory work), <code>PHASE-BOUNDARIES.md</code> (what to do with the context at a seam), <code>CLAUDE-rationale.md</code> (why each rule exists — human reading only).</td>
+      <td>Progressive disclosure keeps the always-loaded budget small: a prohibition or a rationale that fires on 1% of turns should not cost context on the other 99%. The installer verifies all five ship — a pointer whose target is missing fails silently.</td>
     </tr>
     <tr>
       <td>Memory layer <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
@@ -382,6 +391,7 @@ jq --version
       <h3>Run a feature (standard path)</h3>
       <div class="term"><span class="y">/feat-new</span> user-invite "invite members to a workspace"
 <span class="y">/feat-research</span> user-invite
+<span class="y">/feat-grill</span> user-invite    <span class="c"># ⏸ round-by-round interview → decisions.md</span>
 <span class="y">/feat-story</span> user-invite    <span class="c"># ⏸ read story.md before continuing</span>
 <span class="y">/feat-spec</span> user-invite     <span class="c"># ⏸ read brief.md before continuing</span>
 <span class="y">/feat-backend</span> user-invite  <span class="c"># only if the backend track is enabled</span>
@@ -409,9 +419,10 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional C
       <table class="states">
         <tr><th>What you see</th><th>Meaning / what to do</th></tr>
         <tr><td><span class="dot" style="background:var(--ok)"></span>validate clean</td><td>Run <code>/feat-docs</code> for user docs, close with <code>/feat-distill</code>, then review and commit yourself.</td></tr>
-        <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>The fix loop hit its 3-retry cap; human judgment needed. Run <code>/feat-distill</code> first to bank open findings into the Watchlist, then handle manually.</td></tr>
-        <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>Declined by the safety classifier — <b>the code is not broken</b>. Re-run that step with the agent switched to <code>model: opus</code>, or handle manually.</td></tr>
+        <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>The fix loop hit its 3-retry cap; human judgment needed. Flow: <code>/feat-distill</code> first (open findings → Watchlist) → fix manually / revise story-spec at the ⏸ gates / accept as risk → <code>/feat-unblock</code> (resets retries, re-enters at verify). <code>state.json</code> is changed by that command, not by hand.</td></tr>
+        <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>Declined by the safety classifier — <b>the code is not broken</b>. Re-run that step with the agent switched to <code>model: opus</code>, or handle manually; then <code>/feat-unblock</code> to re-enter the line. A feature that blocks twice has an upstream problem — revise story/spec or split the slug.</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>write blocked by a hook</td><td>By design — the active track may not touch that path. Don't work around it; if truly needed, <code>rm .claude/factory/.active</code> (= leaving factory mode).</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>context feels bloated / repeating yourself</td><td>You are mid-phase — finish it. At the next boundary between <code>/feat-*</code> steps, walk the ladder in <code>.claude/factory/PHASE-BOUNDARIES.md</code>: continue → <code>/clear</code> → hand off → subagent → <code>/compact</code> last. <code>/clear</code> is the default here: the artifacts on disk rebuild the context.</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>"jq not found"</td><td>Enforcement is actually OFF (fail-safe allow). Install jq, then continue.</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>gate shows (none configured, skipped)</td><td>That command is blank in the manifest. Add the test/lint script to the project, then fill project.json back in.</td></tr>
       </table>
@@ -427,6 +438,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional C
     <div class="rule"><b>Gates are for humans to hold</b><p>Actually read story and spec at the ⏸ gates. The day you notice yourself approving without reading — that's the signal to redesign the cadence, not a time-saving trick.</p></div>
     <div class="rule"><b>MEMORY.md is code</b><p>It's version-controlled and its diffs get reviewed. Bad memory is read by every subsequent feature — compounding cuts both ways.</p></div>
     <div class="rule"><b>Comments are block-after-block</b><p>Full English block → one empty comment line → full Traditional Chinese block. Never alternate line by line — it forces the reader to skip every other line. Legacy code gets migrated by <code>/feat-recomment</code>, not hand-edited file by file.</p></div>
+    <div class="rule"><b>Decide context at boundaries</b><p>The seam between two <code>/feat-*</code> steps is where you choose what to do with the context — and <code>/compact</code> is the last option there, not the first. Mid-phase there is nothing to decide: continue, or split what is left into subagents.</p></div>
     <div class="rule"><b>No workarounds, no varnish</b><p>Hooks blocking you is intentional; "tests pass" never masks skipped tests; goals are met by evidence, not narration. Being loud about uncertainty is this line's only religion.</p></div>
   </div>
 </section>

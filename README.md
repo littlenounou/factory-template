@@ -28,12 +28,13 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 16 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 17 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
    the top — `CONVENTIONS.md` and `terminology-zh-tw.md`; paste the block into
-   "Project-Specific Rules"). Skip if you let it be the starter.
+   "Project-Specific Rules"). Skip if you let it be the starter. The three companion files
+   under `.claude/factory/` are reached by pointer, never imported — leave them unlisted.
 2. Open Claude Code in the repo and run `/feat-init` (detects stack or asks; writes
    `project.json` including `docsDir`; does NOT scaffold code).
 3. Confirm the manifest.
@@ -42,7 +43,7 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 16 comm
 ```
 /feat-new <slug> "what you want"
 /feat-research <slug>
-/feat-grill <slug>      # interactive interview -> decisions.md (story is gated on it)
+/feat-grill <slug>      # round-by-round interview -> decisions.md (story is gated on it)
 /feat-story <slug>      # review story.md, then:
 /feat-spec <slug>       # review brief.md, then:
 /feat-backend <slug>    # if backend enabled
@@ -51,14 +52,33 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 16 comm
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # only if findings; bounded by loopMaxRetries
+/feat-unblock <slug>    # after `blocked`: human-authorized resume — resets the retry budget
 /feat-docs <slug>       # after a clean validate: README + guides/examples (EN, then zh-TW)
 /feat-distill <slug>    # FABLE 5: closing step — bank verified lessons into MEMORY.md
 /feat-status <slug>     # any time
+
+# Maintenance (outside the line — no slug, no artifacts)
+/feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
 ```
 FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
 loop) are documented in the "Fable 5 addendum" of `.claude/factory/CONVENTIONS.md`. They
 are inert-but-harmless when the session runs another model.
 See `.claude/factory/CONVENTIONS.md` for the full design.
+
+## What the agent loads, and what it reaches for
+
+`CLAUDE.md` holds the behavioural contract and `@import`s two files, so those three are in
+context on every turn. Three more sit beside them and are reached only when their branch
+fires — keeping them out of the always-loaded budget:
+
+| File | Reached when |
+|---|---|
+| `.claude/factory/EXPLORE-MODE.md` | exploratory work opens (`explore mode` / `spike` / POC) |
+| `.claude/factory/PHASE-BOUNDARIES.md` | you are at a phase boundary deciding what to do with the context |
+| `.claude/factory/CLAUDE-rationale.md` | a human is weighing whether a rule still earns its place — the agent never reads this one |
+
+`CLAUDE-rationale.md` is where each rule's *why* lives. Read it before changing a rule;
+edit it in the same PR when you do.
 
 ## Comments, documentation & TW terminology
 `.claude/factory/terminology-zh-tw.md` (imported by `CLAUDE.md`) is the single source of truth for:

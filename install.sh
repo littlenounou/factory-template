@@ -11,6 +11,10 @@ for d in .claude/agents .claude/commands .claude/hooks .claude/factory; do
   [ -d "$SRC/$d" ] || missing="$missing $d"
 done
 [ -f "$SRC/.claude/settings.json" ] || missing="$missing .claude/settings.json"
+# The contract points at these by relative path; a missing one is a silent dead pointer.
+for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md; do
+  [ -f "$SRC/.claude/factory/$f" ] || missing="$missing .claude/factory/$f"
+done
 if [ -n "$missing" ]; then
   echo "ERROR: this template copy is incomplete — missing:$missing"
   echo "Your download likely skipped the hidden .claude/ folder. Re-download the ZIP and"
@@ -35,6 +39,11 @@ fi
 echo
 echo "Installed (counts):"
 echo "  agents:   $(ls -1 "$TARGET/.claude/agents"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 8)"
-echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 16)"
+echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 17)"
 echo "  hooks:    $(ls -1 "$TARGET/.claude/hooks"/*.sh 2>/dev/null | wc -l | tr -d ' ')  (expect 3)"
+echo
+echo "Contract files in .claude/factory/ (imported by CLAUDE.md, or reached by pointer):"
+for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md; do
+  [ -f "$TARGET/.claude/factory/$f" ] && echo "  ok  $f" || echo "  MISSING  $f"
+done
 echo "Done. Next: cd \"$TARGET\", open Claude Code, run /feat-init"
