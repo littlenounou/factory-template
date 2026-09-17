@@ -11,4 +11,5 @@ Research step for feature `$1`.
    to verify against the current code, not as facts — the codebase may have moved on.
 3. Use the built-in **Explore** subagent (read-only) to investigate, then write `<artifactsDir>/$1/research.md` with: relevant files mapped, existing patterns to follow, similar features already in the codebase, and risks (e.g. auth/tenant, timezones, concurrency, existing infra to reuse). Do not modify any code.
 4. Update `state.json` step to `research`.
-5. Tell the user to skim research.md, then run `/feat-story $1`.
+5. Tell the user to skim research.md, then run `/feat-grill $1` (the interview that settles
+   open decisions — `/feat-story` is gated on its output).
