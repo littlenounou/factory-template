@@ -49,8 +49,9 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 ```
 
 沒有 slug、不產 artifacts。先確認 git working tree 乾淨、先跑 dry run,再驅動
-`.claude/factory/comment-migrate.py`——該腳本只「重排」註解行,絕不翻譯或改寫措辭。
-它不敢動的區塊(混著被註解掉的程式碼、單行中英夾雜)會列進
+`.claude/factory/comment-migrate.py`——該腳本只「重排」註解行,絕不翻譯或改寫措辭,
+也絕不更動程式碼(每個檔案寫入前都會驗證)。
+它不敢動的區塊(混著被註解掉的程式碼、單行中英夾雜、語言分界不明、缺少分隔行)會列進
 `comment-migration-report.md` 交給人處理。加 `--check` 時只要還有交錯就回傳非零 exit code。
 
 ## 卡住時看這裡

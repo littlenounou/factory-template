@@ -136,8 +136,14 @@ form required by `terminology-zh-tw.md` §1. The script only REORDERS whole comm
 inserts one separator — it never translates, rewords, adds, or deletes text, so the diff is
 mechanical and reviewable. It handles line comments, `*`-continuation blocks (JSDoc /
 Javadoc / Doxygen), and Python docstrings; it preserves indentation, comment token, and line
-endings; it is idempotent. It refuses to touch a block containing commented-out code or a
-line mixing both languages, listing those in `comment-migration-report.md` for a human.
+endings; it is idempotent. Python files are read with `tokenize` + `ast`, so only real `#`
+comment lines and real docstrings are candidates — string literals and non-docstring
+triple-quoted strings are never touched. A comment run ends at the first non-comment line,
+and a wrapped sentence keeps its continuation lines. Before writing, it verifies that only
+comment / docstring line order changed; otherwise that file is left untouched. It refuses
+ambiguous blocks (commented-out code, a line mixing both languages, an unclear language
+split, a missing separator after a multi-line English block, text on a docstring's quote
+line that would move), listing them in `comment-migration-report.md` for a human.
 Dry-run by default, and it refuses `--apply` on a dirty git tree so the migration lands as
 one standalone commit. `--check` exits non-zero while interleaved comments remain (optional
 CI guard; deliberately NOT wired into `quality-gate.sh`, since comment style is not a build

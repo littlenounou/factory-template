@@ -1,3 +1,53 @@
+# comment-migrate.py — correctness fixes (2026-09-16)
+
+Field report from `/feat-recomment --apply` on a Python repo: all 9 changed blocks were
+wrong. Code lines moved, two asserts swapped, docstrings split mid-sentence. **If you applied
+the 2026-08-12 script, revert that commit** (or `git checkout -- .` if uncommitted) and
+re-run with this version.
+
+## Root causes
+1. **Closing `"""` read as an opener.** The docstring detector matched any line that was
+   only `"""`. After a docstring opening with text (`"""Summary.`), its closing quotes were
+   taken as a new opener, so every code line up to the next bare `"""` became "docstring
+   body" and was reordered. This caused the displaced comments and the swapped asserts
+   (a Chinese string literal counted as a Chinese line).
+2. **Full-width punctuation not counted as Chinese.** `（COLUMN_NAME | …）。` has no CJK
+   ideograph, so it was classified English and pulled away from its own sentence.
+3. **Line-by-line judgement.** Classification ignored the previous line, so a wrapped
+   sentence could be split across the two blocks.
+
+## Fixed (comment-migrate.py)
+- Python is scanned with `tokenize` + `ast`: only lines whose sole token is a comment, and
+  only real module/class/function docstrings, are candidates. String literals, SQL or test
+  data in triple-quoted strings, and trailing comments after code are never touched.
+- A comment run ends at the first line that is not a pure comment line (all languages).
+- CJK detection now includes CJK punctuation, Bopomofo and full-width forms.
+- Continuation-aware classification: a no-CJK line after an unfinished Chinese sentence
+  stays Chinese when it holds only code / identifiers / symbols; if it holds any English
+  word it is flagged as ambiguous instead of guessed.
+- New review flags: multi-line English followed by Chinese with no separator; text on a
+  docstring's quote line that regrouping would move; ambiguous language split.
+- Pre-write safety net: each rewritten file is compared with the original (Python: full
+  token stream plus comment/docstring line multisets; others: non-comment lines in order
+  plus comment line multiset). On any mismatch the file is not written and is flagged.
+- `assert` and doctest prompts (`>>>`) count as commented-out code.
+- JSDoc blocks are handled only when `*/` stands alone on its line.
+- Writes preserve the file's own line endings.
+
+Verified on reproductions of all four reported failures, edge cases (quote-line docstrings,
+CRLF JSDoc, trailing comments, `--check` exit code, forced safety-net failure), and a stress
+run on 574 CPython stdlib files with injected interleaved Chinese: 356 files / 3,643 blocks
+rewritten, 0 AST changes, 0 non-comment line changes, second run changes nothing.
+
+## Modified
+- **feat-recomment.md** — step 3 adds a whole-diff check that only comment lines changed;
+  step 4 lists every review reason and the wrapped-sentence rule.
+- **CONVENTIONS.md** — "Legacy comment migration" describes the new guarantees.
+- **README.md / README_zh-TW.md** — one sentence on the no-code-change guarantee.
+- **factory-cheatsheet_{en,zh-TW}.md** — refusal list updated; no-code-change guarantee added.
+
+---
+
 # Unblock command — recovered and applied (2026-08-14, designed 2026-07-31)
 
 **This work was designed on 2026-07-31 and never landed in the repo.** It was delivered as
@@ -322,3 +372,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-08-12 | (fill in) | Bilingual comments switched from line-interleaved to block-after-block; `/feat-recomment` + `comment-migrate.py` added |
 | 2026-08-14 | (fill in) | Pocock v1.2 sync: grill round-by-round (frontier), Context Health rewritten as phase-boundary decision list, prompt-style "cache" term, validator smells 8 → 12 |
 | 2026-08-14 | (fill in) | writing-for-agents pass: prohibitions rephrased positively, rationale/EXPLORE Mode/phase-boundary ladder disclosed to companion files, changelog moved here |
+| 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
