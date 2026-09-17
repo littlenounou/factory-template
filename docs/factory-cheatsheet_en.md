@@ -50,7 +50,8 @@ The line never commits or opens PRs for you — review and commit yourself at th
 
 No slug, no artifacts. Guards on a clean git tree, dry-runs first, then drives
 `.claude/factory/comment-migrate.py`, which only REORDERS comment lines — never translates or
-rewords. Blocks it refuses (commented-out code, lines mixing both languages) land in
+rewords, and never changes code (each file is verified before writing). Blocks it refuses
+(commented-out code, mixed-language lines, unclear language split, missing separator) land in
 `comment-migration-report.md` for a human. `--check` exits non-zero while interleaving remains.
 
 ## When you're stuck

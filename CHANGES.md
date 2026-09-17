@@ -43,6 +43,8 @@ rewritten, 0 AST changes, 0 non-comment line changes, second run changes nothing
 - **feat-recomment.md** — step 3 adds a whole-diff check that only comment lines changed;
   step 4 lists every review reason and the wrapped-sentence rule.
 - **CONVENTIONS.md** — "Legacy comment migration" describes the new guarantees.
+- **README.md / README_zh-TW.md** — one sentence on the no-code-change guarantee.
+- **factory-cheatsheet_{en,zh-TW}.md** — refusal list updated; no-code-change guarantee added.
 
 ---
 
