@@ -1,4 +1,4 @@
-# Feature Factory 模板（方案 A：逐 repo、納入版本控制）
+# Feature Factory 樣板(Plan A:逐 repo 安裝、版本控制)
 
 **Language 語言:** [English](../README.md) · 繁體中文
 

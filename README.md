@@ -100,5 +100,4 @@ before writing a file it verifies that only comment / docstring line order chang
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
 artifacts — they stay in place as the pipeline's record.
 
-
 This template does not auto-commit or open PRs by design.

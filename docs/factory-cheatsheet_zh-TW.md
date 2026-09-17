@@ -65,6 +65,7 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 | 寫入被 hook 擋下 | 設計如此,不要繞過。真有需要:`rm .claude/factory/.active` 離開產線模式 |
 | context 感覺臃腫 / 自己在重複發問 | 你在階段中途——先做完。到下一個邊界時照 `PHASE-BOUNDARIES.md` 的階梯走:continue → `/clear` → 交接 → 子代理 → `/compact` 墊底。預設是 `/clear`:磁碟上的 artifacts 會把 context 重建起來 |
 | `jq not found` | 強制其實沒開。裝 jq 再繼續 |
+| `/usage` 只見編排模型+Haiku,Sonnet 掛零 | 路由被 env 覆蓋。查 `echo $CLAUDE_CODE_SUBAGENT_MODEL` 與各層 settings.json(見 CONVENTIONS「Known issues」) |
 | gate 顯示 `(none configured, skipped)` | manifest 該指令留空;補上 script 後回填 project.json |
 
 ## 鐵則

@@ -65,6 +65,7 @@ rewords, and never changes code (each file is verified before writing). Blocks i
 | Write blocked by a hook | By design — don't work around it. If truly needed: `rm .claude/factory/.active` (= leaving factory mode) |
 | context feels bloated / you're repeating yourself | You're mid-phase — finish it. At the next boundary walk the ladder in `PHASE-BOUNDARIES.md`: continue → `/clear` → hand off → subagent → `/compact` last. `/clear` is the default: artifacts on disk rebuild the context |
 | `jq not found` | Enforcement is actually OFF. Install jq, then continue |
+| `/usage` shows orchestrator + Haiku only, zero Sonnet | Routing overridden by env. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL` and settings.json at each scope (see CONVENTIONS "Known issues") |
 | gate shows `(none configured, skipped)` | That command is blank in the manifest; add the script, then fill project.json back in |
 
 ## Non-negotiables
