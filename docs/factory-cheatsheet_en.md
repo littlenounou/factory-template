@@ -75,6 +75,7 @@ rewords, and never changes code (each file is verified before writing). Blocks i
 3. **MEMORY.md is code**: review its diffs — bad memory compounds as fast as good memory.
 4. **Comments are block-after-block**: full English block → one empty comment line → full zh-TW block. Never alternate line by line; migrate legacy code with `/feat-recomment`, not by hand.
 5. **Decide context at boundaries**: the seam between `/feat-*` steps is where you choose — `/compact` is the last option there, not the first. Mid-phase: continue, or split into subagents.
-6. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
+6. **Redact before you paste**: evidence is mandatory (Rule 7) and artifacts are version-controlled — credential values go in as `<REDACTED>`, reproduction commands reference them through environment variables, and you quote the signal-carrying lines instead of the whole dump. `protect-secrets.sh` catches secret files by name, not a token pasted into `verification.md`.
+7. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
 
 <sub>The FABLE5 upgrades (model routing / classifier triage / memory layer / /goal convergence) are inert-but-harmless on other models — maintain one template for the whole team; pick the model with `/model`.</sub>

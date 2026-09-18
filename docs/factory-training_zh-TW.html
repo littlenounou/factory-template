@@ -440,6 +440,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
     <div class="rule"><b>MEMORY.md 是程式碼</b><p>它進版本控制、它的 diff 要 review。壞記憶會被每個後續 feature 讀到——複利是雙向的。</p></div>
     <div class="rule"><b>註解一律區塊制</b><p>先寫完整段英文 → 一行空註解 → 再寫完整段繁體中文。不可一行英一行中交錯——那會逼讀者跳行閱讀。舊程式碼交給 <code>/feat-recomment</code> 轉換，不要手動逐檔改。</p></div>
     <div class="rule"><b>在邊界決定 context</b><p>兩個 <code>/feat-*</code> 步驟之間的接縫，才是你決定這份 context 怎麼處理的地方——而 <code>/compact</code> 在那裡是最後一個選項，不是第一個。階段中途沒有東西可決定：要嘛繼續，要嘛把剩下的拆給子代理。</p></div>
+    <div class="rule"><b>貼證據前先遮蔽</b><p>證據是必要的，而 artifacts 會進版本控制，所以任何要貼出去的東西，第一個動作都是遮蔽：憑證值寫成 <code>&lt;REDACTED&gt;</code>，重現指令改用環境變數引用，執行結果只引帶訊號的那幾行。<code>protect-secrets.sh</code> 擋的是檔名像機密的<i>檔案</i>——被貼進 <code>verification.md</code> 的 token 得靠你自己擋。</p></div>
     <div class="rule"><b>不繞過、不美化</b><p>hook 擋你是刻意的；「tests pass」不准掩蓋跳過的測試；goal 靠證據達標，不靠敘述達標。對不確定大聲，是這條產線唯一的信仰。</p></div>
   </div>
 </section>
@@ -450,7 +451,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
   <div class="hazard"></div>
   <div class="wrap">
     <div class="foot">
-      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-08</span>
+      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-09</span>
       <span>詳細設計：.claude/factory/CONVENTIONS.md（含 Fable 5 addendum）</span>
       <span>行為契約：CLAUDE.md</span>
     </div>

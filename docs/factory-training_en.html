@@ -439,6 +439,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional C
     <div class="rule"><b>MEMORY.md is code</b><p>It's version-controlled and its diffs get reviewed. Bad memory is read by every subsequent feature — compounding cuts both ways.</p></div>
     <div class="rule"><b>Comments are block-after-block</b><p>Full English block → one empty comment line → full Traditional Chinese block. Never alternate line by line — it forces the reader to skip every other line. Legacy code gets migrated by <code>/feat-recomment</code>, not hand-edited file by file.</p></div>
     <div class="rule"><b>Decide context at boundaries</b><p>The seam between two <code>/feat-*</code> steps is where you choose what to do with the context — and <code>/compact</code> is the last option there, not the first. Mid-phase there is nothing to decide: continue, or split what is left into subagents.</p></div>
+    <div class="rule"><b>Redact before you paste</b><p>Evidence is mandatory and the artifacts are version-controlled, so redaction is the first move on anything pasted: credential values enter as <code>&lt;REDACTED&gt;</code>, reproduction commands reference them through environment variables, and a run is quoted at its signal-carrying lines. <code>protect-secrets.sh</code> catches secret <i>files</i> by name — a token pasted into <code>verification.md</code> is yours to catch.</p></div>
     <div class="rule"><b>No workarounds, no varnish</b><p>Hooks blocking you is intentional; "tests pass" never masks skipped tests; goals are met by evidence, not narration. Being loud about uncertainty is this line's only religion.</p></div>
   </div>
 </section>
@@ -449,7 +450,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional C
   <div class="hazard"></div>
   <div class="wrap">
     <div class="foot">
-      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-08</span>
+      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-09</span>
       <span>Full design: .claude/factory/CONVENTIONS.md (incl. Fable 5 addendum)</span>
       <span>Behavioral contract: CLAUDE.md</span>
     </div>

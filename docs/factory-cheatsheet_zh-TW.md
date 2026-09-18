@@ -75,6 +75,7 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 3. **MEMORY.md 是程式碼**:diff 要 review,壞記憶的複利跟好記憶一樣快。
 4. **註解一律區塊制**:先寫完整段英文 → 一行空註解 → 再寫完整段繁中。不可一行英一行中交錯;舊程式碼用 `/feat-recomment` 轉,不要手動逐檔改。
 5. **在邊界決定 context**:`/feat-*` 步驟之間的接縫才是你做選擇的地方——`/compact` 在那裡是最後一個選項,不是第一個。階段中途:要嘛繼續,要嘛拆給子代理。
-6. **Fail-Loud**:每步以 ✅/⚠️/❓ 收尾;「tests pass」不准掩蓋跳過的測試;絕不在 `disableAllHooks` 下跑產線。
+6. **貼證據前先遮蔽**:證據是必要的(Rule 7),而 artifacts 進版控——憑證值一律寫成 `<REDACTED>`,重現指令改用環境變數引用,輸出只引帶訊號的那幾行,不貼整份。`protect-secrets.sh` 擋的是檔名像機密的檔案,不是被貼進 `verification.md` 的 token。
+7. **Fail-Loud**:每步以 ✅/⚠️/❓ 收尾;「tests pass」不准掩蓋跳過的測試;絕不在 `disableAllHooks` 下跑產線。
 
 <sub>FABLE5 升級(model 路由 / classifier 分流 / 記憶層 / /goal 收斂)在其他模型下惰性無害——全團隊只維護這一套,模型用 `/model` 選。</sub>
