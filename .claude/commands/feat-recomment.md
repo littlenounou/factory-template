@@ -23,25 +23,11 @@ by hand except for the leftovers the script explicitly refuses to touch.
 3. APPLY (after approval) — `python3 .claude/factory/comment-migrate.py $1 --apply`
    Then show `git diff --stat`. Spot-check 2-3 of the changed blocks by reading them and
    confirm the English block, separator, and Chinese block are in the right order.
-   Also confirm, across the whole diff, that every changed line is a comment or docstring
-   line and each block still sits directly above the code it describes. If any code line
-   moved, run `git checkout -- .` and report it as a script bug; keep the tree clean.
 
 4. LEFTOVERS — read `.claude/factory/comment-migration-report.md`. The "Needs human review"
-   section lists blocks the script refused to change. Each entry states its reason:
-   - commented-out code mixed in with prose;
-   - one line holding both languages;
-   - an English-looking line right after an unfinished Chinese sentence (wrapped sentence
-     or new English sentence — the script cannot tell);
-   - English block followed by Chinese block with no separator (only the separator is
-     missing — insert it between the two blocks);
-   - text sharing a line with docstring quotes that regrouping would move;
-   - "safety check failed" — the script caught itself about to change non-comment content
-     and wrote nothing for that file. Fix that file by hand and report it as a script bug.
-   Work through them ONE FILE AT A TIME:
+   section lists blocks the script refused to reorder (usually commented-out code mixed in
+   with prose, or one line holding both languages). Work through them ONE FILE AT A TIME:
    - Reorder into English block → separator → Chinese block.
-   - A wrapped sentence keeps all its lines together, including a continuation line that
-     holds only code or punctuation.
    - Keep commented-out code as its own separate comment block, adjacent to nothing else.
    - Do NOT translate, reword, add, or delete any comment text. If a comment is wrong or
      missing a translation, say so in your report — do not silently author new prose.

@@ -1,3 +1,68 @@
+# Pocock v1.2.3 sync — evidence redaction (2026-09-18)
+
+Adapted from mattpocock/skills v1.2.3 (MIT), PR #779 "Make `diagnosing-bugs` redact
+secrets". One adoption: redaction as the first move on pasted evidence. Upstream applies it
+to a diagnosis loop; the transferable part is the ordering, which our Rule 7 evidence
+requirement makes load-bearing the same way.
+
+**The gap it closes.** Rule 7 mandates pasted evidence, and that evidence lands in
+version-controlled artifacts (`verification.md`, `validation.md`, `decisions.md`,
+`MEMORY.md`). The only existing defence, `protect-secrets.sh`, matches secret FILES by name
+(`.env*`, `*.key|pem|p12|pfx`, `secrets.*`) and `git add|commit` command strings — it never
+inspects content. A token echoed by a failing test or an `Authorization:` header in a
+reproduction line was written and committed with nothing firing.
+
+NOT adopted from the same release: PR #781 (dropping Claude Code tool and agent-type names
+from subagent dispatch, for Codex portability) — this template is Claude Code only by
+design, and cross-harness support is out of scope, not a deferred item; PR #783 (`wizard`
+time-estimate removal, skill never adopted); v1.2.2 (`writing-for-agents` Codex metadata —
+we borrowed its prose rules, not its packaging). Upstream published no 1.2.1 changelog
+section.
+
+## Modified — contract
+- **CONVENTIONS.md** — new **Evidence & redaction** section after §Honesty, the single
+  source of truth: credential values enter as `<REDACTED>`; reproduction commands reference
+  the credential through its environment variable; a captured run is quoted at its
+  signal-carrying lines. States plainly that `protect-secrets.sh` covers secret files by
+  name and artifact CONTENT is this rule's job, and names Rule 7 as what it serves (the
+  house-rule number is deliberately not cross-referenced — it would go stale). Pocock
+  provenance note bumped to v1.2.3 / 2026-09 with the non-adoptions recorded.
+- **test-verifier.md** — completion criterion for a criterion is now its REDACTED evidence
+  in `verification.md`; points at CONVENTIONS.md rather than restating the rationale.
+- **feat-fix.md** — step 3 gains a per-track reporting bullet: a fix counts as done when its
+  redacted gate/test evidence is shown.
+- **validator.md** — Security check extended to the artifacts themselves; a live credential
+  in one is a finding graded by impact. Guardrails unchanged (🔴 stays reserved for security
+  and failing criteria, so an exposed credential can still reach 🔴 on its own merits).
+
+## Modified — human-facing docs
+- **factory-cheatsheet_{en,zh-TW}.md** — new non-negotiable #6 "Redact before you paste";
+  Fail-Loud renumbered #6 → #7, keeping it last as in the 2026-08-12 and 2026-08-14 passes.
+  Rules #1–#5 unchanged.
+- **factory-training_{en,zh-TW}.html** — matching House Rule card inserted before
+  "No workarounds, no varnish"; footer edition date 2026-08 → 2026-09. Pipeline belt, stage
+  diagram and Under-the-Hood table untouched: this is a contract rule, not a pipeline step.
+  Verified: 14 stations, 7 rules, 22 table rows, balanced tags, HTMLParser-clean, EN/zh-TW
+  at parity.
+
+## Deliberately not done
+- **No CI gate.** No content scan in `quality-gate.sh`, on the same reasoning as
+  `comment-migrate.py --check`: a high-false-positive check that can leave a repo
+  permanently red does not belong in the build.
+- **`protect-secrets.sh` untouched.** Its filename/command contract is a different defence;
+  the two are complementary and neither subsumes the other.
+- Agent/command/hook counts, the `.active` scope mechanism, and the MEMORY.md single-writer
+  contract are unchanged, so `install.sh` / `install.ps1` need no edit.
+
+## Follow-ups (not in this pass)
+- The rule is enforced by reading, not by tooling. Watch the next few features for evidence
+  that landed unredacted; if it recurs, the cheap next step is a PostToolUse hook that warns
+  (never blocks) on high-entropy strings written into `artifactsDir`, not a gate.
+- `README.md` / `README_zh-TW.md` were not touched: they summarise commands and counts, and
+  neither changed. Revisit only if the redaction rule gets a line in the setup steps.
+
+---
+
 # comment-migrate.py — correctness fixes (2026-09-16)
 
 Field report from `/feat-recomment --apply` on a Python repo: all 9 changed blocks were
