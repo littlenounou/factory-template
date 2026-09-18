@@ -1,3 +1,36 @@
+# Upstream standalone skills triage: change summary (2026-09-19)
+
+Closes the "Watchlist candidates" left open by the 2026-08-14 v1.2 sync. Each skill was
+read at mattpocock/skills v1.2.3 (latest; released 2026-08-06). All three are declined.
+A decline is a non-item, not a deferral: none of these stays on the Watchlist. No template
+file changes other than this one.
+
+## Declined
+- **`/wait-what`**: re-pitches a message that did not land, in ASD-STE100 Simplified
+  Technical English with the vocabulary from `CONTEXT.md`. The factory declined
+  `CONTEXT.md` on 2026-07-23 (the glossary lives per feature in `decisions.md`), so half
+  the skill has nothing to read. It repairs one chat message and touches no step, gate, or
+  artifact. ASD-STE100 is an English register; it does nothing for zh-TW conversations.
+- **`/to-questionnaire`**: turns a decision the user cannot answer alone into a Markdown
+  questionnaire for the one person who can. Its only contact point is `/feat-grill`, which
+  has no exit for a decision only a third party can settle. The maintainer confirmed that
+  case does not come up: the person running the grill is the decision-maker. No gap, so
+  nothing to adopt. If that changes, the fix is a "parked decision" outcome in
+  `/feat-grill` and the `/feat-story` guard, not this skill.
+- **`/wizard`**: generates an interactive bash script that walks a human through steps only
+  they can perform and writes captured values to `.env` files and GitHub Actions secrets.
+  Human-only setup steps are rare in the repos using this template, and the builders'
+  ❓ Needs-human-input section covers them. Vendoring would also mean carrying upstream's
+  fixed `template.sh` library through every sync (v1.2.3 already changed it) and adding a
+  model-invoked skill to a template whose agents are name-invoked by design. A repo that
+  needs it can install the upstream skill directly; it runs outside the factory line.
+
+## Modified
+- **CHANGES.md**: "Watchlist candidates" in the 2026-08-14 entry struck through with a
+  pointer to this entry.
+
+---
+
 # Pocock v1.2.3 sync — evidence redaction (2026-09-18)
 
 Adapted from mattpocock/skills v1.2.3 (MIT), PR #779 "Make `diagnosing-bugs` redact
@@ -298,7 +331,8 @@ Adapted from mattpocock/skills v1.2.0 (MIT; released 2026-08-05). Four adoptions
 round-by-round grilling + phase-boundary context rules + the "cache" prompt-pruning term
 + validator smells 8 → 12. NOT adopted: plugin/Codex/docs-site packaging (distribution
 channel only), `/wizard` / `/to-questionnaire` / `/wait-what` (standalone skills,
-Watchlist candidates), `/prototype` branch retention (EXPLORE Mode is outside the
+~~Watchlist candidates~~ all declined 2026-09-19, PR #__), `/prototype` branch
+retention (EXPLORE Mode is outside the
 factory), `/wayfinder` decision tickets (stays a Watchlist item — upstream now offers a
 mature model to copy when `/feat-epic` is built).
 
