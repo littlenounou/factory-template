@@ -38,7 +38,7 @@ $h = (Get-ChildItem (Join-Path $Target ".claude\hooks") -Filter *.sh -EA Silentl
 Write-Host ""
 Write-Host "Installed (counts):"
 Write-Host "  agents:   $a  (expect 8)"
-Write-Host "  commands: $c  (expect 18)"
+Write-Host "  commands: $c  (expect 17)"
 Write-Host "  hooks:    $h  (expect 3)"
 Write-Host ""
 Write-Host "Contract files in .claude/factory/ (imported by CLAUDE.md, or reached by pointer):"
