@@ -160,7 +160,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="規格">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>18</b></div>
+        <div><span>commands</span><b>19</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
         <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
@@ -389,6 +389,13 @@ jq --version
 <span class="c"># 4. 已有 CLAUDE.md → 合併兩個 &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; 區塊</span>
 <span class="c">#    全新 repo → snippet 已自動成為起始 CLAUDE.md，免合併</span>
 <span class="c"># 5. 把 .claude/ + CLAUDE.md 一起 commit</span></div>
+      <h3>規劃 epic（選用，產線上游）</h3>
+      <div class="term"><span class="c"># 超過一個 feature、路線還看不清的大型工作</span>
+<span class="y">/feat-epic</span> billing-v2 "多租戶計費"  <span class="c"># 繪製：終點 + 決策 ticket</span>
+<span class="y">/feat-epic</span> billing-v2    <span class="c"># ⏸ 解決下一張 ticket；重複執行</span>
+<span class="c"># research ticket 在背景跑；grilling／prototype 需要你參與。</span>
+<span class="c"># 它只規劃、不動手。沒有東西要決定時，map 清空並產出</span>
+<span class="c"># 可直接貼上的 /feat-new——每個 feature 再照下面的標準路徑走。</span></div>
       <h3>跑一個 feature（標準路徑）</h3>
       <div class="term"><span class="y">/feat-new</span> user-invite "邀請成員加入工作區"
 <span class="y">/feat-research</span> user-invite

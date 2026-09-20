@@ -24,6 +24,8 @@ multi-turn interview.
      Explore subagent IN THE BACKGROUND so it never blocks a round: only the questions
      downstream of a running exploration wait for it — ask the rest of the frontier now.
    - If the user asks for one question at a time, honour that for the rest of the session.
+   - Decisions in `research.md`'s **Epic context** are settled: build on them. Re-open one
+     only with new evidence, and say so.
 4. If idea + research leave no open decisions, say so and converge immediately — an empty
    grill is a valid outcome for small features.
 5. On consensus, write `<artifactsDir>/$1/decisions.md` (English), sections:

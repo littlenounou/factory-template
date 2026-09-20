@@ -1,3 +1,70 @@
+# /feat-epic: epic planning layer (2026-09-20)
+
+Resolves the last Watchlist item, the `/wayfinder`-style epic planning layer (parked
+2026-07-23). An optional command ABOVE `/feat-new`, for an effort bigger than one feature
+whose route is still foggy. Adapted from mattpocock/skills `/wayfinder` (MIT; read on
+upstream main, 2026-09-20). Kept: name the Destination first, the map as an index (a
+decision lives only in its ticket), decision tickets (plan, don't do), the blocking
+frontier, fog of war (Not yet specified), Out of scope, one ticket per session with
+research tickets burned down in parallel. NOT taken: the issue tracker, ticket claims,
+and the `task` type.
+
+## Decisions (grilled with the maintainer)
+- **One command, two modes.** `/feat-epic <epic> "<desc>"` charts; `/feat-epic <epic>
+  [ticket]` works the next frontier ticket. Mode is chosen by whether the map exists.
+- **Local markdown, no state machinery.** `<artifactsDir>/epics/<epic>/map.md` +
+  `tickets/NN-<name>.md`, blocking by a `Blocked by:` line. No `state.json` (the map is
+  the state; `state.json` stays per feature), `.active` untouched — artifacts are always
+  writable, so it runs safely mid-feature. A tracker would need `gh`, auth, and writes the
+  hooks cannot see.
+- **Three ticket types.** research (AFK: background Explore, parallel; the main session
+  does web lookups when Explore is denied them), grilling (HITL: `/feat-grill`'s round
+  shape), prototype (HITL: text inline, code via EXPLORE Mode under `prototype/`, linked).
+  `task` dropped — human-only steps are rare here (see the 2026-09-19 triage); they become
+  a Notes ❓ item plus `Blocked by: human — …`. Claims dropped: single driver.
+- **One HITL ticket per run**; the seam between tickets is a phase boundary.
+- **Reference, not inherit or re-grill.** Features carry `[epic: <epic>]` in `idea.md`;
+  `/feat-research` copies the epic decisions a feature relies on into `research.md` →
+  Epic context, and `/feat-grill` treats them as settled (re-open only with new evidence).
+- **Hand-off by paste-ready lines.** A cleared map ends in a Feature breakdown of
+  `/feat-new <slug> … [epic: <epic>]` lines in build order (`after:` for dependencies,
+  advisory). The command creates no feature folder; no fog at chart time means no map.
+- **No MEMORY.md path.** Epic decisions are plans, and MEMORY.md takes only verified
+  entries. They reach it the normal way: the child feature's `research.md` carries them,
+  and `/feat-distill` banks what shipping confirmed. Single-writer contract unchanged;
+  `memory-distiller.md` unchanged (it already reads `research.md`).
+- **`/feat-status` shows epics** (status, Destination, decision count, frontier/blocked
+  tickets, fog, and each child feature's step once cleared); a child feature shows
+  `Epic: <epic>`.
+- **One slug namespace.** `/feat-new` and `/feat-epic` each refuse a slug the other uses,
+  and `epics` is reserved. `/feat-epic` ends every run by reminding the user of this.
+
+## New file
+- **feat-epic.md** — `/feat-epic`. Uses the built-in Explore subagent; no new agent
+  (agent count stays 8). Command count 18 → 19.
+
+## Modified
+- **feat-new.md** — slug GUARD (shared namespace, `epics` reserved).
+- **feat-research.md** — step 2: `[epic: <e>]` → Epic context section, settled decisions.
+- **feat-grill.md** — step 3: Epic context decisions are settled.
+- **feat-status.md** — epic view; child feature prints its epic.
+- **CONVENTIONS.md** — pipeline diagram gains `/feat-epic`; new §Epic planning;
+  provenance note records what was kept and dropped from `/wayfinder`.
+- **install.sh / install.ps1** — expected commands 18 → 19.
+- **README.md / README_zh-TW.md** — count 18 → 19; `/feat-epic` atop the Run-a-feature
+  block; `/feat-status` note.
+- **factory-cheatsheet_{en,zh-TW}.md** — new "Plan an epic" section; `/feat-status` note.
+- **factory-training_{en,zh-TW}.html** — spec box commands 18 → 19; "Plan an epic" terminal
+  block before the standard path. Stations, house rules, and table rows unchanged.
+- **CHANGES.md** — `/feat-epic` Watchlist lines struck in the 2026-08-14 and 2026-07-23
+  entries; the Watchlist is empty.
+
+## Unchanged, checked
+`memory-distiller.md`, `feat-story.md`, `PHASE-BOUNDARIES.md` (its ladder already covers
+any `/feat-*` seam), `CLAUDE.factory-snippet.md`, `scope-track.sh`.
+
+---
+
 # /feat-sweep: periodic deep-module sweep (2026-09-19)
 
 Resolves the Watchlist item "periodic deep-module sweep" (2026-07-23). New maintenance
@@ -378,8 +445,8 @@ round-by-round grilling + phase-boundary context rules + the "cache" prompt-prun
 channel only), `/wizard` / `/to-questionnaire` / `/wait-what` (standalone skills,
 ~~Watchlist candidates~~ all declined 2026-09-19, PR #__), `/prototype` branch
 retention (EXPLORE Mode is outside the
-factory), `/wayfinder` decision tickets (stays a Watchlist item — upstream now offers a
-mature model to copy when `/feat-epic` is built).
+factory), ~~`/wayfinder` decision tickets (stays a Watchlist item — upstream now offers a
+mature model to copy when `/feat-epic` is built)~~ — built 2026-09-20 as `/feat-epic` (PR #__).
 
 ## Modified
 - **feat-grill.md** — step 3 rewritten: map decisions as a design tree and ask the whole
@@ -413,8 +480,8 @@ mature model to copy when `/feat-epic` is built).
 - `README.md` / `README_zh-TW.md`: the `/feat-grill` comment line still reads
   "interactive interview" (still true); no change strictly required, but the training
   guide link text may warrant a refresh alongside the docs above.
-- Watchlist (`/feat-epic`): when built, copy upstream's decision-ticket + parallel
-  research burn-down model from `/wayfinder` v1.2.
+- ~~Watchlist (`/feat-epic`): when built, copy upstream's decision-ticket + parallel
+  research burn-down model from `/wayfinder` v1.2.~~ — shipped 2026-09-20 (PR #__).
 
 ---
 
@@ -499,8 +566,9 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
   — done in the 2026-08-14 passes (grill station added, counts corrected to 17).
 - ~~Optional maintenance pass: prune all 8 agents per the new Prompt style rules~~ — done
   in the 2026-08-14 writing-for-agents pass; the commands were pruned selectively, not all.
-- Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); ~~periodic deep-module
-  sweep as an explore-mode tool~~ — shipped 2026-09-19 as `/feat-sweep` (PR #__).
+- ~~Watchlist: /wayfinder-style epic planning layer (`/feat-epic`)~~ — shipped 2026-09-20
+  (PR #__); ~~periodic deep-module sweep as an explore-mode tool~~ — shipped 2026-09-19 as
+  `/feat-sweep` (PR #__). The Watchlist is now empty.
 
 
 ---

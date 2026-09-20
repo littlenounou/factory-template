@@ -159,7 +159,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="Specs">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>18</b></div>
+        <div><span>commands</span><b>19</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>human checkpoints</span><b>2 (⏸ story / spec)</b></div>
         <div><span>fix-loop hard cap</span><b>loopMaxRetries = 3</b></div>
@@ -388,6 +388,13 @@ jq --version
 <span class="c"># 4. Existing CLAUDE.md → merge the two &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; blocks</span>
 <span class="c">#    Greenfield repo → the snippet already became your starter CLAUDE.md</span>
 <span class="c"># 5. Commit .claude/ + CLAUDE.md together</span></div>
+      <h3>Plan an epic (optional, above the line)</h3>
+      <div class="term"><span class="c"># For an effort bigger than one feature, route still foggy</span>
+<span class="y">/feat-epic</span> billing-v2 "per-tenant billing"  <span class="c"># chart: Destination + decision tickets</span>
+<span class="y">/feat-epic</span> billing-v2    <span class="c"># ⏸ resolve the next ticket; repeat</span>
+<span class="c"># research tickets run in the background; grilling / prototype need you.</span>
+<span class="c"># It plans, never builds. When nothing is left to decide, the map clears into</span>
+<span class="c"># paste-ready /feat-new lines — each feature then walks the standard path below.</span></div>
       <h3>Run a feature (standard path)</h3>
       <div class="term"><span class="y">/feat-new</span> user-invite "invite members to a workspace"
 <span class="y">/feat-research</span> user-invite

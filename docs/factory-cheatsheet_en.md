@@ -17,6 +17,22 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 
 **Contract files.** `CLAUDE.md` `@import`s `CONVENTIONS.md` + `terminology-zh-tw.md` — those three load every turn. Three more under `.claude/factory/` are reached by pointer, never imported: `EXPLORE-MODE.md`, `PHASE-BOUNDARIES.md`, and `CLAUDE-rationale.md` (why each rule exists — human reading only; edit it in the same PR when you change a rule). The installer lists all five ok/MISSING.
 
+## Plan an epic (optional, above the line)
+
+```
+/feat-epic <epic> "description" → chart: Destination + decision tickets → epics/<epic>/map.md
+/feat-epic <epic> [ticket]      → resolve the next ticket; repeat until the map clears
+```
+
+For an effort bigger than one feature whose route is still foggy. It plans, it never builds:
+each ticket is a question whose answer is a decision (research runs in the background;
+grilling and prototype need you), one HITL ticket per run. When nothing is left to decide,
+the map clears into a Feature breakdown of paste-ready `/feat-new … [epic: <epic>]` lines —
+you run them, and each feature walks the normal line with the epic's decisions already
+settled in its research. No `state.json`, no `.active`, safe mid-feature. Epic and feature
+slugs share one namespace (and `epics` is reserved). Small effort, no fog → it tells you to
+skip the map and use `/feat-new`.
+
 ## Run a feature
 
 ```
@@ -37,7 +53,7 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 /feat-unblock <slug>            → after `blocked`: human-authorized resume (resets retries)
 /feat-docs <slug>               → user docs: README + docsDir guides (EN → zh-TW, Mermaid)
 /feat-distill <slug>            → closing step: bank lessons into MEMORY.md (distill failures too)
-/feat-status <slug>             → check progress any time
+/feat-status <slug>             → check progress any time (a feature or an epic)
 ```
 
 The line never commits or opens PRs for you — review and commit yourself at the end.

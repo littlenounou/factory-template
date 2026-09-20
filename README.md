@@ -28,7 +28,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 18 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 19 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
@@ -41,6 +41,11 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 18 comm
 
 ## Run a feature
 ```
+# Optional, for an effort bigger than one feature — plan above the line first:
+/feat-epic <epic> "what you want"  # chart the map: destination + decision tickets
+/feat-epic <epic>       # resolve the next ticket; repeat until the map clears into
+                        # paste-ready /feat-new lines (one per feature)
+
 /feat-new <slug> "what you want"
 /feat-research <slug>
 /feat-grill <slug>      # round-by-round interview -> decisions.md (story is gated on it)
@@ -55,7 +60,7 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 18 comm
 /feat-unblock <slug>    # after `blocked`: human-authorized resume — resets the retry budget
 /feat-docs <slug>       # after a clean validate: README + guides/examples (EN, then zh-TW)
 /feat-distill <slug>    # FABLE 5: closing step — bank verified lessons into MEMORY.md
-/feat-status <slug>     # any time
+/feat-status <slug>     # any time (a feature or an epic)
 
 # Maintenance (outside the line — no slug, no state.json)
 /feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
