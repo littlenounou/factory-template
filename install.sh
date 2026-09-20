@@ -39,7 +39,7 @@ fi
 echo
 echo "Installed (counts):"
 echo "  agents:   $(ls -1 "$TARGET/.claude/agents"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 8)"
-echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 17)"
+echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')  (expect 18)"
 echo "  hooks:    $(ls -1 "$TARGET/.claude/hooks"/*.sh 2>/dev/null | wc -l | tr -d ' ')  (expect 3)"
 echo
 echo "Contract files in .claude/factory/ (imported by CLAUDE.md, or reached by pointer):"

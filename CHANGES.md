@@ -1,3 +1,48 @@
+# /feat-sweep: periodic deep-module sweep (2026-09-19)
+
+Resolves the Watchlist item "periodic deep-module sweep" (2026-07-23). New maintenance
+command, outside the per-feature pipeline. Shape adapted from mattpocock/skills
+`improve-codebase-architecture` (MIT; read at v1.2.3): scope before scanning, weight
+recently changed code, deletion test as the filter, three strength tiers, never edits
+code. NOT taken from upstream: the HTML report, `CONTEXT.md` / ADR updates, and the
+post-pick grilling (`/feat-grill` already owns that once a candidate enters the line).
+
+## Decisions (grilled with the maintainer)
+- **A maintenance command, not an EXPLORE-MODE section.** The Watchlist called it an
+  "explore-mode tool", but `EXPLORE-MODE.md` is a rule-relaxation table for prototype
+  work; a read-only sweep relaxes no rule. `/feat-recomment` is the precedent.
+- **Named `/feat-sweep [path]`** — every command carries the `feat-` prefix.
+- **One report, overwritten**: `<artifactsDir>/sweep-report.md`, version-controlled, so
+  git history is the trend. Each candidate ends in a paste-ready `/feat-new` line; the
+  command never creates a feature folder.
+- **Shallow modules only.** The 12-smell baseline stays with the validator on per-feature
+  diffs; repo-wide it would bury the candidates in ⚪ noise. Cap: 7 candidates, tiers
+  Strong / Worth exploring / Speculative, plus a Top recommendation.
+- **No reminder mechanism.** Cadence is the human's. A nudge from `/feat-distill` would
+  couple an outside-the-line tool into the pipeline.
+
+## New file
+- **feat-sweep.md** — `/feat-sweep [path]`. Uses the built-in read-only Explore subagent
+  (no new agent; agent count stays 8). Reads root `CLAUDE.md` (documented conventions
+  override), MEMORY.md (`[durable]` decisions are not re-litigated), and the previous
+  report (candidates marked `new` / `repeat`). Leaves `.active`, `state.json`, and
+  MEMORY.md alone, so it needs no GUARD and may run mid-feature. Command count 17 → 18.
+
+## Modified
+- **CONVENTIONS.md** — §Maintenance commands describes `/feat-sweep`; the group is now
+  "no slug, no `state.json`" (both maintenance commands do write a report file).
+- **install.sh / install.ps1** — expected commands 17 → 18.
+- **README.md / README_zh-TW.md** — count 17 → 18; `/feat-sweep` in the Maintenance list.
+- **factory-cheatsheet_{en,zh-TW}.md** — `/feat-sweep` in the Maintenance block plus one
+  paragraph (read-only, report shape, suggested cadence); the existing paragraph is now
+  labelled as `/feat-recomment`'s, since the block lists two commands.
+- **factory-training_{en,zh-TW}.html** — spec box commands 17 → 18; `/feat-sweep` added
+  to the Maintenance terminal block. Stations, house rules, and table rows unchanged.
+- **CHANGES.md** — the 2026-07-23 Watchlist line struck through for the sweep half
+  (`/feat-epic` remains open).
+
+---
+
 # Upstream standalone skills triage: change summary (2026-09-19)
 
 Closes the "Watchlist candidates" left open by the 2026-08-14 v1.2 sync. Each skill was
@@ -454,8 +499,8 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
   — done in the 2026-08-14 passes (grill station added, counts corrected to 17).
 - ~~Optional maintenance pass: prune all 8 agents per the new Prompt style rules~~ — done
   in the 2026-08-14 writing-for-agents pass; the commands were pruned selectively, not all.
-- Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); periodic deep-module
-  sweep as an explore-mode tool.
+- Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); ~~periodic deep-module
+  sweep as an explore-mode tool~~ — shipped 2026-09-19 as `/feat-sweep` (PR #__).
 
 
 ---

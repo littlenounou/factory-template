@@ -46,13 +46,20 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 
 ```
 /feat-recomment [path]         → 把舊的交錯式雙語註解轉成區塊形式
+/feat-sweep [path]             → 唯讀掃描淺模組 → sweep-report.md
 ```
 
-沒有 slug、不產 artifacts。先確認 git working tree 乾淨、先跑 dry run,再驅動
+`/feat-recomment`:沒有 slug、沒有 `state.json`。先確認 git working tree 乾淨、先跑 dry run,再驅動
 `.claude/factory/comment-migrate.py`——該腳本只「重排」註解行,絕不翻譯或改寫措辭,
 也絕不更動程式碼(每個檔案寫入前都會驗證)。
 它不敢動的區塊(混著被註解掉的程式碼、單行中英夾雜、語言分界不明、缺少分隔行)會列進
 `comment-migration-report.md` 交給人處理。加 `--check` 時只要還有交錯就回傳非零 exit code。
+
+`/feat-sweep` 是唯讀的:沒有 slug、沒有 `state.json`,feature 進行到一半也能安全執行。
+它對整個 repo 套用刪除測試(最近常改動的程式碼優先),並覆寫 `sweep-report.md`:
+最多 7 個排序過的候選,每個結尾附一行可直接貼上的 `/feat-new`。
+它絕不改程式碼、也不建立 feature——哪個候選要進產線由你決定。執行節奏自己定,
+例如每出貨幾個 feature 或每季一次;報告請 commit,趨勢看 git 歷史。
 
 ## 卡住時看這裡
 
