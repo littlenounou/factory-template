@@ -20,6 +20,8 @@ Do:
 
 Every test must be able to fail: a hardcoded pass or a literal assertion is a tautological test and verifies nothing (Rule 7).
 
+Redact before you paste. `verification.md` is version-controlled: credential values go in as `<REDACTED>`, any command you record references the credential through its environment variable, and a run is quoted at its signal-carrying lines (see CONVENTIONS.md, Evidence & redaction). You are done with a criterion when its redacted evidence is in the file.
+
 FABLE 5: on a classifier refusal, record the affected criterion in `verification.md` and in ⚠️ as `classifier-refusal: <criterion>`, then carry on with the remaining criteria (see CONVENTIONS.md, Fable 5 addendum).
 
 End with ✅ Verified (tests written + run) / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

@@ -13,5 +13,6 @@ Fix loop for feature `$1`.
 3. Otherwise, read `validation.md` + `verification.md`. For each 🔴/🟠 finding and each failing test, identify the owning track. For each owning track in turn:
    - write `<track> $1` to `.claude/factory/.active`;
    - delegate the specific fixes to that track's builder (backend-builder / frontend-builder), changing only what the finding requires (surgical);
-   - run `bash .claude/hooks/quality-gate.sh <track>`.
+   - run `bash .claude/hooks/quality-gate.sh <track>`;
+   - report that track's outcome with redacted evidence: credential values as `<REDACTED>`, commands referencing the credential through its environment variable, and the gate/test output quoted at its signal-carrying lines (see CONVENTIONS.md, Evidence & redaction). A fix counts as done when its redacted evidence is shown.
 4. Save `state.json`. Tell the user to re-run `/feat-verify $1` then `/feat-validate $1` to confirm the fixes.

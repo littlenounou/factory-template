@@ -26,7 +26,7 @@
 ```
 安裝程式會把 `.claude/` 複製進 repo，並讓 hooks 具備執行權限。若 repo 已有 `CLAUDE.md`，
 它**不會**被修改——安裝程式會把 `CLAUDE.factory-snippet.md` 放在旁邊供你自行合併。若沒有
-`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、17 個 commands、
+`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、18 個 commands、
 3 個 hooks。
 
 ## 在 repo 內的首次設定（3 步驟）
@@ -56,8 +56,9 @@
 /feat-distill <slug>    # FABLE 5：收尾步驟——把已驗證的教訓存入 MEMORY.md
 /feat-status <slug>     # 任何時候
 
-# 維護指令（產線之外——無 slug、不產 artifacts）
+# 維護指令（產線之外——無 slug、無 state.json）
 /feat-recomment [path]  # 把舊的交錯式雙語註解轉成區塊形式
+/feat-sweep [path]      # 唯讀掃描淺模組 -> sweep-report.md
 ```
 FABLE 5 的增補（模型路由、classifier 拒絕處理、記憶層、收斂迴圈）記載於
 `.claude/factory/CONVENTIONS.md` 的「Fable 5 addendum」。在其他模型上執行時，這些增補

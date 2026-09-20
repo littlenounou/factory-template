@@ -1,3 +1,146 @@
+# /feat-sweep: periodic deep-module sweep (2026-09-19)
+
+Resolves the Watchlist item "periodic deep-module sweep" (2026-07-23). New maintenance
+command, outside the per-feature pipeline. Shape adapted from mattpocock/skills
+`improve-codebase-architecture` (MIT; read at v1.2.3): scope before scanning, weight
+recently changed code, deletion test as the filter, three strength tiers, never edits
+code. NOT taken from upstream: the HTML report, `CONTEXT.md` / ADR updates, and the
+post-pick grilling (`/feat-grill` already owns that once a candidate enters the line).
+
+## Decisions (grilled with the maintainer)
+- **A maintenance command, not an EXPLORE-MODE section.** The Watchlist called it an
+  "explore-mode tool", but `EXPLORE-MODE.md` is a rule-relaxation table for prototype
+  work; a read-only sweep relaxes no rule. `/feat-recomment` is the precedent.
+- **Named `/feat-sweep [path]`** — every command carries the `feat-` prefix.
+- **One report, overwritten**: `<artifactsDir>/sweep-report.md`, version-controlled, so
+  git history is the trend. Each candidate ends in a paste-ready `/feat-new` line; the
+  command never creates a feature folder.
+- **Shallow modules only.** The 12-smell baseline stays with the validator on per-feature
+  diffs; repo-wide it would bury the candidates in ⚪ noise. Cap: 7 candidates, tiers
+  Strong / Worth exploring / Speculative, plus a Top recommendation.
+- **No reminder mechanism.** Cadence is the human's. A nudge from `/feat-distill` would
+  couple an outside-the-line tool into the pipeline.
+
+## New file
+- **feat-sweep.md** — `/feat-sweep [path]`. Uses the built-in read-only Explore subagent
+  (no new agent; agent count stays 8). Reads root `CLAUDE.md` (documented conventions
+  override), MEMORY.md (`[durable]` decisions are not re-litigated), and the previous
+  report (candidates marked `new` / `repeat`). Leaves `.active`, `state.json`, and
+  MEMORY.md alone, so it needs no GUARD and may run mid-feature. Command count 17 → 18.
+
+## Modified
+- **CONVENTIONS.md** — §Maintenance commands describes `/feat-sweep`; the group is now
+  "no slug, no `state.json`" (both maintenance commands do write a report file).
+- **install.sh / install.ps1** — expected commands 17 → 18.
+- **README.md / README_zh-TW.md** — count 17 → 18; `/feat-sweep` in the Maintenance list.
+- **factory-cheatsheet_{en,zh-TW}.md** — `/feat-sweep` in the Maintenance block plus one
+  paragraph (read-only, report shape, suggested cadence); the existing paragraph is now
+  labelled as `/feat-recomment`'s, since the block lists two commands.
+- **factory-training_{en,zh-TW}.html** — spec box commands 17 → 18; `/feat-sweep` added
+  to the Maintenance terminal block. Stations, house rules, and table rows unchanged.
+- **CHANGES.md** — the 2026-07-23 Watchlist line struck through for the sweep half
+  (`/feat-epic` remains open).
+
+---
+
+# Upstream standalone skills triage: change summary (2026-09-19)
+
+Closes the "Watchlist candidates" left open by the 2026-08-14 v1.2 sync. Each skill was
+read at mattpocock/skills v1.2.3 (latest; released 2026-08-06). All three are declined.
+A decline is a non-item, not a deferral: none of these stays on the Watchlist. No template
+file changes other than this one.
+
+## Declined
+- **`/wait-what`**: re-pitches a message that did not land, in ASD-STE100 Simplified
+  Technical English with the vocabulary from `CONTEXT.md`. The factory declined
+  `CONTEXT.md` on 2026-07-23 (the glossary lives per feature in `decisions.md`), so half
+  the skill has nothing to read. It repairs one chat message and touches no step, gate, or
+  artifact. ASD-STE100 is an English register; it does nothing for zh-TW conversations.
+- **`/to-questionnaire`**: turns a decision the user cannot answer alone into a Markdown
+  questionnaire for the one person who can. Its only contact point is `/feat-grill`, which
+  has no exit for a decision only a third party can settle. The maintainer confirmed that
+  case does not come up: the person running the grill is the decision-maker. No gap, so
+  nothing to adopt. If that changes, the fix is a "parked decision" outcome in
+  `/feat-grill` and the `/feat-story` guard, not this skill.
+- **`/wizard`**: generates an interactive bash script that walks a human through steps only
+  they can perform and writes captured values to `.env` files and GitHub Actions secrets.
+  Human-only setup steps are rare in the repos using this template, and the builders'
+  ❓ Needs-human-input section covers them. Vendoring would also mean carrying upstream's
+  fixed `template.sh` library through every sync (v1.2.3 already changed it) and adding a
+  model-invoked skill to a template whose agents are name-invoked by design. A repo that
+  needs it can install the upstream skill directly; it runs outside the factory line.
+
+## Modified
+- **CHANGES.md**: "Watchlist candidates" in the 2026-08-14 entry struck through with a
+  pointer to this entry.
+
+---
+
+# Pocock v1.2.3 sync — evidence redaction (2026-09-18)
+
+Adapted from mattpocock/skills v1.2.3 (MIT), PR #779 "Make `diagnosing-bugs` redact
+secrets". One adoption: redaction as the first move on pasted evidence. Upstream applies it
+to a diagnosis loop; the transferable part is the ordering, which our Rule 7 evidence
+requirement makes load-bearing the same way.
+
+**The gap it closes.** Rule 7 mandates pasted evidence, and that evidence lands in
+version-controlled artifacts (`verification.md`, `validation.md`, `decisions.md`,
+`MEMORY.md`). The only existing defence, `protect-secrets.sh`, matches secret FILES by name
+(`.env*`, `*.key|pem|p12|pfx`, `secrets.*`) and `git add|commit` command strings — it never
+inspects content. A token echoed by a failing test or an `Authorization:` header in a
+reproduction line was written and committed with nothing firing.
+
+NOT adopted from the same release: PR #781 (dropping Claude Code tool and agent-type names
+from subagent dispatch, for Codex portability) — this template is Claude Code only by
+design, and cross-harness support is out of scope, not a deferred item; PR #783 (`wizard`
+time-estimate removal, skill never adopted); v1.2.2 (`writing-for-agents` Codex metadata —
+we borrowed its prose rules, not its packaging). Upstream published no 1.2.1 changelog
+section.
+
+## Modified — contract
+- **CONVENTIONS.md** — new **Evidence & redaction** section after §Honesty, the single
+  source of truth: credential values enter as `<REDACTED>`; reproduction commands reference
+  the credential through its environment variable; a captured run is quoted at its
+  signal-carrying lines. States plainly that `protect-secrets.sh` covers secret files by
+  name and artifact CONTENT is this rule's job, and names Rule 7 as what it serves (the
+  house-rule number is deliberately not cross-referenced — it would go stale). Pocock
+  provenance note bumped to v1.2.3 / 2026-09 with the non-adoptions recorded.
+- **test-verifier.md** — completion criterion for a criterion is now its REDACTED evidence
+  in `verification.md`; points at CONVENTIONS.md rather than restating the rationale.
+- **feat-fix.md** — step 3 gains a per-track reporting bullet: a fix counts as done when its
+  redacted gate/test evidence is shown.
+- **validator.md** — Security check extended to the artifacts themselves; a live credential
+  in one is a finding graded by impact. Guardrails unchanged (🔴 stays reserved for security
+  and failing criteria, so an exposed credential can still reach 🔴 on its own merits).
+
+## Modified — human-facing docs
+- **factory-cheatsheet_{en,zh-TW}.md** — new non-negotiable #6 "Redact before you paste";
+  Fail-Loud renumbered #6 → #7, keeping it last as in the 2026-08-12 and 2026-08-14 passes.
+  Rules #1–#5 unchanged.
+- **factory-training_{en,zh-TW}.html** — matching House Rule card inserted before
+  "No workarounds, no varnish"; footer edition date 2026-08 → 2026-09. Pipeline belt, stage
+  diagram and Under-the-Hood table untouched: this is a contract rule, not a pipeline step.
+  Verified: 14 stations, 7 rules, 22 table rows, balanced tags, HTMLParser-clean, EN/zh-TW
+  at parity.
+
+## Deliberately not done
+- **No CI gate.** No content scan in `quality-gate.sh`, on the same reasoning as
+  `comment-migrate.py --check`: a high-false-positive check that can leave a repo
+  permanently red does not belong in the build.
+- **`protect-secrets.sh` untouched.** Its filename/command contract is a different defence;
+  the two are complementary and neither subsumes the other.
+- Agent/command/hook counts, the `.active` scope mechanism, and the MEMORY.md single-writer
+  contract are unchanged, so `install.sh` / `install.ps1` need no edit.
+
+## Follow-ups (not in this pass)
+- The rule is enforced by reading, not by tooling. Watch the next few features for evidence
+  that landed unredacted; if it recurs, the cheap next step is a PostToolUse hook that warns
+  (never blocks) on high-entropy strings written into `artifactsDir`, not a gate.
+- `README.md` / `README_zh-TW.md` were not touched: they summarise commands and counts, and
+  neither changed. Revisit only if the redaction rule gets a line in the setup steps.
+
+---
+
 # comment-migrate.py — correctness fixes (2026-09-16)
 
 Field report from `/feat-recomment --apply` on a Python repo: all 9 changed blocks were
@@ -233,7 +376,8 @@ Adapted from mattpocock/skills v1.2.0 (MIT; released 2026-08-05). Four adoptions
 round-by-round grilling + phase-boundary context rules + the "cache" prompt-pruning term
 + validator smells 8 → 12. NOT adopted: plugin/Codex/docs-site packaging (distribution
 channel only), `/wizard` / `/to-questionnaire` / `/wait-what` (standalone skills,
-Watchlist candidates), `/prototype` branch retention (EXPLORE Mode is outside the
+~~Watchlist candidates~~ all declined 2026-09-19, PR #__), `/prototype` branch
+retention (EXPLORE Mode is outside the
 factory), `/wayfinder` decision tickets (stays a Watchlist item — upstream now offers a
 mature model to copy when `/feat-epic` is built).
 
@@ -355,8 +499,8 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
   — done in the 2026-08-14 passes (grill station added, counts corrected to 17).
 - ~~Optional maintenance pass: prune all 8 agents per the new Prompt style rules~~ — done
   in the 2026-08-14 writing-for-agents pass; the commands were pruned selectively, not all.
-- Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); periodic deep-module
-  sweep as an explore-mode tool.
+- Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); ~~periodic deep-module
+  sweep as an explore-mode tool~~ — shipped 2026-09-19 as `/feat-sweep` (PR #__).
 
 
 ---

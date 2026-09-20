@@ -85,8 +85,17 @@ the retry budget to the human. Findings in `validation.md` / `verification.md` s
 written — re-running verify/validate regenerates them.
 
 ## Maintenance commands (outside the per-feature pipeline)
-Not pipeline steps: no slug, no artifacts. `/feat-recomment [path]` migrates legacy
+Not pipeline steps: no slug, no `state.json`. `/feat-recomment [path]` migrates legacy
 line-interleaved bilingual comments to the block-after-block form (see below).
+`/feat-sweep [path]` is the periodic deep-module sweep (shape adapted from
+mattpocock/skills `improve-codebase-architecture`, MIT). Read-only: it applies the
+validator's deletion test across the repo — recently changed code first, via the
+built-in Explore subagent — and overwrites `<artifactsDir>/sweep-report.md` with at most
+7 ranked candidates, each ending in a paste-ready `/feat-new` line. It leaves `.active`,
+`state.json`, and MEMORY.md alone, so it may run mid-feature; a refactor it suggests
+enters the line only through `/feat-new`, chosen by the human. Shallow modules only —
+the smells baseline stays with the validator, on per-feature diffs. Cadence is the
+human's; no pipeline step prompts for it.
 
 ## Prompt style (agents & commands)
 Binding when editing anything under `.claude/agents/` or `.claude/commands/`:
@@ -136,14 +145,8 @@ form required by `terminology-zh-tw.md` §1. The script only REORDERS whole comm
 inserts one separator — it never translates, rewords, adds, or deletes text, so the diff is
 mechanical and reviewable. It handles line comments, `*`-continuation blocks (JSDoc /
 Javadoc / Doxygen), and Python docstrings; it preserves indentation, comment token, and line
-endings; it is idempotent. Python files are read with `tokenize` + `ast`, so only real `#`
-comment lines and real docstrings are candidates — string literals and non-docstring
-triple-quoted strings are never touched. A comment run ends at the first non-comment line,
-and a wrapped sentence keeps its continuation lines. Before writing, it verifies that only
-comment / docstring line order changed; otherwise that file is left untouched. It refuses
-ambiguous blocks (commented-out code, a line mixing both languages, an unclear language
-split, a missing separator after a multi-line English block, text on a docstring's quote
-line that would move), listing them in `comment-migration-report.md` for a human.
+endings; it is idempotent. It refuses to touch a block containing commented-out code or a
+line mixing both languages, listing those in `comment-migration-report.md` for a human.
 Dry-run by default, and it refuses `--apply` on a dirty git tree so the migration lands as
 one standalone commit. `--check` exits non-zero while interleaved comments remain (optional
 CI guard; deliberately NOT wired into `quality-gate.sh`, since comment style is not a build
@@ -169,6 +172,19 @@ never conflicts with EXPLORE Mode's relaxed rules).
 ## Honesty
 Every agent ends with the project's Fail-Loud format: ✅ Verified / ⚠️ Skipped-Uncertain /
 ❓ Needs-human-input. "Tests pass" is never used to mask skipped tests.
+
+## Evidence & redaction
+A step proves itself with real output pasted into its artifact — Rule 7 (anti-reward-hacking)
+is met by evidence, not by narration. Those artifacts are version-controlled, so redaction is
+the first move on anything pasted:
+- Credential values enter as `<REDACTED>` — tokens, keys, connection strings, cookies,
+  signed URLs — in `verification.md`, `validation.md`, `decisions.md`, and `MEMORY.md`.
+- Reproduction commands reference the credential through its environment variable
+  (`curl -H "Authorization: Bearer $API_TOKEN" …`), so the value stays in the environment.
+- A captured run is quoted at its signal-carrying lines — the failing assertion, the error,
+  the differing field — in place of the whole dump.
+`protect-secrets.sh` covers secret FILES by name (`.env`, `*.key|pem|p12|pfx`, `secrets.*`);
+the CONTENT of an artifact is this rule's job.
 
 ## Fable 5 addendum (marked FABLE5 in the files it touches)
 Applies when the orchestrating session runs Claude Fable 5. On other models these changes
@@ -197,11 +213,6 @@ but is opt-in, not automatic). Factory semantics:
   its retry budget rephrasing a refusal.
 - Security-sensitive work (anything under an Off-Limits area such as `src/security/`) is the
   most classifier-prone; prefer `model: opus` for it, or keep it outside the factory.
-  Note (2026-07): Sonnet 5 ships cyber safeguards ON BY DEFAULT (mirroring Opus 4.7/4.8,
-  less restrictive than Fable 5) — so refusal triage now applies to the WORKER tier too,
-  not only the Fable 5 orchestrator. And since Opus 4.8 carries safeguards as well,
-  "escape to opus" may not escape for security-flavored work: weigh the "outside the
-  factory, by a human" option more heavily there.
 
 **Memory layer.** `<artifactsDir>/MEMORY.md` is the factory's cross-feature memory:
 verified facts, general rules, dated Watchlist. `/feat-distill <slug>` (memory-distiller)
@@ -230,24 +241,6 @@ document language policy), and is version-controlled — review its diffs like c
 - Anti-reward-hacking (Rule 7): the goal is met by the code satisfying the story — never
   by weakening tests or narrating success without pasted evidence.
 
-**Known issues (model routing).** The frontmatter `model:` pins are belt-and-braces, not
-the enforcement mechanism. What actually enforces routing is the project-level env pin in
-`.claude/settings.json` (`CLAUDE_CODE_SUBAGENT_MODEL: claude-sonnet-5`), because:
-- claude-code#44385: the frontmatter `model:` field can be ignored entirely — subagents
-  inherit the parent model unless a model is passed explicitly on the Agent tool call.
-- `CLAUDE_CODE_SUBAGENT_MODEL` set at ANY scope overrides frontmatter for every subagent.
-  A user-level (`~/.claude/settings.json`) or shell-exported value silently rewrites the
-  whole routing table — e.g. a global `haiku` cost cap puts the validator and
-  test-verifier on Haiku, which this file explicitly warns against. Project settings
-  override user settings, so the template's pin wins — EXCEPT against a shell-exported
-  variable, which beats settings.json env: check `echo $CLAUDE_CODE_SUBAGENT_MODEL`
-  before a factory run.
-- Per-feature `model: opus` escape hatch: under the env pin, frontmatter opus is also
-  overridden. For that run, set the value in `.claude/settings.local.json` (gitignored,
-  outranks project settings) and remove it afterwards.
-- Symptom signature if routing is broken: `/usage` shows the orchestrator model + Haiku
-  only, with Sonnet at zero.
-
 **References.** This addendum was motivated by 0xCodez's self-improving-agent thread and
 its BlockTempo zh-TW translation. They are inspiration, not specification: every
 product-behavior claim (routing, refusal signal, /goal mechanics) was re-verified against
@@ -263,6 +256,12 @@ posts (2026-07) before adoption. Re-synced against upstream v1.2.0 (2026-08): gr
 to round-by-round frontier interviewing, the Prompt style gained the cache test, the smells
 baseline grew 8 → 12, and the root CLAUDE.md's Context Health section was rewritten around
 upstream's phase-boundary ordering (continue → clear → hand off → subagent → compact).
+Re-synced again against v1.2.3 (2026-09): Evidence & redaction above, adapted from
+`diagnosing-bugs`' Redact section — upstream applies it to a diagnosis loop, and the
+transferable part is the redact-before-you-show ordering, which our pasted-evidence
+requirement makes load-bearing the same way.
 Deliberately NOT adopted: CONTEXT.md (duties covered by
-MEMORY.md + per-slug decisions.md, preserving the single-writer contract) and the setup
-skill (covered by /feat-init + project.json).
+MEMORY.md + per-slug decisions.md, preserving the single-writer contract), the setup
+skill (covered by /feat-init + project.json), and v1.2.3's harness-portability pass
+(dropping Claude Code tool and agent-type names for Codex) — this template is Claude Code
+only by design, since model routing, hooks and `.active` are Claude Code mechanisms.

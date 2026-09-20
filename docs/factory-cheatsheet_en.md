@@ -46,13 +46,20 @@ The line never commits or opens PRs for you — review and commit yourself at th
 
 ```
 /feat-recomment [path]          → migrate legacy interleaved bilingual comments to block form
+/feat-sweep [path]              → read-only sweep for shallow modules → sweep-report.md
 ```
 
-No slug, no artifacts. Guards on a clean git tree, dry-runs first, then drives
+`/feat-recomment`: no slug, no `state.json`. Guards on a clean git tree, dry-runs first, then drives
 `.claude/factory/comment-migrate.py`, which only REORDERS comment lines — never translates or
 rewords, and never changes code (each file is verified before writing). Blocks it refuses
 (commented-out code, mixed-language lines, unclear language split, missing separator) land in
 `comment-migration-report.md` for a human. `--check` exits non-zero while interleaving remains.
+
+`/feat-sweep` is read-only: no slug, no `state.json`, safe to run mid-feature. It applies the
+deletion test across the repo (recently changed code first) and overwrites `sweep-report.md`
+with up to 7 ranked candidates, each ending in a paste-ready `/feat-new` line. It never edits
+code or creates a feature — you pick what enters the line. Run it on your own cadence, e.g.
+every few shipped features or once a quarter; commit the report so git history shows the trend.
 
 ## When you're stuck
 
@@ -75,6 +82,7 @@ rewords, and never changes code (each file is verified before writing). Blocks i
 3. **MEMORY.md is code**: review its diffs — bad memory compounds as fast as good memory.
 4. **Comments are block-after-block**: full English block → one empty comment line → full zh-TW block. Never alternate line by line; migrate legacy code with `/feat-recomment`, not by hand.
 5. **Decide context at boundaries**: the seam between `/feat-*` steps is where you choose — `/compact` is the last option there, not the first. Mid-phase: continue, or split into subagents.
-6. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
+6. **Redact before you paste**: evidence is mandatory (Rule 7) and artifacts are version-controlled — credential values go in as `<REDACTED>`, reproduction commands reference them through environment variables, and you quote the signal-carrying lines instead of the whole dump. `protect-secrets.sh` catches secret files by name, not a token pasted into `verification.md`.
+7. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
 
 <sub>The FABLE5 upgrades (model routing / classifier triage / memory layer / /goal convergence) are inert-but-harmless on other models — maintain one template for the whole team; pick the model with `/model`.</sub>
