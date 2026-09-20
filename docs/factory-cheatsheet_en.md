@@ -2,7 +2,7 @@
 
 **Language 語言:** [繁體中文](factory-cheatsheet_zh-TW.md) · English
 
-> Full training: `docs/factory-training_en.html` · Design details: `.claude/factory/CONVENTIONS.md`
+> Full training: `docs/factory-training_en.html` · Design rationale: `.claude/factory/CLAUDE-rationale.md`
 > Core belief: reliability comes from the system, not the model — sequence via commands, scope via hooks, bounded loops, independent verification.
 
 ## Install (once per repo)
@@ -13,9 +13,9 @@ jq --version                 # hooks need jq; missing = enforcement is OFF (fail
 /feat-init                   # inside Claude Code: detects the stack, writes project.json, no scaffolding
 ```
 
-Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfield repo → the snippet auto-becomes your starter CLAUDE.md.
+Existing CLAUDE.md → add the two `@import` lines from the `<<< FEATURE FACTORY >>>` block (upgrading: delete the old "### Feature Factory" block); greenfield repo → the snippet auto-becomes your starter CLAUDE.md.
 
-**Contract files.** `CLAUDE.md` `@import`s `CONVENTIONS.md` + `terminology-zh-tw.md` — those three load every turn. Three more under `.claude/factory/` are reached by pointer, never imported: `EXPLORE-MODE.md`, `PHASE-BOUNDARIES.md`, and `CLAUDE-rationale.md` (why each rule exists — human reading only; edit it in the same PR when you change a rule). The installer lists all five ok/MISSING.
+**Contract files.** `CLAUDE.md` `@import`s `CONVENTIONS.md` + `terminology-zh-tw.md` — those three load every turn, in the main session and again in every factory agent, so `CONVENTIONS.md` holds only what crosses commands. Four more under `.claude/factory/` are reached by pointer, never imported: `EXPLORE-MODE.md`, `PHASE-BOUNDARIES.md`, `WRITING-FOR-AGENTS.md` (read before editing `CLAUDE.md` or `.claude/`), and `CLAUDE-rationale.md` (why each rule and mechanism exists — human reading only; edit it in the same PR when you change one). The installer lists all six ok/MISSING.
 
 ## Plan an epic (optional, above the line)
 

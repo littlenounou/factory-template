@@ -315,8 +315,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </tr>
     <tr>
       <td>Contract file layout<span class="path">CLAUDE.md + .claude/factory/*.md</span></td>
-      <td><code>CLAUDE.md</code> holds the behavioural contract and <code>@import</code>s two files, so those three load every turn. Three companions sit beside them and are reached only when their branch fires: <code>EXPLORE-MODE.md</code> (exploratory work), <code>PHASE-BOUNDARIES.md</code> (what to do with the context at a seam), <code>CLAUDE-rationale.md</code> (why each rule exists — human reading only).</td>
-      <td>Progressive disclosure keeps the always-loaded budget small: a prohibition or a rationale that fires on 1% of turns should not cost context on the other 99%. The installer verifies all five ship — a pointer whose target is missing fails silently.</td>
+      <td><code>CLAUDE.md</code> holds the behavioural contract and <code>@import</code>s two files, so those three load every turn — in the main session and again in every factory agent. <code>CONVENTIONS.md</code> therefore holds only what crosses commands. Four companions sit beside them and are reached only when their branch fires: <code>EXPLORE-MODE.md</code> (exploratory work), <code>PHASE-BOUNDARIES.md</code> (what to do with the context at a seam), <code>WRITING-FOR-AGENTS.md</code> (before editing any agent-read file), <code>CLAUDE-rationale.md</code> (why each rule and mechanism exists — human reading only).</td>
+      <td>Progressive disclosure keeps the always-loaded budget small: a prohibition or a rationale that fires on 1% of turns should not cost context on the other 99%. The installer verifies all six ship — a pointer whose target is missing fails silently.</td>
     </tr>
     <tr>
       <td>Memory layer <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
@@ -385,7 +385,7 @@ jq --version
 <span class="c"># 3. Open Claude Code in the repo, initialise the manifest</span>
 <span class="y">/feat-init</span>   <span class="c"># detects the stack or asks; writes project.json only</span>
 
-<span class="c"># 4. Existing CLAUDE.md → merge the two &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; blocks</span>
+<span class="c"># 4. Existing CLAUDE.md → add the two @import lines from the &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; block</span>
 <span class="c">#    Greenfield repo → the snippet already became your starter CLAUDE.md</span>
 <span class="c"># 5. Commit .claude/ + CLAUDE.md together</span></div>
       <h3>Plan an epic (optional, above the line)</h3>
@@ -463,7 +463,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional C
   <div class="wrap">
     <div class="foot">
       <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-09</span>
-      <span>Full design: .claude/factory/CONVENTIONS.md (incl. Fable 5 addendum)</span>
+      <span>Design rationale: .claude/factory/CLAUDE-rationale.md</span>
       <span>Behavioral contract: CLAUDE.md</span>
     </div>
   </div>

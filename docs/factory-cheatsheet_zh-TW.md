@@ -2,7 +2,7 @@
 
 **語言 Language:** 繁體中文 · [English](factory-cheatsheet_en.md)
 
-> 完整教材:`docs/factory-training_zh-TW.html` · 設計細節:`.claude/factory/CONVENTIONS.md`
+> 完整教材:`docs/factory-training_zh-TW.html` · 設計理由:`.claude/factory/CLAUDE-rationale.md`
 > 核心信念:可靠性來自系統,不是模型——順序靠指令、範圍靠 hooks、迴圈有停損、驗收靠獨立驗證者。
 
 ## 安裝(每 repo 一次)
@@ -13,9 +13,9 @@ jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-
 /feat-init                   # 在 Claude Code 內執行:偵測技術棧、寫 project.json,不 scaffold
 ```
 
-已有 CLAUDE.md → 合併兩個 `<<< FEATURE FACTORY >>>` 區塊;全新 repo → snippet 自動成為起始 CLAUDE.md。
+已有 CLAUDE.md → 加入 `<<< FEATURE FACTORY >>>` 區塊裡的兩行 `@import`(升級時:刪除舊的「### Feature Factory」區塊);全新 repo → snippet 自動成為起始 CLAUDE.md。
 
-**契約檔案。** `CLAUDE.md` `@import` 了 `CONVENTIONS.md` 與 `terminology-zh-tw.md`,這三份每一輪都載入。`.claude/factory/` 底下另有三份以 pointer 觸達、不匯入:`EXPLORE-MODE.md`、`PHASE-BOUNDARIES.md`,以及 `CLAUDE-rationale.md`(每條規則的理由——只給人讀;改規則時在同一個 PR 內一併更新)。安裝程式會逐份列出 ok/MISSING。
+**契約檔案。** `CLAUDE.md` `@import` 了 `CONVENTIONS.md` 與 `terminology-zh-tw.md`,這三份每一輪都載入——主 session 如此,每個 factory agent 也再載入一次,所以 `CONVENTIONS.md` 只放跨指令的內容。`.claude/factory/` 底下另有四份以 pointer 觸達、不匯入:`EXPLORE-MODE.md`、`PHASE-BOUNDARIES.md`、`WRITING-FOR-AGENTS.md`(編輯 `CLAUDE.md` 或 `.claude/` 之前先讀),以及 `CLAUDE-rationale.md`(每條規則與機制的理由——只給人讀;修改時在同一個 PR 內一併更新)。安裝程式會逐份列出六份的 ok/MISSING。
 
 ## 規劃 epic(選用,產線上游)
 

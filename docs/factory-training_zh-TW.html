@@ -316,8 +316,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </tr>
     <tr>
       <td>契約檔案結構<span class="path">CLAUDE.md + .claude/factory/*.md</span></td>
-      <td><code>CLAUDE.md</code> 承載行為契約並 <code>@import</code> 兩份檔案，這三份每一輪都載入。另有三份伴隨文件放在旁邊，只在對應分支觸發時才取用：<code>EXPLORE-MODE.md</code>（探索性工作）、<code>PHASE-BOUNDARIES.md</code>（在接縫處決定 context 怎麼處理）、<code>CLAUDE-rationale.md</code>（每條規則的理由——只給人讀）。</td>
-      <td>漸進式揭露讓恆常載入的預算保持精簡：只在 1% 回合會觸發的禁令或理由，不該在其餘 99% 的回合佔用 context。安裝程式會驗證五份都有隨附——pointer 的目標檔缺席是無聲失敗。</td>
+      <td><code>CLAUDE.md</code> 承載行為契約並 <code>@import</code> 兩份檔案，這三份每一輪都載入——主 session 如此，每個 factory agent 也再載入一次，所以 <code>CONVENTIONS.md</code> 只放跨指令的內容。另有四份伴隨文件放在旁邊，只在對應分支觸發時才取用：<code>EXPLORE-MODE.md</code>（探索性工作）、<code>PHASE-BOUNDARIES.md</code>（在接縫處決定 context 怎麼處理）、<code>WRITING-FOR-AGENTS.md</code>（編輯任何 agent 會讀的檔案之前）、<code>CLAUDE-rationale.md</code>（每條規則與機制的理由——只給人讀）。</td>
+      <td>漸進式揭露讓恆常載入的預算保持精簡：只在 1% 回合會觸發的禁令或理由，不該在其餘 99% 的回合佔用 context。安裝程式會驗證六份都有隨附——pointer 的目標檔缺席是無聲失敗。</td>
     </tr>
     <tr>
       <td>記憶層 <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
@@ -386,7 +386,7 @@ jq --version
 <span class="c"># 3. 在 repo 開 Claude Code，初始化 manifest</span>
 <span class="y">/feat-init</span>   <span class="c"># 偵測技術棧或直接問你；只寫 project.json</span>
 
-<span class="c"># 4. 已有 CLAUDE.md → 合併兩個 &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; 區塊</span>
+<span class="c"># 4. 已有 CLAUDE.md → 加入 &lt;&lt;&lt;FEATURE FACTORY&gt;&gt;&gt; 區塊裡的兩行 @import</span>
 <span class="c">#    全新 repo → snippet 已自動成為起始 CLAUDE.md，免合併</span>
 <span class="c"># 5. 把 .claude/ + CLAUDE.md 一起 commit</span></div>
       <h3>規劃 epic（選用，產線上游）</h3>
@@ -464,7 +464,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
   <div class="wrap">
     <div class="foot">
       <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-09</span>
-      <span>詳細設計：.claude/factory/CONVENTIONS.md（含 Fable 5 addendum）</span>
+      <span>設計理由：.claude/factory/CLAUDE-rationale.md</span>
       <span>行為契約：CLAUDE.md</span>
     </div>
   </div>

@@ -9,7 +9,7 @@ $missing = @()
 foreach ($d in $need) { if (-not (Test-Path -PathType Container (Join-Path $Src $d))) { $missing += $d } }
 if (-not (Test-Path (Join-Path $Src ".claude\settings.json"))) { $missing += ".claude\settings.json" }
 # The contract points at these by relative path; a missing one is a silent dead pointer.
-$contract = @("CONVENTIONS.md","terminology-zh-tw.md","CLAUDE-rationale.md","EXPLORE-MODE.md","PHASE-BOUNDARIES.md")
+$contract = @("CONVENTIONS.md","terminology-zh-tw.md","CLAUDE-rationale.md","EXPLORE-MODE.md","PHASE-BOUNDARIES.md","WRITING-FOR-AGENTS.md")
 foreach ($f in $contract) {
   if (-not (Test-Path (Join-Path $Src ".claude\factory\$f"))) { $missing += ".claude\factory\$f" }
 }
@@ -26,7 +26,8 @@ $claudeMd = Join-Path $Target "CLAUDE.md"
 $snippet  = Join-Path $Src "CLAUDE.factory-snippet.md"
 if (Test-Path $claudeMd) {
   Copy-Item -Force $snippet (Join-Path $Target "CLAUDE.factory-snippet.md")
-  Write-Host "* Existing CLAUDE.md left untouched - merge the two <<< FEATURE FACTORY >>> blocks into it."
+  Write-Host "* Existing CLAUDE.md left untouched - add the two @import lines from the <<< FEATURE FACTORY >>> block."
+  Write-Host "  Upgrading? Delete the old '### Feature Factory' block - it now lives in CONVENTIONS.md."
 } else {
   Copy-Item -Force $snippet $claudeMd
   Write-Host "* No CLAUDE.md found - installed the snippet as a starter CLAUDE.md."

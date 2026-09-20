@@ -2,8 +2,7 @@
 description: Interview the human about the feature plan until shared understanding, then write decisions.md. Runs after /feat-research; /feat-story is gated on its output.
 argument-hint: <slug>
 ---
-Grill step for feature `$1`. This step runs in the MAIN session — subagents cannot hold a
-multi-turn interview.
+Grill step for feature `$1`, in the MAIN session (a subagent cannot hold an interview).
 
 1. Write `docs $1` to `.claude/factory/.active`.
 2. Read `<artifactsDir>/$1/idea.md`, `research.md` (if present), and `<artifactsDir>/MEMORY.md` (if present).
@@ -30,8 +29,8 @@ multi-turn interview.
    grill is a valid outcome for small features.
 5. On consensus, write `<artifactsDir>/$1/decisions.md` (English), sections:
    - **Decisions** — one line each: `- [D#] decision — rationale`. Mark genuinely
-     hard-to-reverse ones `[durable]` (candidates for MEMORY.md; only `/feat-distill` may
-     write MEMORY.md — never write it here).
+     hard-to-reverse ones `[durable]` (candidates for MEMORY.md, banked later by
+     `/feat-distill`).
    - **Glossary** — canonical terms settled during the grill (`term: definition`). Omit if none.
    - **Declined alternatives** — options considered and rejected, with why. Omit if none.
 6. Update `state.json` step to `grill`.

@@ -1,8 +1,8 @@
 ---
-description: Plan an effort bigger than one feature as a map of decision tickets, burn them down one session at a time, then hand off paste-ready /feat-new lines. Optional layer above the per-feature pipeline.
+description: Plan an effort bigger than one feature as a map of decision tickets, burned down one per run, handing off paste-ready /feat-new lines.
 argument-hint: <epic-slug> ["<description>" to chart | [ticket] to work]
 ---
-Epic planning for `$1` (shape adapted from mattpocock/skills `/wayfinder`, MIT).
+Epic planning for `$1`.
 
 The epic PLANS; the features DO. Every ticket holds a question whose resolution is a
 decision, never a slice of the build. The map is done when nothing is left to decide
@@ -10,10 +10,9 @@ before features start — then it hands off `/feat-new` lines and stops. The pul
 build something is the signal that you have reached the edge of the map.
 
 Everything lives in `<artifactsDir>/epics/$1/` (`artifactsDir` from
-`.claude/factory/project.json`): `map.md` plus `tickets/NN-<name>.md`. The epic has no
-`state.json` — the map is its state — and this command leaves `.active`, every feature's
-`state.json`, and `MEMORY.md` exactly as they are (artifacts are always writable), so it
-may run while a feature is mid-flight. It reads code and writes only inside its epic folder.
+`.claude/factory/project.json`): `map.md` plus `tickets/NN-<name>.md`. The map is the
+epic's state — there is no `state.json` — and this command writes only inside its epic
+folder, leaving `.active` and every feature untouched, so it may run mid-feature.
 
 **Mode.** If `<artifactsDir>/epics/$1/map.md` exists → WORK (an optional second token names
 a ticket). Otherwise → CHART, and the rest of "$ARGUMENTS" is the description (required).
