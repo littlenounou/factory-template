@@ -15,6 +15,8 @@ reads this file, so the SAME template works for a full-stack app, a pure-fronten
 ## The pipeline
 ```
 /feat-init      (once per repo: write project.json)
+/feat-epic      <epic> "<desc>"   -> epics/<epic>/map.md + tickets   (optional, above the line;
+                                     repeat to burn down; hands off /feat-new lines)
 /feat-new       <slug> "<desc>"   -> idea.md + state.json
 /feat-research  <slug>            -> research.md   (built-in Explore, read-only)
 /feat-grill     <slug>            -> decisions.md  ⏸ interactive interview (main session)
@@ -29,7 +31,7 @@ reads this file, so the SAME template works for a full-stack app, a pure-fronten
 /feat-unblock   <slug>            -> human-authorized resume after `blocked` (resets retries)
 /feat-docs      <slug>            -> README + guides/examples (EN, then zh-TW)  [after a clean validate]
 /feat-distill   <slug>            -> FABLE 5: bank verified lessons into MEMORY.md  [closing step]
-/feat-status    <slug>            -> where am I
+/feat-status    <slug>            -> where am I (a feature, or an epic's map)
 ```
 Each step writes its output as a file under `<artifactsDir>/<slug>/`. The next step reads
 those files — that is how context is handed between agents (each subagent starts with a
@@ -53,6 +55,23 @@ Output: `<artifactsDir>/<slug>/decisions.md` (settled decisions, glossary, decli
 alternatives). `/feat-story` is GATED on this file. Hard-to-reverse decisions are marked
 `[durable]` — candidates for MEMORY.md, banked only by `/feat-distill` (the single-writer
 contract on MEMORY.md is unchanged). "No open decisions" is a valid fast outcome.
+
+## Epic planning (/feat-epic)
+Optional layer ABOVE `/feat-new`, for an effort bigger than one feature whose route is
+still foggy (shape adapted from mattpocock/skills `/wayfinder`, MIT). It plans; the
+features do. Charting names the Destination, maps the open decisions as tickets in
+`<artifactsDir>/epics/<epic>/` (`map.md` + `tickets/`), and fires the research tickets in
+parallel; each later run resolves one human-in-the-loop ticket (grilling or prototype)
+while research tickets burn down in the background. When no ticket and no fog remain, the
+map clears into a Feature breakdown of paste-ready `/feat-new <slug> … [epic: <epic>]`
+lines — the human runs them, and each feature then walks the unchanged line.
+- **No new state machinery.** No `state.json` (the map is the state), `.active` untouched,
+  MEMORY.md never written: it may run mid-feature.
+- **One place per decision.** `/feat-research` copies the epic decisions a feature relies
+  on into `research.md` → **Epic context**; `/feat-grill` treats them as settled. They
+  reach MEMORY.md only the normal way — `/feat-distill` banking what shipping confirmed.
+- **One slug namespace.** `/feat-new` and `/feat-epic` each refuse a slug the other uses,
+  and `epics`. Gates, guards, and the retry budget stay per feature; nothing is bypassed.
 
 ## Blocked handling (/feat-unblock)
 What actually happens when `/feat-fix` hits the cap, and the only supported way back.
@@ -260,6 +279,10 @@ Re-synced again against v1.2.3 (2026-09): Evidence & redaction above, adapted fr
 `diagnosing-bugs`' Redact section — upstream applies it to a diagnosis loop, and the
 transferable part is the redact-before-you-show ordering, which our pasted-evidence
 requirement makes load-bearing the same way.
+`/feat-epic` (2026-09) is adapted from `/wayfinder` as read on upstream main on 2026-09-20:
+kept the destination, map-as-index, decision tickets, blocking frontier, fog of war, and
+plan-don't-do; dropped the issue tracker (local markdown instead), ticket claims (single
+driver), and the `task` type (human-only steps become Needs-human-input blockers).
 Deliberately NOT adopted: CONTEXT.md (duties covered by
 MEMORY.md + per-slug decisions.md, preserving the single-writer contract), the setup
 skill (covered by /feat-init + project.json), and v1.2.3's harness-portability pass
