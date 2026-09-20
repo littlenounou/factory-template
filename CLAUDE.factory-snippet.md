@@ -2,15 +2,17 @@
 <!-- HOW TO USE THIS FILE                                                 -->
 <!-- • NEW project (no CLAUDE.md yet): rename this file to CLAUDE.md      -->
 <!--   as-is. You get the full behavioural contract + factory rules.      -->
-<!-- • EXISTING CLAUDE.md: leave it in place. Lift only the two blocks    -->
-<!--   marked  <<< FEATURE FACTORY >>>  into your own file:               -->
-<!--     (1) the two @import lines near the top, and                      -->
-<!--     (2) the "### Feature Factory" subsection under Project-Specific. -->
+<!-- • EXISTING CLAUDE.md: leave it in place. Lift only the block marked -->
+<!--   <<< FEATURE FACTORY >>> (the two @import lines) into your own file,-->
+<!--   near the top. An older copy of this snippet also had a "### Feature-->
+<!--   Factory" subsection under Project-Specific: delete it — its rules  -->
+<!--   now live in the imported CONVENTIONS.md.                           -->
 <!-- Then fill in Tech Stack + Test and Build Commands (or run /feat-init).-->
 <!-- Companion files, reached by pointer and never @imported:             -->
-<!--   .claude/factory/CLAUDE-rationale.md   (why each rule exists)       -->
+<!--   .claude/factory/CLAUDE-rationale.md   (why each rule exists; human)-->
 <!--   .claude/factory/EXPLORE-MODE.md       (exploratory work)           -->
 <!--   .claude/factory/PHASE-BOUNDARIES.md   (what to do with context)    -->
+<!--   .claude/factory/WRITING-FOR-AGENTS.md (editing agent-read files)   -->
 <!-- =================================================================== -->
 
 # CLAUDE.md
@@ -21,10 +23,10 @@
 > Each rule's design rationale lives in `.claude/factory/CLAUDE-rationale.md` — human
 > reading, not loaded by the agent. Read it before changing a rule.
 
-<!-- <<< FEATURE FACTORY (1/2): import shared pipeline conventions + doc/term policy >>> -->
+<!-- <<< FEATURE FACTORY: import the pipeline conventions + comment/doc/term policy >>> -->
 @.claude/factory/CONVENTIONS.md
 @.claude/factory/terminology-zh-tw.md
-<!-- <<< /FEATURE FACTORY (1/2) >>> -->
+<!-- <<< /FEATURE FACTORY >>> -->
 
 ---
 
@@ -233,29 +235,6 @@ situation is Default Mode.
 
 > This section is filled in by the team and applies alongside the universal rules. **If they conflict, this section takes precedence.**
 
-<!-- <<< FEATURE FACTORY (2/2): pipeline rules for this repo >>> -->
-### Feature Factory (project-specific)
-
-- **Running any `/feat-*` command == Default Mode.** The factory is for features we have
-  committed to ship; prototype / spike / POC work takes the EXPLORE Mode path instead.
-- **Track config lives in `.claude/factory/project.json`** (run `/feat-init` once). It is
-  the single source of truth for paths, commands, `docsDir`, and which tracks exist —
-  agents, commands, and hooks all read it.
-- **Scope is hook-enforced** via `.claude/factory/.active`. A blocked write is the hook
-  doing its job: report it and stay inside the active track (Rule 5).
-- **Every factory agent ends with Fail-Loud** ✅ / ⚠️ / ❓ (Rule 0).
-- **Deterministic flow control (order, branching, the fix loop) lives in commands + hooks,
-  not in the model's judgement** (Rule 9). You drive the sequence, one `/feat-*` per step.
-- **Comments are thorough and bilingual, block after block** — the complete English block,
-  a separator, then the complete Traditional Chinese (Taiwan) block. The rule, the
-  examples, the document-language policy, and the TW term dictionary all live in the
-  imported `terminology-zh-tw.md`; it is the single source of truth for all three.
-  `/feat-recomment` migrates legacy comments in place.
-- **`/feat-docs <slug>`** is the final authoring step (after a clean `/feat-validate`): the
-  **doc-writer** agent writes the README + guides/examples with **Mermaid** diagrams, then
-  the zh-TW translations. Per-slug artifacts stay where they are, as the pipeline's record.
-<!-- <<< /FEATURE FACTORY (2/2) >>> -->
-
 ### Tech Stack
 
 - [Fill in, or let `/feat-init` detect — e.g., TypeScript 5.x strict mode, React 19, Vitest, Postgres 16]
@@ -288,5 +267,6 @@ situation is Default Mode.
 
 *This file is a contract between the team and AI, not a unilateral instruction from AI. If
 team members find a rule failing in practice or causing harm, open a PR to modify this file
-— **rules are tools, not scripture**. The changelog lives in `CHANGES.md`; the rationale
-for each rule lives in `.claude/factory/CLAUDE-rationale.md`.*
+— **rules are tools, not scripture**. The rationale for each rule lives in
+`.claude/factory/CLAUDE-rationale.md`; the rules' change history lives in the factory
+template repo's `CHANGES.md`, which is not installed into this repo.*

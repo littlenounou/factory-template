@@ -1,3 +1,117 @@
+# writing-for-agents pass 2 — always-loaded layer (2026-09-20)
+
+Second audit against upstream `writing-for-agents` (read on main, 2026-09-20). The finding
+that drove it: Claude Code loads `CLAUDE.md` **and its `@import`s into every custom
+subagent** (only built-in Explore and Plan skip them), so the always-loaded layer is paid
+once per turn in the main session and again on every factory agent run. `CONVENTIONS.md`
+had grown into a design document — mostly procedures already owned by command files,
+caches of the environment, and history. Measured (HTML comments excluded, as they are
+stripped before loading): always-loaded words **5,217 → 2,644 (-49%)**; `CONVENTIONS.md`
+2,810 → ~530; snippet 1,619 → 1,391; agent descriptions 238 → 181; command descriptions
+382 → 313 (descriptions are always-loaded pointers too).
+
+## Decisions (grilled with the maintainer)
+- **`CONVENTIONS.md` stays the imported file, shrunk to the core** — existing repos keep
+  their `@import` line; reinstalling upgrades them. Design narrative moved to
+  `CLAUDE-rationale.md` (human-only, never loaded).
+- **Duplicated procedure is deleted, not moved** — the command/agent file is the single
+  source of truth; README, cheatsheets and training carry the human overview.
+- **Prompt style disclosed** to `WRITING-FOR-AGENTS.md`, reached by one pointer, and
+  re-synced to upstream's current reference.
+- **Snippet block 2/2 deleted**; its unique rules folded into the core.
+- **Scope includes commands and agents**, at least everything added since the
+  2026-08-14 pass (`/feat-recomment`, `/feat-unblock`, `/feat-sweep`, `/feat-epic`) plus
+  lines the core change touched.
+- **Verification by traceability** (table below) plus a live `/context` check by the
+  maintainer.
+
+## New file
+- **`.claude/factory/WRITING-FOR-AGENTS.md`** — disclosed reference: the two loads (with
+  the per-subagent multiplier), context pointers, information hierarchy and the branching
+  test, co-location, sprawl, completion criteria (clarity + demand, premature completion),
+  leading words and the positive prompt, and pruning (single source of truth per context,
+  cache test, relevance/sediment, no-ops). Contract files 5 → 6.
+
+## Modified
+- **CONVENTIONS.md** — rewritten as the core: Pipeline (manifest + diagram), Invariants,
+  Evidence & redaction, Classifier refusals (the definition the agents point at), and the
+  pointer to `WRITING-FOR-AGENTS.md`. Human notes sit in an HTML comment. Supersedes the
+  §Epic planning section added earlier today.
+- **CLAUDE-rationale.md** — new "Factory mechanisms" part: why commands + hooks, blocked
+  handling, the Fable 5 addendum (routing, refusals, memory layer, convergence loop,
+  references), maintenance commands, Pocock provenance.
+- **CLAUDE.factory-snippet.md** — block 2/2 removed; merge is now the two `@import` lines;
+  header comment lists the fourth companion file and the upgrade step.
+- **Agents** — backend/frontend-builder: restated Rules 5/7/9 removed (CLAUDE.md reaches
+  them), slice rule and hook line phrased positively, a no-op parenthetical cut.
+  test-verifier: description negation cut, redaction restatement → pointer. validator:
+  description negation + rationale cut, ⛔ line phrased positively. memory-distiller:
+  description trimmed, "never modify" → "you write one file". doc-writer: scope stated
+  three times → once, positively; doc-language line (a cache of terminology §2) cut.
+  spec-writer: restated Rule 1 cut. Classifier pointers retargeted to the new section.
+- **Commands** — feat-recomment: identity trimmed, a duplicate approval ban cut, the
+  word-for-word guardrail labelled and paired. feat-unblock: dead pointer to §Blocked
+  handling removed. feat-sweep, feat-ship, feat-distill, feat-init: descriptions pruned.
+  feat-docs: doc-writer's procedure and the scope-token cache removed (the agent owns
+  both); completion criterion added. feat-fix: redaction and refusal restatements →
+  pointers. feat-grill: MEMORY single-writer restatement cut. feat-epic: provenance moved
+  to rationale; state paragraph tightened.
+- **install.sh / install.ps1** — contract list gains `WRITING-FOR-AGENTS.md`; merge
+  message now says "add the two @import lines" plus the upgrade step.
+- **README.md / docs/README_zh-TW.md, cheatsheets, training HTML (EN/zh-TW)** — merge
+  instructions, the loads table (four companions), the per-subagent reload, and pointers
+  from "full design in CONVENTIONS.md" to `CLAUDE-rationale.md`.
+
+- **Dangling `CHANGES.md` references fixed** — `CHANGES.md` stays at this repo's root, but
+  the installer ships only `.claude/` and the snippet, so a bare "`CHANGES.md`" in an
+  installed file pointed at nothing in a target repo (or at that repo's own changelog).
+  The snippet's footer (always loaded, since 2026-08-14), the CONVENTIONS header comment,
+  and WRITING-FOR-AGENTS' Relevance rule now name the factory template repo's `CHANGES.md`
+  explicitly; the Relevance rule also routes a target repo's own adjustments to that
+  repo's changelog or commit message.
+
+## Traceability — every removed CONVENTIONS.md line and where it lives now
+| Removed section | Single source of truth now |
+|---|---|
+| Tracks & the manifest | core §Pipeline (condensed) |
+| The pipeline (per-step detail) | core diagram + each command file |
+| What makes this reliable | CLAUDE-rationale.md; order/Rule 9 line kept in core |
+| Grill step | feat-grill.md |
+| Epic planning | feat-epic.md; slug namespace kept in core §Invariants |
+| Blocked handling | feat-fix.md steps 1–2, feat-unblock.md, feat-status.md; why → rationale |
+| Maintenance commands | feat-sweep.md, feat-recomment.md; core diagram line |
+| Prompt style | WRITING-FOR-AGENTS.md (superset) |
+| Scope enforcement | core §Invariants; token list = scope-track.sh; each command removes `.active` itself |
+| User-facing documentation | feat-docs.md + doc-writer.md; terminology-zh-tw.md §2 |
+| Legacy comment migration | feat-recomment.md + comment-migrate.py; `--check` rationale → rationale |
+| Disclosed reference table | snippet pointers (EXPLORE, PHASE-BOUNDARIES); core pointer (WRITING-FOR-AGENTS) |
+| Mode contract | core §Invariants |
+| Honesty | CLAUDE.md Rule 0 + each agent's closing line |
+| Fable 5: model routing | agent frontmatter `model:` + its comment; why → rationale |
+| Fable 5: classifier refusals | core §Classifier refusals, feat-fix.md step 0, validator.md |
+| Fable 5: memory layer | feat-distill.md, memory-distiller.md, feat-research.md, MEMORY.md header |
+| Fable 5: convergence loop | feat-ship.md; design constraints → rationale |
+| References, Pocock provenance | CLAUDE-rationale.md |
+| Snippet block 2/2 | core §Pipeline/§Invariants; Fail-Loud = Rule 0; comment rule = terminology-zh-tw.md |
+| Builders' Rules 5/7/9, spec-writer's Rule 1 | CLAUDE.md (loaded into every factory agent) |
+
+## Upgrade note
+The `/feat-epic` delivery zip placed `README_zh-TW.md` at the repo root by mistake; its home
+is `docs/README_zh-TW.md` (the language links in both READMEs point there). If a root copy
+exists, delete it — `docs/README_zh-TW.md` in this change carries both updates.
+Reinstall. In an existing `CLAUDE.md`, delete the old "### Feature Factory" block under
+Project-Specific Rules; keeping it is harmless duplication, not an error.
+
+## Follow-ups
+- Run `/context` before and after in a real repo and compare Memory files; then ship one
+  small feature to confirm no rule stopped binding (the no-op test is model-relative).
+- ❓ Open: mark all 19 commands `disable-model-invocation: true` (they are user-invoked by
+  design). Upside: the model can never self-start a pipeline step, and descriptions may
+  leave the context. Not applied — reports disagree on whether descriptions actually
+  leave the context, and one open bug has the model refusing a user-typed command.
+
+---
+
 # /feat-epic: epic planning layer (2026-09-20)
 
 Resolves the last Watchlist item, the `/wayfinder`-style epic planning layer (parked
@@ -51,7 +165,7 @@ and the `task` type.
 - **CONVENTIONS.md** — pipeline diagram gains `/feat-epic`; new §Epic planning;
   provenance note records what was kept and dropped from `/wayfinder`.
 - **install.sh / install.ps1** — expected commands 18 → 19.
-- **README.md / README_zh-TW.md** — count 18 → 19; `/feat-epic` atop the Run-a-feature
+- **README.md / docs/README_zh-TW.md** — count 18 → 19; `/feat-epic` atop the Run-a-feature
   block; `/feat-status` note.
 - **factory-cheatsheet_{en,zh-TW}.md** — new "Plan an epic" section; `/feat-status` note.
 - **factory-training_{en,zh-TW}.html** — spec box commands 18 → 19; "Plan an epic" terminal

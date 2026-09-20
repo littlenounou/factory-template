@@ -1,9 +1,9 @@
 ---
-description: Human-authorized resume after a blocked or blocked-classifier stop. Shows the open findings, records how the block was handled, resets the retry budget, and re-enters at verify. Runs in the main session.
+description: Human-authorized resume after a blocked or blocked-classifier stop — records how the block was handled, resets the retry budget, re-enters at verify.
 argument-hint: <slug>
 ---
-Unblock step for feature `$1`. `retries` persists in `state.json` and this command is what
-resets it (see CONVENTIONS.md, Blocked handling).
+Unblock step for feature `$1`, in the main session. `retries` persists in `state.json`; this
+command is the only thing that resets it.
 
 0. GUARD — read `<artifactsDir>/$1/state.json`. Proceed if `step` is `blocked` or
    `blocked-classifier`, or if `step` is `distilled` while `validation.md` still has open

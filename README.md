@@ -31,10 +31,12 @@ already has a `CLAUDE.md`, it is NOT modified — the installer drops
 snippet is copied as a starter. Expected counts after install: 8 agents, 19 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
-1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
-   the top — `CONVENTIONS.md` and `terminology-zh-tw.md`; paste the block into
-   "Project-Specific Rules"). Skip if you let it be the starter. The three companion files
-   under `.claude/factory/` are reached by pointer, never imported — leave them unlisted.
+1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md`: add its two `@import` lines near
+   the top (`CONVENTIONS.md` and `terminology-zh-tw.md`). That is the whole merge. Skip if you
+   let it be the starter. Upgrading from before 2026-09-20: delete the old "### Feature
+   Factory" block under "Project-Specific Rules" — its rules now live in `CONVENTIONS.md`.
+   The four companion files under `.claude/factory/` are reached by pointer, never
+   imported — leave them unlisted.
 2. Open Claude Code in the repo and run `/feat-init` (detects stack or asks; writes
    `project.json` including `docsDir`; does NOT scaffold code).
 3. Confirm the manifest.
@@ -67,24 +69,27 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 19 comm
 /feat-sweep [path]      # read-only sweep for shallow modules -> sweep-report.md
 ```
 FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
-loop) are documented in the "Fable 5 addendum" of `.claude/factory/CONVENTIONS.md`. They
-are inert-but-harmless when the session runs another model.
-See `.claude/factory/CONVENTIONS.md` for the full design.
+loop) are inert-but-harmless when the session runs another model. The design and the
+reason behind each mechanism are in `.claude/factory/CLAUDE-rationale.md`.
 
 ## What the agent loads, and what it reaches for
 
 `CLAUDE.md` holds the behavioural contract and `@import`s two files, so those three are in
-context on every turn. Three more sit beside them and are reached only when their branch
-fires — keeping them out of the always-loaded budget:
+context on every turn — for the main session and again for every factory agent, since each
+subagent reloads `CLAUDE.md` and its imports. `CONVENTIONS.md` therefore carries only what
+crosses commands (the pipeline, its invariants, evidence & redaction, classifier refusals);
+each command and agent file owns its own procedure. Four more files sit beside them and
+are reached only when their branch fires:
 
 | File | Reached when |
 |---|---|
 | `.claude/factory/EXPLORE-MODE.md` | exploratory work opens (`explore mode` / `spike` / POC) |
 | `.claude/factory/PHASE-BOUNDARIES.md` | you are at a phase boundary deciding what to do with the context |
-| `.claude/factory/CLAUDE-rationale.md` | a human is weighing whether a rule still earns its place — the agent never reads this one |
+| `.claude/factory/WRITING-FOR-AGENTS.md` | anyone edits `CLAUDE.md` or a file under `.claude/` |
+| `.claude/factory/CLAUDE-rationale.md` | a human is weighing whether a rule or mechanism still earns its place — the agent never reads this one |
 
-`CLAUDE-rationale.md` is where each rule's *why* lives. Read it before changing a rule;
-edit it in the same PR when you do.
+`CLAUDE-rationale.md` is where each rule's and each mechanism's *why* lives. Read it before
+changing one; edit it in the same PR when you do.
 
 ## Comments, documentation & TW terminology
 `.claude/factory/terminology-zh-tw.md` (imported by `CLAUDE.md`) is the single source of truth for:

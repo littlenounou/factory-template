@@ -1,5 +1,5 @@
 ---
-description: One-time per repo. Detects the project's stack/tracks (or asks, for an empty repo) and writes .claude/factory/project.json. Does NOT scaffold code.
+description: One-time per repo — detect the stack and tracks (or ask) and write .claude/factory/project.json; writes no code.
 argument-hint: (no args)
 ---
 Initialise the feature factory for THIS repo by producing `.claude/factory/project.json`.

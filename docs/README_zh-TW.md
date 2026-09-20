@@ -30,10 +30,11 @@
 3 個 hooks。
 
 ## 在 repo 內的首次設定（3 步驟）
-1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`（在檔案上方加入兩行 `@import` ——
-   `CONVENTIONS.md` 與 `terminology-zh-tw.md`；並把該區塊貼進「Project-Specific Rules」）。
-   若你讓 snippet 直接當起始檔則可略過。`.claude/factory/` 底下的三份伴隨文件是以 pointer
-   觸達、不匯入的，請勿把它們列入 `@import`。
+1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`：在檔案上方加入它的兩行 `@import`
+   （`CONVENTIONS.md` 與 `terminology-zh-tw.md`），合併就只有這樣。若你讓 snippet 直接當起始檔
+   則可略過。從 2026-09-20 之前的版本升級：請刪除「Project-Specific Rules」底下舊的
+   「### Feature Factory」區塊——那些規則現在都在 `CONVENTIONS.md` 裡。`.claude/factory/`
+   底下的四份伴隨文件是以 pointer 觸達、不匯入的，請勿把它們列入 `@import`。
 2. 在 repo 內開啟 Claude Code 並執行 `/feat-init`（偵測技術堆疊或詢問你；寫出
    `project.json`，含 `docsDir`；**不會**產生任何程式碼骨架）。
 3. 確認產出的清單檔。
@@ -65,23 +66,25 @@
 /feat-recomment [path]  # 把舊的交錯式雙語註解轉成區塊形式
 /feat-sweep [path]      # 唯讀掃描淺模組 -> sweep-report.md
 ```
-FABLE 5 的增補（模型路由、classifier 拒絕處理、記憶層、收斂迴圈）記載於
-`.claude/factory/CONVENTIONS.md` 的「Fable 5 addendum」。在其他模型上執行時，這些增補
-無作用但也無害。完整設計請見 `.claude/factory/CONVENTIONS.md`。
+FABLE 5 的增補（模型路由、classifier 拒絕處理、記憶層、收斂迴圈）在其他模型上執行時
+無作用但也無害。整體設計與每個機制背後的理由，請見 `.claude/factory/CLAUDE-rationale.md`。
 
 ## 代理恆常載入什麼，又在何時去取用什麼
 
-`CLAUDE.md` 承載行為契約並 `@import` 兩份文件，因此這三份每一輪都在 context 內。另有三份
-文件放在它們旁邊，只在對應分支觸發時才被取用——藉此把它們排除在恆常載入的預算之外：
+`CLAUDE.md` 承載行為契約並 `@import` 兩份文件，因此這三份每一輪都在 context 內——主 session
+如此，每個 factory agent 也再載入一次，因為每個 subagent 都會重新載入 `CLAUDE.md` 與其匯入檔。
+所以 `CONVENTIONS.md` 只放跨指令的內容（流水線、其不變式、證據與遮蔽、classifier 拒絕）；
+各指令與 agent 的流程由各自的檔案負責。另有四份文件放在它們旁邊，只在對應分支觸發時才被取用：
 
 | 檔案 | 何時被取用 |
 |---|---|
 | `.claude/factory/EXPLORE-MODE.md` | 開始探索性工作時（`explore mode`／`spike`／POC） |
 | `.claude/factory/PHASE-BOUNDARIES.md` | 你正站在階段邊界、決定這份 context 該怎麼處理時 |
-| `.claude/factory/CLAUDE-rationale.md` | 由人判斷某條規則是否仍值得保留時——代理永遠不讀這一份 |
+| `.claude/factory/WRITING-FOR-AGENTS.md` | 任何人要編輯 `CLAUDE.md` 或 `.claude/` 底下的檔案時 |
+| `.claude/factory/CLAUDE-rationale.md` | 由人判斷某條規則或機制是否仍值得保留時——代理永遠不讀這一份 |
 
-每條規則的**設計理由**都在 `CLAUDE-rationale.md`。修改規則前先讀它；修改時在同一個 PR 內
-一併更新它。
+每條規則與每個機制的**設計理由**都在 `CLAUDE-rationale.md`。修改前先讀它；修改時在同一個
+PR 內一併更新它。
 
 ## 註解、文件與台灣術語
 `.claude/factory/terminology-zh-tw.md`（由 `CLAUDE.md` 匯入）是以下三件事的單一真實來源：

@@ -1,5 +1,5 @@
 ---
-description: Maintenance — read-only sweep for shallow modules across the repo (deletion test). Writes sweep-report.md with ranked deepening candidates. Not part of the per-feature pipeline.
+description: Maintenance — read-only deletion-test sweep for shallow modules; writes sweep-report.md with ranked deepening candidates.
 argument-hint: [path] (default: the enabled tracks' dirs)
 ---
 Sweep the codebase for shallow modules and report deepening candidates. Target: `$1`

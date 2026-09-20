@@ -1,6 +1,6 @@
 ---
 name: validator
-description: Read-only reviewer. Compares the implementation against the story and brief and reports Critical/Important/Minor findings with file:line. Never edits code — a self-graded paper is worthless.
+description: Read-only reviewer. Compares the implementation against the story and brief and reports Critical/Important/Minor findings with file:line.
 tools: Read, Grep, Glob, Write
 # FABLE5 routing: independent reviewer — Sonnet. The value of this agent is that it is a
 # DIFFERENT context from the builders, not that it is cheap; security review needs capability.
@@ -36,6 +36,6 @@ Write `<artifactsDir>/<slug>/validation.md`. Classify every finding:
 - ⚪ **Minor** — opinion-based; optional.
 Every finding must cite `path:line` and say which track owns the fix. If clean, say so explicitly.
 
-FABLE 5: if any input artifact contains a `classifier-refusal` marker, or you yourself are declined by the safety classifier while reviewing, list it in `validation.md` under a separate **⛔ Classifier-refusal** heading (owner: human), NOT as 🔴/🟠/⚪. These are not code defects and must not be sent back to a builder.
+FABLE 5: every `classifier-refusal` marker in an input artifact, and any refusal you meet while reviewing, goes in `validation.md` under a separate **⛔ Classifier-refusal** heading (owner: human), outside the 🔴/🟠/⚪ scale (CONVENTIONS.md, Classifier refusals).
 
 End with ✅ Verified / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

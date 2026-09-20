@@ -4,7 +4,7 @@ argument-hint: <slug>
 ---
 Fix loop for feature `$1`.
 
-0. FABLE 5 GUARD — classifier refusals are not defects. Before touching `retries`, scan `validation.md`, `verification.md`, and any builder reports for `classifier-refusal` markers (incl. the validator's ⛔ section). Set those findings aside: they were declined by the model's safety classifier, not caused by broken code, so they must NOT consume retries and must NOT be retried by rephrasing.
+0. FABLE 5 GUARD (CONVENTIONS.md, Classifier refusals). Before touching `retries`, scan `validation.md`, `verification.md`, and any builder reports for `classifier-refusal` markers (incl. the validator's ⛔ section) and set those findings aside: they leave `retries` untouched.
    - If ALL open findings are classifier refusals: set `state.json` step to `blocked-classifier`, remove `.claude/factory/.active`, list the refused items, and tell the user to either (a) re-run that specific step with the owning agent's `model` switched to `opus`, or (b) handle those items manually. Either way, re-enter the line afterwards via `/feat-unblock $1`. END HERE — retries stay untouched.
    - Otherwise, continue below with the remaining (normal) findings only; carry the refused items forward untouched in your final report.
 
@@ -14,5 +14,5 @@ Fix loop for feature `$1`.
    - write `<track> $1` to `.claude/factory/.active`;
    - delegate the specific fixes to that track's builder (backend-builder / frontend-builder), changing only what the finding requires (surgical);
    - run `bash .claude/hooks/quality-gate.sh <track>`;
-   - report that track's outcome with redacted evidence: credential values as `<REDACTED>`, commands referencing the credential through its environment variable, and the gate/test output quoted at its signal-carrying lines (see CONVENTIONS.md, Evidence & redaction). A fix counts as done when its redacted evidence is shown.
+   - report that track's outcome with redacted evidence (CONVENTIONS.md, Evidence & redaction). A fix counts as done when its redacted evidence is shown.
 4. Save `state.json`. Tell the user to re-run `/feat-verify $1` then `/feat-validate $1` to confirm the fixes.

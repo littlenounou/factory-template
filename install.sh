@@ -12,7 +12,7 @@ for d in .claude/agents .claude/commands .claude/hooks .claude/factory; do
 done
 [ -f "$SRC/.claude/settings.json" ] || missing="$missing .claude/settings.json"
 # The contract points at these by relative path; a missing one is a silent dead pointer.
-for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md; do
+for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md WRITING-FOR-AGENTS.md; do
   [ -f "$SRC/.claude/factory/$f" ] || missing="$missing .claude/factory/$f"
 done
 if [ -n "$missing" ]; then
@@ -29,8 +29,9 @@ echo "• Copied .claude/ into $TARGET"
 
 if [ -f "$TARGET/CLAUDE.md" ]; then
   cp "$SRC/CLAUDE.factory-snippet.md" "$TARGET/CLAUDE.factory-snippet.md"
-  echo "• Existing CLAUDE.md left untouched — merge the two <<< FEATURE FACTORY >>> blocks"
-  echo "  from CLAUDE.factory-snippet.md (copied to the repo root) into it."
+  echo "• Existing CLAUDE.md left untouched — add the two @import lines from the"
+  echo "  <<< FEATURE FACTORY >>> block of CLAUDE.factory-snippet.md (copied to the repo root)."
+  echo "  Upgrading? Delete the old \"### Feature Factory\" block — it now lives in CONVENTIONS.md."
 else
   cp "$SRC/CLAUDE.factory-snippet.md" "$TARGET/CLAUDE.md"
   echo "• No CLAUDE.md found — installed the snippet as a starter CLAUDE.md."
@@ -43,7 +44,7 @@ echo "  commands: $(ls -1 "$TARGET/.claude/commands"/*.md 2>/dev/null | wc -l | 
 echo "  hooks:    $(ls -1 "$TARGET/.claude/hooks"/*.sh 2>/dev/null | wc -l | tr -d ' ')  (expect 3)"
 echo
 echo "Contract files in .claude/factory/ (imported by CLAUDE.md, or reached by pointer):"
-for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md; do
+for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md WRITING-FOR-AGENTS.md; do
   [ -f "$TARGET/.claude/factory/$f" ] && echo "  ok  $f" || echo "  MISSING  $f"
 done
 echo "Done. Next: cd \"$TARGET\", open Claude Code, run /feat-init"

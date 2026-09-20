@@ -1,5 +1,5 @@
 ---
-description: FABLE 5 memory layer. After a clean validation, distill verified lessons from this feature into the cross-feature MEMORY.md.
+description: Closing step — distill this feature's verified lessons into the cross-feature MEMORY.md (after a clean validation or a block).
 argument-hint: <slug>
 ---
 Distill step for feature `$1` (FABLE 5 memory layer).

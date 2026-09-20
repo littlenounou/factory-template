@@ -1,5 +1,5 @@
 ---
-description: FABLE 5 convergence loop. Pairs with /goal to drive verify → validate → fix to completion autonomously. Human checkpoints (story/spec) are NOT affected — this only automates the mechanical tail after the build steps.
+description: FABLE 5 convergence loop — pairs with /goal to drive verify → validate → fix to completion; the ⏸ story/spec checkpoints stay human.
 argument-hint: <slug>
 ---
 Ship-convergence step for feature `$1` (FABLE 5 — pairs with the built-in `/goal`).
@@ -7,7 +7,7 @@ Ship-convergence step for feature `$1` (FABLE 5 — pairs with the built-in `/go
 0. PRECONDITIONS — check all three, STOP with a pointer if any fails:
    - `<artifactsDir>/$1/brief.md` exists (the human-approved spec; ship never skips the ⏸ checkpoints).
    - Every enabled build step has run: `state.json` step is `backend`, `frontend`, `verify`, `validate`, or a fix/blocked state — not `new`/`research`/`story`/`spec`.
-   - `/goal` is available in this session (it is part of the hooks system; with `disableAllHooks` set you lose BOTH scope enforcement and /goal — do not run the factory that way).
+   - `/goal` is available in this session (it is part of the hooks system — CONVENTIONS.md, Invariants).
 
 1. If no goal is active: print the following for the user to run verbatim (Claude cannot set goals; only the user can), then end this turn.
 
