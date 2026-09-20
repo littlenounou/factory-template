@@ -46,13 +46,20 @@ The line never commits or opens PRs for you — review and commit yourself at th
 
 ```
 /feat-recomment [path]          → migrate legacy interleaved bilingual comments to block form
+/feat-sweep [path]              → read-only sweep for shallow modules → sweep-report.md
 ```
 
-No slug, no artifacts. Guards on a clean git tree, dry-runs first, then drives
+`/feat-recomment`: no slug, no `state.json`. Guards on a clean git tree, dry-runs first, then drives
 `.claude/factory/comment-migrate.py`, which only REORDERS comment lines — never translates or
 rewords, and never changes code (each file is verified before writing). Blocks it refuses
 (commented-out code, mixed-language lines, unclear language split, missing separator) land in
 `comment-migration-report.md` for a human. `--check` exits non-zero while interleaving remains.
+
+`/feat-sweep` is read-only: no slug, no `state.json`, safe to run mid-feature. It applies the
+deletion test across the repo (recently changed code first) and overwrites `sweep-report.md`
+with up to 7 ranked candidates, each ending in a paste-ready `/feat-new` line. It never edits
+code or creates a feature — you pick what enters the line. Run it on your own cadence, e.g.
+every few shipped features or once a quarter; commit the report so git history shows the trend.
 
 ## When you're stuck
 

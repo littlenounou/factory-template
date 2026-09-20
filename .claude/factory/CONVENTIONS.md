@@ -85,8 +85,17 @@ the retry budget to the human. Findings in `validation.md` / `verification.md` s
 written — re-running verify/validate regenerates them.
 
 ## Maintenance commands (outside the per-feature pipeline)
-Not pipeline steps: no slug, no artifacts. `/feat-recomment [path]` migrates legacy
+Not pipeline steps: no slug, no `state.json`. `/feat-recomment [path]` migrates legacy
 line-interleaved bilingual comments to the block-after-block form (see below).
+`/feat-sweep [path]` is the periodic deep-module sweep (shape adapted from
+mattpocock/skills `improve-codebase-architecture`, MIT). Read-only: it applies the
+validator's deletion test across the repo — recently changed code first, via the
+built-in Explore subagent — and overwrites `<artifactsDir>/sweep-report.md` with at most
+7 ranked candidates, each ending in a paste-ready `/feat-new` line. It leaves `.active`,
+`state.json`, and MEMORY.md alone, so it may run mid-feature; a refactor it suggests
+enters the line only through `/feat-new`, chosen by the human. Shallow modules only —
+the smells baseline stays with the validator, on per-feature diffs. Cadence is the
+human's; no pipeline step prompts for it.
 
 ## Prompt style (agents & commands)
 Binding when editing anything under `.claude/agents/` or `.claude/commands/`:

@@ -160,7 +160,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="規格">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>17</b></div>
+        <div><span>commands</span><b>18</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
         <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
@@ -413,7 +413,12 @@ jq --version
 <span class="y">/feat-recomment</span>            <span class="c"># 沒有 slug；需 git tree 乾淨；先跑 dry run</span>
 <span class="c"># 它只「重排」註解行——絕不翻譯、不改寫措辭。</span>
 <span class="c"># 不敢動的區塊會列進 comment-migration-report.md 交給人處理。</span>
-python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 CI 檢查</span></div>
+python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 CI 檢查</span>
+
+<span class="c"># 定期：唯讀掃描淺模組（刪除測試）</span>
+<span class="y">/feat-sweep</span>                <span class="c"># 沒有 slug；feature 進行中也可執行；寫出 sweep-report.md</span>
+<span class="c"># 最多 7 個排序過的候選，每個附一行可直接貼上的 /feat-new。</span>
+<span class="c"># 它絕不改程式碼、也不建立 feature——哪個候選進產線由你決定。</span></div>
     </div>
     <div class="howcol">
       <h3>狀態對照：卡住時看這裡</h3>

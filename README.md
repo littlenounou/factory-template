@@ -28,7 +28,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 17 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 18 commands, 3 hooks.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
@@ -57,8 +57,9 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 17 comm
 /feat-distill <slug>    # FABLE 5: closing step — bank verified lessons into MEMORY.md
 /feat-status <slug>     # any time
 
-# Maintenance (outside the line — no slug, no artifacts)
+# Maintenance (outside the line — no slug, no state.json)
 /feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
+/feat-sweep [path]      # read-only sweep for shallow modules -> sweep-report.md
 ```
 FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
 loop) are documented in the "Fable 5 addendum" of `.claude/factory/CONVENTIONS.md`. They
