@@ -14,10 +14,6 @@ Inputs: `story.md`, `brief.md`, `verification.md`, and the actual changed source
 Check:
 - **Acceptance**: is every story criterion actually met?
 - **Security**: auth checks, tenant/ownership isolation, secrets in logs or code, injection.
-  The artifacts are in scope as well — `verification.md`, `validation.md`, `decisions.md` and
-  `MEMORY.md` carry pasted evidence into version control, so a live credential sitting in one
-  is a finding, graded by impact like any other (`protect-secrets.sh` guards secret files by
-  name, not artifact content).
 - **Scope**: were files changed outside the brief's agreed area?
 - **Conventions**: consistency with root `CLAUDE.md`; copied anti-patterns surfaced, not silently propagated.
 - **Duplication / dead code** introduced by this change.
