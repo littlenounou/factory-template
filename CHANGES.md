@@ -1,3 +1,41 @@
+# /feat-epic: delegate, and human-ruled scope drops (2026-09-20)
+
+Follow-up to `/feat-epic`. Two gaps found while walking the WORK loop: a ticket that turns
+out to move only one feature had no exit except being answered in the epic or squeezed into
+Out of scope, and both scope drops were decided by the agent alone, at the point in the run
+where the pull to finish is strongest (upstream's premature completion). CHART is unchanged.
+
+- **Third way to close a ticket: `delegated`.** The question moves one feature only, so
+  that feature's `/feat-grill` settles it. Its Decisions-so-far line reads
+  `delegated to <feature-slug> — <the open question>`, and step 6 carries it into the
+  Feature breakdown as `open: <ticket titles>` beside that feature's `/feat-new` line. A
+  question that shapes the split, or that several features depend on, stays with the epic.
+- **The human rules on every scope drop.** Out of scope and delegated are now raised in the
+  same grilling round as the ticket being resolved (`❓` + `➡️`, no extra round), and step 5
+  acts on the answer. The Destination's own Out of scope, agreed while charting, is already
+  the human's.
+- **Closing report** names every ticket closed without being answered, with its new owner,
+  so a drop cannot pass silently.
+- Clearing the map is unchanged: no open ticket, no fog. Delegating closes a ticket, so no
+  condition had to be relaxed.
+
+## Modified
+- **feat-epic.md** — ticket `Status` gains `delegated`; new "Three ways a ticket closes"
+  paragraph; WORK steps 3, 5, 6 and the closing report. 1,007 → ~1,140 words.
+
+## writing-for-agents check on the change
+- **Step ordering fixed.** Step 4 set `closed` on the ticket in hand before step 5 could
+  apply a ruling to it, so dropping the ticket you just resolved contradicted itself. Step 3
+  now says the ticket in hand may itself be dropped, and step 4 covers answered tickets.
+- **Co-location.** `Decisions so far` was defined as "one line per closed ticket", which
+  invited out-of-scope tickets in and needed a "never in Decisions so far" ban in step 5.
+  The definition now reads "answered or delegated", and the ban is gone — a boundary stated
+  once where the concept is defined, not repeated as a prohibition at the point of use.
+- **No-ops cut.** "No separate round" restated "in the same round"; "which step 6 carries
+  into the breakdown" restated step 6's own instruction.
+
+---
+
 # writing-for-agents pass 2 — always-loaded layer (2026-09-20)
 
 Second audit against upstream `writing-for-agents` (read on main, 2026-09-20). The finding
