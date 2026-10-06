@@ -1,6 +1,6 @@
 ---
 description: Maintenance — migrate legacy line-interleaved bilingual comments to the block-after-block form.
-argument-hint: [path] (default: whole repo)
+argument-hint: "[path] (default: whole repo)"
 ---
 Migrate existing comments to the block-after-block bilingual form defined in
 `.claude/factory/terminology-zh-tw.md` §1. Target: `$1` (default: the whole repo).

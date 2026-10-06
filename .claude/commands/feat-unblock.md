@@ -41,10 +41,11 @@ command is the only thing that resets it.
 6. RESET — set `retries` to 0 and `step` to `validate` in `state.json`; remove
    `.claude/factory/.active` if present.
 
-7. NEXT — run the branch from the step-2 table. Once verify and validate are green the
-   normal tail applies: `/feat-docs $1`, closing with `/feat-distill $1`. `/feat-ship $1`
-   may drive the remaining convergence. Hard guardrail: a human runs this command, outside
-   any active `/goal` loop — unblocking is a judgment call, not a convergence step.
+7. NEXT — tell the human the commands for their branch of the step-2 table, in order; they
+   run each one. Once verify and validate are green the normal tail applies:
+   `/feat-docs $1`, closing with `/feat-distill $1`. `/feat-ship $1` may drive the remaining
+   convergence. Hard guardrail: a human runs this command, outside any active `/goal`
+   loop — unblocking is a judgment call, not a convergence step.
 
 End with ✅ Verified (state changes actually written, audit entry appended) /
 ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

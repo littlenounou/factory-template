@@ -51,7 +51,8 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 
 /feat-unblock <slug>           → `blocked` 之後:人工授權復工(重置 retries)
 /feat-docs <slug>              → 使用者文件:README + docsDir 指南(英文→繁中,Mermaid)
-/feat-distill <slug>           → 收尾:教訓入 MEMORY.md(失敗也要蒸餾)
+/feat-distill <slug>           → 收尾:教訓入 MEMORY.md(失敗也要蒸餾);
+                                 機械性教訓會變成建議的 lint/hook 檢查,由你加上
 /feat-status <slug>            → 隨時查進度(feature 或 epic 皆可)
 ```
 

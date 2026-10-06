@@ -1,8 +1,9 @@
 # Factory Memory (FABLE 5 memory layer — cross-feature, version-controlled)
 
 > Written ONLY by the memory-distiller agent via `/feat-distill`, after a feature passes
-> validation. Read at the start of `/feat-research`. Humans may edit freely — this file is
-> part of the repo and reviewable in PRs like any other change.
+> validation. Read at the start of `/feat-research`; the validator also checks each diff
+> against General rules. Humans may edit freely — this file is part of the repo and
+> reviewable in PRs like any other change.
 >
 > Entry contract (enforced by the distiller):
 > - Every entry is VERIFIED: it traces to something that actually happened in a shipped
@@ -19,12 +20,16 @@
 
 ## General rules
 <!-- Reusable do/don't patterns distilled from fixes and findings, written so the NEXT
-     feature can apply them without context.
+     feature can apply them without context. Judgement calls only: a pattern a linter,
+     hook or CI job could catch becomes a proposed check instead (see Watchlist).
      e.g. - [2026-07-06 csv-export] Streaming responses bypass the global error handler; wrap them explicitly. -->
 (none yet)
 
 ## Watchlist
 <!-- Known-flaky things, deferred cleanups surfaced under Rule 5, and open risks that are
-     not defects of any single feature. Remove entries when resolved.
-     e.g. - [2026-07-06 report-gen] tests/e2e/pdf.spec is timing-sensitive on CI; reruns usually pass. -->
+     not defects of any single feature, plus `check pending: <rule>` (a proposed check
+     not yet added) and `no guardrail: <track> <lint|test>` (a blank gate command).
+     Remove entries when resolved.
+     e.g. - [2026-07-06 report-gen] tests/e2e/pdf.spec is timing-sensitive on CI; reruns usually pass.
+     e.g. - [2026-07-06 csv-export] check pending: ban naive datetime.now(), in ruff DTZ rules -->
 (none yet)

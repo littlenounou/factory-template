@@ -15,8 +15,14 @@ Grill step for feature `$1`, in the MAIN session (a subagent cannot hold an inte
    - Every question uses this fixed shape, so the user can answer by number
      ("Q1 agree, Q2 agree, Q3 change to ..."):
 
-     ❓ **Q<n>** — **<title>**: <body; include the choices if it is multiple-choice>
+     ❓ **Q<n>** - **<title>**: <body; include the choices if it is multiple-choice>
+
      ➡️ <your recommended answer>
+
+     ---
+
+     A horizontal rule separates consecutive questions; the last one in a round ends at
+     its ➡️ line.
 
    - If a question can be answered from `research.md` or by reading the codebase
      (read-only), read instead of asking. Dispatch such fact-finding to the built-in

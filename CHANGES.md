@@ -1,3 +1,95 @@
+# Pocock v1.3.1 sync: prevention pass, grill separator, command hand-offs (2026-10-07)
+
+Read against mattpocock/skills v1.3.1 (MIT; tagged 2026-10-05; changelog and `SKILL.md`
+files read from a clone, since the GitHub Releases page still showed v1.2.3). v1.3.0
+added `implement-spec`, `pr` and `retro`, removed `resolving-merge-conflicts`, renamed
+`CONTEXT.md` to `GLOSSARY.md`, and swept em-dashes from the repo; v1.3.1 points a fixed
+bug at `retro` to ask what would have prevented it.
+
+## Decisions (grilled with the maintainer)
+- **Adopt `retro`'s mechanical/judgement split into `/feat-distill`.** A fixed failure is
+  asked "what would have caught it earlier?". Mechanical patterns become proposed checks
+  (lint rule, `project.json` command or hook) that a human adds; judgement calls stay
+  General rules. The distiller cannot edit config, so it only proposes.
+- **Validator reads General rules only** (Q1a). Verified facts describe the codebase and
+  serve research, not diff review.
+- **Proposed checks are tracked** (Q1b): a `check pending: <rule>` Watchlist entry stays
+  until the check exists in the repo, so a one-time report cannot drop it.
+- **A blank gate command is a finding** (Q1c): `no guardrail: <track> <lint|test>`.
+  `quality-gate.sh` prints `(none configured, skipped)` and moves on, so nothing else
+  surfaces it.
+- **`pr`: point to upstream, do not vendor** (Q2). One README line; the factory still never
+  opens PRs.
+- **`implement-spec`: declined** (Q3), a non-item rather than a Watchlist entry. Its
+  parallel worktrees are merged by a subagent, which conflicts with the rule that the
+  human commits, and its implementers would share one `state.json` (`retries`, `step`) and
+  one `backend-summary.md`. Large work is already split into features by `/feat-epic`.
+- **Em-dashes: new English lines use fewer** (Q4). No repo-wide sweep. Upstream gives no
+  stated reason for its ban (PRs #879 and #905 describe only the change); the rule kept
+  here is the one with a reason for agents: a colon, comma, period or parentheses names
+  the relation a dash leaves open. zh-TW 破折號 is untouched.
+
+## Modified
+- **memory-distiller.md**: new step 2 Prevention pass (mechanical / judgement /
+  upstream gap); General rules now take only judgement and upstream-gap answers; Watchlist
+  gains `check pending` and `no guardrail` entries and their removal conditions; reads
+  `project.json`; ❓ lists every Proposed check.
+- **validator.md**: reads MEMORY.md's General rules; new **Memory rules** check (cite
+  `[date slug]`, root `CLAUDE.md` overrides, 🟠/⚪ only).
+- **feat-distill.md**: step 5 reports every Proposed check.
+- **MEMORY.md**: header names the validator as a reader; General rules and Watchlist
+  comments describe the split, with a `check pending` example. Note that `install.sh`
+  overwrites this file in a target repo (see Follow-ups).
+- **feat-grill.md**: round shape matches upstream: ` - ` after `Q<n>`, a blank line
+  before ➡️, and `---` between questions. `/feat-epic` inherits it by pointer.
+- **feat-sweep.md / feat-recomment.md**: `argument-hint` quoted. Unquoted, a value
+  starting with `[` is invalid YAML (PyYAML rejects both files); the same class of bug as
+  upstream #911.
+- **feat-spec.md / feat-unblock.md**: the next step is told to the human, matching every
+  other command. Upstream v1.3.0 (#880) found that skills telling the agent to invoke a
+  user-invoked skill fail silently; these two lines would break the same way once
+  `disable-model-invocation` lands on the `/feat-*` commands (the deferred follow-up from
+  writing-for-agents pass 2).
+- **spec-writer.md**: "slices with no blockers may be built in parallel" replaced by an
+  ordering rule (every slice after its blockers; builders work top to bottom). Nothing in
+  the factory builds slices in parallel.
+- **WRITING-FOR-AGENTS.md**: new section "Punctuation and frontmatter" (dash rule for new
+  English lines; quote frontmatter values containing `: ` or starting with `[`, `{`, `*`,
+  `&`).
+- **CLAUDE-rationale.md**: Fable 5 addendum gains the Prevention pass rationale; Pocock
+  provenance gains the v1.3.1 re-sync and the v1.3.x declines (`implement-spec`, `pr` as a
+  step, the em-dash sweep) and notes the `GLOSSARY.md` rename.
+- **README.md / docs/README_zh-TW.md**: one paragraph pointing to upstream `pr`.
+- **factory-cheatsheet_{en,zh-TW}.md**: `/feat-distill` line mentions proposed checks.
+- **factory-training_{en,zh-TW}.html**: `/feat-distill` station and Memory-layer row
+  describe the prevention pass and the validator reading General rules. Stations, house
+  rules and table row counts unchanged.
+
+## Not taken, no action needed
+- `resolving-merge-conflicts` removal: nothing here referenced it.
+- #878 "Call the Skill tool with ...": commands delegate with "Use the **X** subagent",
+  already explicit, and no command loads a skill.
+- `GLOSSARY.md` rename: `CONTEXT.md` was declined on 2026-07-23; provenance notes the new
+  name so an upstream search finds it.
+
+## Unchanged, checked
+`CONVENTIONS.md` (the always-loaded layer is unchanged: the MEMORY.md single-writer
+invariant still holds, the validator only reads), agent and command descriptions, agent
+and command counts (8 / 19), `install.sh` / `install.ps1`, `quality-gate.sh`,
+`scope-track.sh`, `feat-epic.md`, `feat-ship.md`.
+
+## Follow-ups (not in this pass)
+- **`install.sh` / `install.ps1` overwrite `.claude/factory/MEMORY.md`** on reinstall
+  (`cp -R` / `Copy-Item -Force` over the whole `.claude/`), so upgrading a repo whose
+  `artifactsDir` is the default wipes its memory. Found while checking this change;
+  fix as its own issue (copy MEMORY.md only when absent).
+- `disable-model-invocation` on `/feat-*` (deferred from pass 2) can now proceed: every
+  command hands off by telling the human.
+- Watch the first few distills for checks proposed but never added; if `check pending`
+  entries pile up, raise them in `/feat-status`.
+
+---
+
 # /feat-epic: delegate, and human-ruled scope drops (2026-09-20)
 
 Follow-up to `/feat-epic`. Two gaps found while walking the WORK loop: a ticket that turns
@@ -737,3 +829,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-08-14 | (fill in) | Pocock v1.2 sync: grill round-by-round (frontier), Context Health rewritten as phase-boundary decision list, prompt-style "cache" term, validator smells 8 → 12 |
 | 2026-08-14 | (fill in) | writing-for-agents pass: prohibitions rephrased positively, rationale/EXPLORE Mode/phase-boundary ladder disclosed to companion files, changelog moved here |
 | 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
+| 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules, grill round separator, commands hand off to the human |

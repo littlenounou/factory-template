@@ -272,7 +272,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage f5" data-n="11">
       <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 new</span><span class="out">→ MEMORY.md updated</span></div>
-      <p>The memory-distiller banks the lessons that <em>actually happened</em> in this feature into the cross-feature <code>MEMORY.md</code> (Verified facts / General rules / Watchlist). <b>Failures get distilled too</b>: a blocked feature's open findings go to the Watchlist so the next feature doesn't rediscover them. Zero new lessons is a legitimate result — padding is forbidden.</p>
+      <p>The memory-distiller banks the lessons that <em>actually happened</em> in this feature into the cross-feature <code>MEMORY.md</code> (Verified facts / General rules / Watchlist). <b>Failures get distilled too</b>: a blocked feature's open findings go to the Watchlist so the next feature doesn't rediscover them. Zero new lessons is a legitimate result — padding is forbidden. For each fixed failure it asks what would have caught it earlier: a mechanical pattern comes back as a <b>proposed lint/hook check</b> for you to add (tracked as <code>check pending</code>), and only judgement calls become General rules, which the validator then checks on later diffs.</p>
     </div>
   </div>
   <p class="linefoot">At any time, <code>/feat-status &lt;slug&gt;</code> shows where a feature sits on the line and what to run next.</p>
@@ -320,7 +320,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </tr>
     <tr>
       <td>Memory layer <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
-      <td>Cross-feature long-term memory, written only by the memory-distiller and read by /feat-research at the start of every feature. Every entry must trace to something that actually happened; hard cap ~150 lines.</td>
+      <td>Cross-feature long-term memory, written only by the memory-distiller, read by /feat-research at the start of every feature, and its General rules checked by the validator on every diff. Every entry must trace to something that actually happened; hard cap ~150 lines.</td>
       <td>Lives in the repo, under version control — <b>review memory diffs like code</b>: bad memory compounds exactly as fast as good memory.</td>
     </tr>
   </table>

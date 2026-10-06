@@ -52,7 +52,8 @@ skip the map and use `/feat-new`.
 
 /feat-unblock <slug>            → after `blocked`: human-authorized resume (resets retries)
 /feat-docs <slug>               → user docs: README + docsDir guides (EN → zh-TW, Mermaid)
-/feat-distill <slug>            → closing step: bank lessons into MEMORY.md (distill failures too)
+/feat-distill <slug>            → closing step: bank lessons into MEMORY.md (distill failures too);
+                                  mechanical lessons come back as proposed lint/hook checks for you to add
 /feat-status <slug>             → check progress any time (a feature or an epic)
 ```
 

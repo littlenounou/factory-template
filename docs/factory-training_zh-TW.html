@@ -273,7 +273,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage f5" data-n="11">
       <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 新增</span><span class="out">→ MEMORY.md 更新</span></div>
-      <p>memory-distiller 把這個 feature「實際發生過」的教訓蒸餾進跨 feature 的 <code>MEMORY.md</code>（Verified facts／General rules／Watchlist）。<b>失敗也要蒸餾</b>：blocked 的開放問題進 Watchlist，下個 feature 不重踩。零新教訓是合法結果，禁止硬湊。</p>
+      <p>memory-distiller 把這個 feature「實際發生過」的教訓蒸餾進跨 feature 的 <code>MEMORY.md</code>（Verified facts／General rules／Watchlist）。<b>失敗也要蒸餾</b>：blocked 的開放問題進 Watchlist，下個 feature 不重踩。零新教訓是合法結果，禁止硬湊。每個修好的失敗都會被追問「什麼能更早攔到它」：機械性的模式會變成<b>建議的 lint／hook 檢查</b>由你加上（以 <code>check pending</code> 追蹤），只有判斷題才寫成 General rules，之後由 validator 在每次 diff 檢查。</p>
     </div>
   </div>
   <p class="linefoot">隨時可用 <code>/feat-status &lt;slug&gt;</code> 查詢任何 feature 在產線上的位置與下一步。</p>
@@ -321,7 +321,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </tr>
     <tr>
       <td>記憶層 <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
-      <td>跨 feature 的長期記憶，只由 memory-distiller 寫入、由 /feat-research 開場讀取。條目必須可追溯到實際發生的事，硬上限 ~150 行。</td>
+      <td>跨 feature 的長期記憶，只由 memory-distiller 寫入、由 /feat-research 開場讀取，其 General rules 由 validator 在每次 diff 檢查。條目必須可追溯到實際發生的事，硬上限 ~150 行。</td>
       <td>放在 repo 裡、進版本控制——<b>記憶的 diff 要像程式碼一樣 review</b>，壞記憶的複利跟好記憶一樣快。</td>
     </tr>
   </table>

@@ -111,4 +111,7 @@ before writing a file it verifies that only comment / docstring line order chang
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
 artifacts — they stay in place as the pipeline's record.
 
-This template does not auto-commit or open PRs by design.
+This template does not auto-commit or open PRs by design. For the PR body, the `pr` skill
+from [mattpocock/skills](https://github.com/mattpocock/skills) (Claude Code plugin
+`mattpocock-skills`) works beside the line: a summary visual, before/after evidence, and a
+merge-danger call. It is not part of the factory and needs no factory changes.
