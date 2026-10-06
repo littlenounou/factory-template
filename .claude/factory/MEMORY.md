@@ -2,8 +2,8 @@
 
 > Written ONLY by the memory-distiller agent via `/feat-distill`, after a feature passes
 > validation. Read at the start of `/feat-research`; the validator also checks each diff
-> against General rules. Humans may edit freely — this file is part of the repo and
-> reviewable in PRs like any other change.
+> against General rules and the Watchlist's `check pending` entries. Humans may edit
+> freely — this file is part of the repo and reviewable in PRs like any other change.
 >
 > Entry contract (enforced by the distiller):
 > - Every entry is VERIFIED: it traces to something that actually happened in a shipped

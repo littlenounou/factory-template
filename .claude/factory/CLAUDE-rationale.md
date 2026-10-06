@@ -168,6 +168,10 @@ the `model:` fields are plain subagent routing and the refusal path never trigge
   judgement calls. The validator reads General rules because review is where standards
   belong: the builders carry the most context pressure, the reviewer the least. A blank
   `lint`/`test` command is itself a Watchlist entry, since the gate silently skips it.
+  The validator also reads `check pending` entries: until the human adds the check, the
+  lesson would otherwise sit where no reviewer looks, leaving mechanical lessons less
+  guarded than judgement calls. Once the check exists the distiller removes the entry,
+  and the gate takes over from review.
   Adapted from upstream `retro` (v1.3.0) and v1.3.1's "fix, then ask what would have
   prevented it".
 - **Convergence loop.** `/feat-ship` + `/goal` automates only the mechanical tail; the two

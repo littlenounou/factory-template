@@ -11,8 +11,12 @@ bug at `retro` to ask what would have prevented it.
   asked "what would have caught it earlier?". Mechanical patterns become proposed checks
   (lint rule, `project.json` command or hook) that a human adds; judgement calls stay
   General rules. The distiller cannot edit config, so it only proposes.
-- **Validator reads General rules only** (Q1a). Verified facts describe the codebase and
-  serve research, not diff review.
+- **Validator reads General rules and `check pending` entries** (Q1a, Q1d). Verified facts
+  describe the codebase and serve research, not diff review, so they stay out. A
+  `check pending` entry is a rule waiting for its check: without it, a mechanical lesson
+  sat where no reviewer looked until the human added the check, leaving it less guarded
+  than a judgement call. Once the check exists the distiller removes the entry and the
+  gate takes over.
 - **Proposed checks are tracked** (Q1b): a `check pending: <rule>` Watchlist entry stays
   until the check exists in the repo, so a one-time report cannot drop it.
 - **A blank gate command is a finding** (Q1c): `no guardrail: <track> <lint|test>`.
@@ -34,10 +38,11 @@ bug at `retro` to ask what would have prevented it.
   upstream gap); General rules now take only judgement and upstream-gap answers; Watchlist
   gains `check pending` and `no guardrail` entries and their removal conditions; reads
   `project.json`; ❓ lists every Proposed check.
-- **validator.md**: reads MEMORY.md's General rules; new **Memory rules** check (cite
-  `[date slug]`, root `CLAUDE.md` overrides, 🟠/⚪ only).
+- **validator.md**: reads MEMORY.md's General rules and the Watchlist's `check pending`
+  entries; new **Memory rules** check (cite `[date slug]`, root `CLAUDE.md` overrides,
+  🟠/⚪ only).
 - **feat-distill.md**: step 5 reports every Proposed check.
-- **MEMORY.md**: header names the validator as a reader; General rules and Watchlist
+- **MEMORY.md**: header names the validator as a reader (General rules, `check pending`); General rules and Watchlist
   comments describe the split, with a `check pending` example. Note that `install.sh`
   overwrites this file in a target repo (see Follow-ups).
 - **feat-grill.md**: round shape matches upstream: ` - ` after `Q<n>`, a blank line
@@ -62,7 +67,7 @@ bug at `retro` to ask what would have prevented it.
 - **README.md / docs/README_zh-TW.md**: one paragraph pointing to upstream `pr`.
 - **factory-cheatsheet_{en,zh-TW}.md**: `/feat-distill` line mentions proposed checks.
 - **factory-training_{en,zh-TW}.html**: `/feat-distill` station and Memory-layer row
-  describe the prevention pass and the validator reading General rules. Stations, house
+  describe the prevention pass and what the validator reads. Stations, house
   rules and table row counts unchanged.
 
 ## Not taken, no action needed
@@ -829,4 +834,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-08-14 | (fill in) | Pocock v1.2 sync: grill round-by-round (frontier), Context Health rewritten as phase-boundary decision list, prompt-style "cache" term, validator smells 8 → 12 |
 | 2026-08-14 | (fill in) | writing-for-agents pass: prohibitions rephrased positively, rationale/EXPLORE Mode/phase-boundary ladder disclosed to companion files, changelog moved here |
 | 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
-| 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules, grill round separator, commands hand off to the human |
+| 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules and `check pending`, grill round separator, commands hand off to the human |
