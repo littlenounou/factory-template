@@ -107,4 +107,7 @@ PR 內一併更新它。
 ——那些留在原處，作為流水線的紀錄。
 
 
-本模板刻意不自動 commit，也不自動開 PR。
+本模板刻意不自動 commit，也不自動開 PR。PR 描述可搭配
+[mattpocock/skills](https://github.com/mattpocock/skills) 的 `pr` skill（Claude Code
+plugin `mattpocock-skills`），它在產線之外運作：摘要圖示、修改前後的證據，以及合併風險判斷。
+它不屬於工廠產線，也不需要修改任何工廠設定。

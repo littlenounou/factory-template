@@ -25,7 +25,8 @@ Produce ONE file: `<artifactsDir>/<slug>/brief.md`, with these sections:
    each slice is a user-checkable capability end-to-end across the enabled tracks (its own
    data, logic, and UI), never a technical layer ("all migrations first" is forbidden).
    One line per slice: `S<n> <name> — satisfies criteria [#s] — blocked-by: [S#s | none]`.
-   Slices with no blockers may be built in parallel. A single slice is fine for small features.
+   Order the list so every slice comes after its blockers: the builders work it top to
+   bottom. A single slice is fine for small features.
 8. **Risks** — security (auth, tenant isolation, secrets), concurrency, data loss, etc.
 
 Rules:

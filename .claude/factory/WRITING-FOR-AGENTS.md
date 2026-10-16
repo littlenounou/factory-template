@@ -46,6 +46,16 @@ sentence-long gesture into one such word. **Prompt the positive**: state the tar
 behaviour, because a prohibition drags the banned behaviour into context. A ban stays only
 as a hard guardrail with no positive form, labelled as one and paired with its target.
 
+## Punctuation and frontmatter
+- In a new or rewritten English line, use the mark that names the relation where an
+  em-dash would go: a colon for an explanation, a comma or parentheses for an aside, a
+  period for two separate claims. A dash leaves that relation for the reader to guess.
+  Existing lines stay as they are until they are rewritten for another reason; zh-TW
+  text keeps its 破折號.
+- Quote a frontmatter value in double quotes when it contains `: ` or starts with `[`,
+  `{`, `*` or `&`. Unquoted, it is invalid YAML, which a strict parser rejects; the
+  em-dash-to-colon swap above is the usual way one appears.
+
 ## Pruning
 - **Single source of truth, per context.** Within one context, each meaning lives once.
   An agent file is its own context, so a rule its task needs may repeat across agent

@@ -159,6 +159,21 @@ the `model:` fields are plain subagent routing and the refusal path never trigge
   validate, or after a block (open findings go to the Watchlist, never to General rules).
   Only evidence-backed entries, capped near 150 lines, English, version-controlled: review
   its diffs like code.
+- **Prevention pass (2026-10).** Each fixed failure is asked "what would have caught it
+  earlier?" A mechanical pattern written as a General rule only asks a model to re-derive
+  the same call on every future diff, and spends memory's line budget doing it; a lint
+  rule or hook pays once, and `quality-gate.sh` then runs it in every build step and inside
+  `/feat-ship`. So mechanical lessons become proposed checks (the distiller cannot edit
+  config, so a human adds them, tracked as `check pending`), and General rules keep the
+  judgement calls. The validator reads General rules because review is where standards
+  belong: the builders carry the most context pressure, the reviewer the least. A blank
+  `lint`/`test` command is itself a Watchlist entry, since the gate silently skips it.
+  The validator also reads `check pending` entries: until the human adds the check, the
+  lesson would otherwise sit where no reviewer looks, leaving mechanical lessons less
+  guarded than judgement calls. Once the check exists the distiller removes the entry,
+  and the gate takes over from review.
+  Adapted from upstream `retro` (v1.3.0) and v1.3.1's "fix, then ask what would have
+  prevented it".
 - **Convergence loop.** `/feat-ship` + `/goal` automates only the mechanical tail; the two
   ⏸ checkpoints stay human. The goal text follows three constraints: every condition is
   provable from output shown in the transcript (the evaluator, default Haiku, sees only
@@ -197,7 +212,16 @@ baseline and deletion test, and the prompt-style rules.
   current reference (context pointers, the two loads, the information hierarchy,
   completion criteria, sprawl, single source of truth, sediment), disclosed behind a
   pointer instead of imported.
+- v1.3.1 re-sync (2026-10): the prevention pass in `/feat-distill` and the validator's
+  memory-rules check, from `retro`; the grill round's `---` separator; the
+  user-invoked-skill invariant, applied as "commands tell the human the next command";
+  the frontmatter-quoting and punctuation lines in `WRITING-FOR-AGENTS.md`.
 - Deliberately NOT adopted: CONTEXT.md (covered by MEMORY.md plus per-slug decisions.md,
-  keeping the single writer), the setup skill (covered by `/feat-init` + `project.json`),
-  and v1.2.3's harness-portability pass — this template is Claude Code only by design,
-  since model routing, hooks and `.active` are Claude Code mechanisms.
+  keeping the single writer; upstream renamed it GLOSSARY.md in v1.3.0), the setup skill
+  (covered by `/feat-init` + `project.json`), and v1.2.3's harness-portability pass — this
+  template is Claude Code only by design, since model routing, hooks and `.active` are
+  Claude Code mechanisms. From v1.3.x: `implement-spec` (parallel worktrees merged by a
+  subagent conflict with the human-commits rule and the single per-feature `state.json`;
+  `/feat-epic` already splits large work into features), `pr` as a factory step (the
+  upstream skill runs beside the line, see README), and the repo-wide em-dash sweep (new
+  English lines follow the punctuation rule instead).

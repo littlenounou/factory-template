@@ -1,6 +1,6 @@
 ---
 description: Maintenance — read-only deletion-test sweep for shallow modules; writes sweep-report.md with ranked deepening candidates.
-argument-hint: [path] (default: the enabled tracks' dirs)
+argument-hint: "[path] (default: the enabled tracks' dirs)"
 ---
 Sweep the codebase for shallow modules and report deepening candidates. Target: `$1`
 (default: the `dirs` of every enabled track in `.claude/factory/project.json`).

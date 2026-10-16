@@ -15,5 +15,7 @@ Distill step for feature `$1` (FABLE 5 memory layer).
    current `<artifactsDir>/MEMORY.md`, and update MEMORY.md per its entry contract.
 4. Update `state.json` step to `distilled`. Remove `.claude/factory/.active`.
 5. Report what changed in MEMORY.md: entries added / merged / dropped, or "no new lessons".
+   List every `Proposed check` from the distiller: each is a lint rule, `project.json`
+   command or hook for the human to add, tracked as `check pending` until it exists.
    This is the last factory step for a feature — the code itself is still yours to review
    and commit (this template does not auto-commit).
