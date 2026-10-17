@@ -1,6 +1,6 @@
 # CLAUDE.md snippet: no-op rules pruned (2026-10-17)
 
-Issue #40 · PR #__
+Issue #40 · PR #41
 
 The snippet still carried rules that restate what Claude Code and current (5.x) models do
 by default. Under `WRITING-FOR-AGENTS.md` (No-ops) such a sentence is deleted whole, and the
