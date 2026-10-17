@@ -1,3 +1,29 @@
+# v1.0.0 (2026-10-17)
+
+First release. `main` had never been tagged; v1.0.0 is `develop` as of PR #36, merged to
+`main`. Every dated entry below this one predates v1.0.0 and is part of it.
+
+## What ships
+- **8 agents**: backend-builder, doc-writer, frontend-builder, memory-distiller, spec-writer,
+  story-writer, test-verifier, validator.
+- **19 commands**: `/feat-backend`, `/feat-distill`, `/feat-docs`, `/feat-epic`, `/feat-fix`,
+  `/feat-frontend`, `/feat-grill`, `/feat-init`, `/feat-new`, `/feat-recomment`,
+  `/feat-research`, `/feat-ship`, `/feat-spec`, `/feat-status`, `/feat-story`, `/feat-sweep`,
+  `/feat-unblock`, `/feat-validate`, `/feat-verify`.
+- **3 hooks**: protect-secrets, quality-gate, scope-track (project-root anchored,
+  `onFailure: "block"`).
+- **Installers**: `install.sh` and `install.ps1`; reinstalling keeps the repo's `MEMORY.md`
+  and merges `settings.json`.
+- **Docs**: README (en, zh-TW), cheatsheet and training guide (en, zh-TW).
+
+## Requirements
+Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
+## Release housekeeping
+PR #37 recorded `main`'s #22/#23 history (the `/feat-sweep` merge and its revert, net
+effect nothing) in `develop`, so the `develop` -> `main` merge is conflict-free and equals
+`develop`.
+
 # Installers keep the repo's MEMORY.md and settings (2026-10-17)
 
 Issue #33 · PR #36
