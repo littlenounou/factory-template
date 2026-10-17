@@ -25,15 +25,12 @@ than quiet about delivery.
 either original — it leaves future engineers permanently unsure which direction is
 correct.
 
-## Rule 2 — Read Before You Write
-
-Without context, AI is most likely to make changes that look reasonable on the surface but
-violate the existing design. Reading first is the cheapest line of defense.
-
 ## Rule 3 — Think Before Coding
 
-AI's most common failure mode is filling in blanks without confirmation. This rule forces
-explicit reasoning.
+AI's most common failure mode is filling in blanks without confirmation. Current models
+already state assumptions and stop when confused, so the rule keeps only the stricter half:
+when a request has several reasonable readings, the user picks one, not the model. By
+default a model decides low-stakes ambiguity itself.
 
 ## Rule 4 — Simplicity First, With Room for Reasonable Preparation
 
@@ -49,7 +46,10 @@ technical debt accumulate forever — disclosure is the necessary compromise.
 ## Rule 6 — Goal-Driven Execution
 
 Strong success criteria let AI loop independently to completion. Weak criteria ("make it
-work") require constant clarification.
+work") require constant clarification. Planning a multi-step task is what the task list
+already does, so the rule keeps one instruction that is not the default order: reproduce a
+bug with a failing test before fixing it. The failing test proves the fix addresses the
+reported bug and not a neighbouring one.
 
 ## Rule 7 — Tests Verify Intent, Not Just Behavior
 
@@ -61,17 +61,25 @@ pass (wrong path). This rule is the structural defense against reward-hacking.
 
 Blind compliance lets AI propagate bad habits. But unilateral "improvement" fragments
 style and breaks team consistency. Surfacing without acting is the lowest-impact
-compromise.
+compromise. Following the existing convention is default model behaviour, so the rule
+states only the exception.
 
 ## Rule 9 — Use the Model Only for Judgment Calls
 
 AI is good at interpretation work, not guarantee work. Putting AI in the wrong slot makes
 systems hard to debug and hard to trust.
 
-## Rule 10 — Checkpoint After Every Significant Step
+## Retired: Rules 2 and 10
 
-The most dangerous failure in long tasks is stacking on top of errors. Checkpoints catch
-errors early and prevent contamination of later steps.
+Both restated what the harness and current models already do (2026-10-17, #40), and a
+sentence that restates the default pays context load on every agent run to say nothing
+(`WRITING-FOR-AGENTS.md`, No-ops). Rule 2 (Read Before You Write): Claude Code's Edit tool
+refuses a file not read in the session, and reading callers before changing an interface is
+default behaviour. Rule 10 (Checkpoint After Every Significant Step): the task list tracks
+done and remaining work where the user can see it, Rule 0 reports what was verified, and
+inside the factory every `/feat-*` step is a checkpoint. The numbers are not reused, so
+references to Rules 5, 7 and 9 elsewhere stay valid. If a retired behaviour regresses,
+restore it as a paired guardrail.
 
 ## Context Health — phase boundaries
 
@@ -93,7 +101,7 @@ still the things the agent can actually observe.
 ## EXPLORE Mode
 
 Exploration needs *more* honesty than production work, not less: a misleading prototype
-conclusion poisons every decision built on it. That is why Rules 0, 1, 2 and 9 cannot be
+conclusion poisons every decision built on it. That is why Rules 0, 1 and 9 cannot be
 switched off in any mode, while the test and scope discipline can be.
 
 Promotion from prototype to production is an explicit decision, not a silent upgrade —
