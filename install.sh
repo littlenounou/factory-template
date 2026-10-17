@@ -22,10 +22,75 @@ if [ -n "$missing" ]; then
   exit 1
 fi
 
-mkdir -p "$TARGET/.claude"
-cp -R "$SRC/.claude/." "$TARGET/.claude/"
+# Template-owned files are overwritten on every install. Two files are the repo's own and
+# are handled below instead: .claude/factory/MEMORY.md and .claude/settings.json.
+mkdir -p "$TARGET/.claude/factory"
+shopt -s dotglob
+for item in "$SRC/.claude/"*; do
+  case "$(basename "$item")" in settings.json|factory) continue ;; esac
+  cp -R "$item" "$TARGET/.claude/"
+done
+for item in "$SRC/.claude/factory/"*; do
+  [ "$(basename "$item")" = "MEMORY.md" ] && continue
+  cp -R "$item" "$TARGET/.claude/factory/"
+done
+shopt -u dotglob
 chmod +x "$TARGET/.claude/hooks/"*.sh 2>/dev/null || true
 echo "• Copied .claude/ into $TARGET"
+
+# MEMORY.md is written by /feat-distill, so the repo's copy is never overwritten. It lives in
+# <artifactsDir>; read that from project.json the same way the hooks do.
+ARTDIR=".claude/factory"
+PROJ="$TARGET/.claude/factory/project.json"
+if [ -f "$PROJ" ] && command -v jq >/dev/null 2>&1; then
+  ARTDIR="$(jq -r '.artifactsDir // ".claude/factory"' "$PROJ" 2>/dev/null || true)"
+  ARTDIR="${ARTDIR#./}"; ARTDIR="${ARTDIR%/}"
+  [ -n "$ARTDIR" ] || ARTDIR=".claude/factory"
+fi
+MEM="$TARGET/.claude/factory/MEMORY.md"
+if [ "$ARTDIR" != ".claude/factory" ]; then
+  echo "• MEMORY.md not installed: artifactsDir is '$ARTDIR', so the memory layer is"
+  echo "  $ARTDIR/MEMORY.md. To start one, copy the template's .claude/factory/MEMORY.md there."
+elif [ -f "$MEM" ]; then
+  echo "• Kept the repo's .claude/factory/MEMORY.md (never overwritten)."
+else
+  cp "$SRC/.claude/factory/MEMORY.md" "$MEM"
+  echo "• Installed a starter .claude/factory/MEMORY.md."
+fi
+
+# settings.json: the template owns .hooks; every other key (permissions, env, ...) is the repo's.
+# Merge: keep the repo's keys, add keys only the template has, replace .hooks with the template's.
+SET="$TARGET/.claude/settings.json"
+TPL="$SRC/.claude/settings.json"
+if [ ! -f "$SET" ]; then
+  cp "$TPL" "$SET"
+  echo "• Installed .claude/settings.json."
+elif ! command -v jq >/dev/null 2>&1 || ! jq -e 'type == "object"' "$SET" >/dev/null 2>&1; then
+  cp "$SET" "$SET.bak"
+  cp "$TPL" "$SET"
+  echo "WARNING: could not merge .claude/settings.json (jq not found, or the file is not a JSON object)."
+  echo "  Replaced it with the template's; your old file is .claude/settings.json.bak."
+  echo "  Copy back any permissions or other settings you need."
+else
+  if jq -e '.hooks == null' "$SET" >/dev/null; then
+    note="• Merged .claude/settings.json: added the factory hooks, kept your other settings."
+  elif jq -e --slurpfile t "$TPL" '.hooks == $t[0].hooks' "$SET" >/dev/null; then
+    note="• Merged .claude/settings.json: hooks already current, kept your other settings."
+  else
+    cp "$SET" "$SET.bak"
+    note="• Merged .claude/settings.json: replaced \"hooks\" with the template's, kept your other
+  settings. The old file is .claude/settings.json.bak; re-add any hooks of your own from it."
+  fi
+  MERGE='($t[0] + .) | .hooks = $t[0].hooks'
+  # Rewrite only when something changes, so an up-to-date file keeps its formatting.
+  if ! jq -e --slurpfile t "$TPL" "($MERGE) == ." "$SET" >/dev/null; then
+    tmp="$(mktemp)"
+    jq --slurpfile t "$TPL" "$MERGE" "$SET" > "$tmp"
+    cat "$tmp" > "$SET"
+    rm -f "$tmp"
+  fi
+  echo "$note"
+fi
 
 if [ -f "$TARGET/CLAUDE.md" ]; then
   cp "$SRC/CLAUDE.factory-snippet.md" "$TARGET/CLAUDE.factory-snippet.md"

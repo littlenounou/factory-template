@@ -31,6 +31,14 @@
 `CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、19 個 commands、
 3 個 hooks。
 
+重新執行安裝程式（升級）會更新模板的檔案，並保留 repo 自己的檔案：
+- `.claude/factory/MEMORY.md` 只在 repo 還沒有時才安裝，之後絕不覆蓋。若 `artifactsDir`
+  不是預設值，則完全不安裝：記憶層位於 `<artifactsDir>/MEMORY.md`。
+- `.claude/settings.json` 會被合併（`install.sh` 使用 `jq`）：`hooks` 取自模板，其他所有鍵
+  （`permissions`、`env`…）都保留。若你的 `hooks` 與模板不同，舊檔會另存為
+  `.claude/settings.json.bak`，請從中補回你自己的 hooks。無法合併時（`install.sh` 缺少
+  `jq`，或檔案不是有效的 JSON），會先備份成同一個 `.bak` 再整份取代，並印出警告。
+
 ## 在 repo 內的首次設定（3 步驟）
 1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`：在檔案上方加入它的兩行 `@import`
    （`CONVENTIONS.md` 與 `terminology-zh-tw.md`），合併就只有這樣。若你讓 snippet 直接當起始檔

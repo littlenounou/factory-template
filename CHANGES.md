@@ -1,3 +1,56 @@
+# Installers keep the repo's MEMORY.md and settings (2026-10-17)
+
+Issue #33
+
+Both installers copied the whole template `.claude/` over the target, so re-running one to
+upgrade replaced two files the repo owns: `.claude/factory/MEMORY.md` (the memory layer,
+written by `/feat-distill`) was reset to the empty starter, and `.claude/settings.json` lost
+the repo's own keys such as `permissions`. Reproduced on `develop` with `install.sh`.
+
+## If a reinstall already wiped your memory
+The old content is in git history unless the wiped file was committed and the history
+rewritten. From the target repo's root:
+```
+git log --oneline -- .claude/factory/MEMORY.md     # find the last commit before the reinstall
+git checkout <commit> -- .claude/factory/MEMORY.md  # restore it into the working tree
+```
+If the reinstall is not committed yet, `git checkout -- .claude/factory/MEMORY.md` is enough.
+Restore `.claude/settings.json` the same way, then re-run the fixed installer: it keeps your
+keys and refreshes `hooks`.
+
+## Decisions (grilled with the maintainer)
+- **MEMORY.md is installed only when absent**, and the installer says whether it was kept
+  or installed. Every other template file is still overwritten.
+- **Non-default `artifactsDir`**: MEMORY.md is not installed at all (memory lives in
+  `<artifactsDir>/MEMORY.md`); the installer prints where, and does not create it there.
+- **settings.json is merged**: the template owns `hooks`, the repo owns every other key.
+  Repo keys are kept, keys only the template has are added, `hooks` is replaced. Rejected:
+  overwrite-with-backup (wipes `permissions` on every upgrade) and skip-and-merge-by-hand
+  (hook fixes such as `onFailure: "block"` would never reach an upgraded repo).
+- **No per-hook merge**: a repo whose `hooks` differ from the template's gets
+  `.claude/settings.json.bak` and a note to re-add its own hooks from it.
+- **Fallback**: when the file cannot be merged (`install.sh` without `jq`, or not a JSON
+  object), it is backed up to `.bak` and replaced, with a warning.
+- **No test file in the repo**: the repro (six scenarios) is recorded in the PR.
+
+## Modified
+- **install.sh**: copies `.claude/` item by item, skipping `settings.json` and
+  `factory/MEMORY.md`; reads `artifactsDir` from `project.json` with `jq` (default
+  `.claude/factory`, as the hooks do); merges `settings.json` with `jq` and rewrites it only
+  when something changes. Without `jq`, `artifactsDir` cannot be read and the default is
+  assumed; an existing MEMORY.md is still kept.
+- **install.ps1**: the same, with `ConvertFrom-Json`; the merged file is written as UTF-8
+  without a BOM.
+- **README.md / docs/README_zh-TW.md**: "Install into a repo" says what a reinstall keeps.
+
+## Unchanged, checked
+Which files ship, `CLAUDE.md` handling (still left untouched, snippet dropped beside it),
+agent/command/hook counts (8 / 19 / 3), the contract-file check, the Claude Code version
+check, MEMORY.md content. The cheatsheets' "re-run the installer" recovery tip stays
+correct. The Follow-ups item in the Pocock v1.3.1 sync entry keeps its wording.
+
+---
+
 # Model-neutral wording: the Fable 5 label dropped (2026-10-17)
 
 Issue #34 · PR #35 (same PR as the hook-path fix below)
