@@ -12,7 +12,9 @@
   不可妥協事項（供日常使用）。
 
 ## 環境需求
-- Claude Code（CLI）。agents／commands／hooks 只在其中生效。
+- Claude Code（CLI）**2.1.295 以上**。agents／commands／hooks 只在其中生效。
+  hooks 設定了 `onFailure: "block"`：hook 無法執行（script 不見、找不到 `bash`）時會擋下
+  該次工具呼叫，而不是略過檢查。安裝程式偵測到較舊版本時會提出警告。
 - PATH 上要有 `bash` 與 `jq`（hooks 會用到）。在 Windows 上請從 Git Bash 或 WSL 啟動
   Claude Code 以便 hooks 能執行，並安裝 `jq`。缺少 `jq` 時 hooks 會安全降級（放行）並印出
   提示——亦即略過強制檢查，不會壞掉任何東西。

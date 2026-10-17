@@ -13,7 +13,10 @@ full-stack, frontend-only, or backend-only projects.
   command flow, stuck-state table, non-negotiables (for daily use).
 
 ## Requirements
-- Claude Code (CLI). Agents / commands / hooks only take effect there.
+- Claude Code (CLI) **2.1.295 or later**. Agents / commands / hooks only take effect there.
+  The hooks set `onFailure: "block"`: a hook that cannot run (script missing, `bash` not
+  found) blocks the tool call instead of being skipped. The installer warns when it finds
+  an older version.
 - `bash` and `jq` available on PATH (hooks use them). On Windows, run Claude Code from
   Git Bash or WSL so the hooks execute; install `jq`. Without `jq`, hooks fail safe
   (allow) and print a notice — i.e. enforcement is skipped, nothing breaks.

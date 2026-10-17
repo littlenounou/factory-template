@@ -47,4 +47,28 @@ echo "Contract files in .claude/factory/ (imported by CLAUDE.md, or reached by p
 for f in CONVENTIONS.md terminology-zh-tw.md CLAUDE-rationale.md EXPLORE-MODE.md PHASE-BOUNDARIES.md WRITING-FOR-AGENTS.md; do
   [ -f "$TARGET/.claude/factory/$f" ] && echo "  ok  $f" || echo "  MISSING  $f"
 done
+
+# The hooks in settings.json use onFailure: "block", which needs Claude Code 2.1.295+.
+# Warn only: the installer may run in a shell where `claude` is not on PATH.
+NEED="2.1.295"
+echo
+if command -v claude >/dev/null 2>&1; then
+  HAVE="$(claude --version 2>/dev/null | awk '{print $1}')"
+  older=0
+  IFS=. read -r h1 h2 h3 _ <<< "${HAVE}.0.0"
+  IFS=. read -r n1 n2 n3 _ <<< "$NEED"
+  for pair in "$h1:$n1" "$h2:$n2" "$h3:$n3"; do
+    a="${pair%%:*}"; b="${pair##*:}"; a="${a//[!0-9]/}"; a="${a:-0}"
+    if [ "$a" -lt "$b" ]; then older=1; break; fi
+    if [ "$a" -gt "$b" ]; then break; fi
+  done
+  if [ "$older" -eq 1 ]; then
+    echo "WARNING: Claude Code $HAVE is older than $NEED. The hooks rely on onFailure: \"block\""
+    echo "  (a hook that cannot run blocks the tool call). Upgrade Claude Code before using this repo."
+  else
+    echo "Claude Code $HAVE — ok (needs $NEED+)."
+  fi
+else
+  echo "NOTE: 'claude' not found on PATH here; check that Claude Code is $NEED or later."
+fi
 echo "Done. Next: cd \"$TARGET\", open Claude Code, run /feat-init"

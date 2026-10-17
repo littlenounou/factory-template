@@ -4,14 +4,14 @@
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "bash .claude/hooks/protect-secrets.sh" },
-          { "type": "command", "command": "bash .claude/hooks/scope-track.sh" }
+          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/protect-secrets.sh\"", "onFailure": "block" },
+          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/scope-track.sh\"", "onFailure": "block" }
         ]
       },
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "bash .claude/hooks/protect-secrets.sh" }
+          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/protect-secrets.sh\"", "onFailure": "block" }
         ]
       }
     ]

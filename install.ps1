@@ -46,4 +46,25 @@ Write-Host "Contract files in .claude/factory/ (imported by CLAUDE.md, or reache
 foreach ($f in $contract) {
   if (Test-Path (Join-Path $Target ".claude\factory\$f")) { Write-Host "  ok  $f" } else { Write-Host "  MISSING  $f" }
 }
+
+# The hooks in settings.json use onFailure: "block", which needs Claude Code 2.1.295+.
+# Warn only: the installer may run in a shell where `claude` is not on PATH.
+$needVer = [version]"2.1.295"
+Write-Host ""
+$cmd = Get-Command claude -EA SilentlyContinue
+if ($cmd) {
+  $raw = (& claude --version 2>$null | Out-String)
+  if ($raw -match '(\d+(\.\d+){1,3})') {
+    $haveVer = [version]$Matches[1]
+    if ($haveVer -lt $needVer) {
+      Write-Warning "Claude Code $haveVer is older than $needVer. The hooks rely on onFailure: `"block`" (a hook that cannot run blocks the tool call). Upgrade Claude Code before using this repo."
+    } else {
+      Write-Host "Claude Code $haveVer - ok (needs $needVer+)."
+    }
+  } else {
+    Write-Host "NOTE: could not read the Claude Code version; check that it is $needVer or later."
+  }
+} else {
+  Write-Host "NOTE: 'claude' not found on PATH here; check that Claude Code is $needVer or later."
+}
 Write-Host "Done. Next: cd `"$Target`", open Claude Code, run /feat-init"
