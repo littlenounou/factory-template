@@ -2,8 +2,7 @@
 description: Interview the human about the feature plan until shared understanding, then write decisions.md. Runs after /feat-research; /feat-story is gated on its output.
 argument-hint: <slug>
 ---
-Grill step for feature `$1`. This step runs in the MAIN session — subagents cannot hold a
-multi-turn interview.
+Grill step for feature `$1`, in the MAIN session (a subagent cannot hold an interview).
 
 1. Write `docs $1` to `.claude/factory/.active`.
 2. Read `<artifactsDir>/$1/idea.md`, `research.md` (if present), and `<artifactsDir>/MEMORY.md` (if present).
@@ -16,20 +15,28 @@ multi-turn interview.
    - Every question uses this fixed shape, so the user can answer by number
      ("Q1 agree, Q2 agree, Q3 change to ..."):
 
-     ❓ **Q<n>** — **<title>**: <body; include the choices if it is multiple-choice>
+     ❓ **Q<n>** - **<title>**: <body; include the choices if it is multiple-choice>
+
      ➡️ <your recommended answer>
+
+     ---
+
+     A horizontal rule separates consecutive questions; the last one in a round ends at
+     its ➡️ line.
 
    - If a question can be answered from `research.md` or by reading the codebase
      (read-only), read instead of asking. Dispatch such fact-finding to the built-in
      Explore subagent IN THE BACKGROUND so it never blocks a round: only the questions
      downstream of a running exploration wait for it — ask the rest of the frontier now.
    - If the user asks for one question at a time, honour that for the rest of the session.
+   - Decisions in `research.md`'s **Epic context** are settled: build on them. Re-open one
+     only with new evidence, and say so.
 4. If idea + research leave no open decisions, say so and converge immediately — an empty
    grill is a valid outcome for small features.
 5. On consensus, write `<artifactsDir>/$1/decisions.md` (English), sections:
    - **Decisions** — one line each: `- [D#] decision — rationale`. Mark genuinely
-     hard-to-reverse ones `[durable]` (candidates for MEMORY.md; only `/feat-distill` may
-     write MEMORY.md — never write it here).
+     hard-to-reverse ones `[durable]` (candidates for MEMORY.md, banked later by
+     `/feat-distill`).
    - **Glossary** — canonical terms settled during the grill (`term: definition`). Omit if none.
    - **Declined alternatives** — options considered and rejected, with why. Omit if none.
 6. Update `state.json` step to `grill`.

@@ -6,6 +6,8 @@ Start a new feature.
 
 - First token of "$ARGUMENTS" is the slug (kebab-case). The rest is the description.
 - Read `artifactsDir` from `.claude/factory/project.json` (default `.claude/factory`).
+- GUARD: epics and features share one slug namespace. STOP if the slug is `epics` or an
+  epic already uses it (`<artifactsDir>/epics/<slug>/` exists).
 - Create `<artifactsDir>/<slug>/` containing:
   - `idea.md` — the description text.
   - `state.json` — `{ "slug": "<slug>", "step": "new", "retries": 0 }`.

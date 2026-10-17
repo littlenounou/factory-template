@@ -14,7 +14,14 @@ fi
 FILE="$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // ""')"
 [ -z "$FILE" ] && exit 0
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# Repo root: the cwd's git top level, which follows Claude into a worktree. If the cwd
+# has left the repo (a `cd` elsewhere), fall back to the session's project dir so the
+# manifest is still found; never to the bare cwd, which would silently allow everything.
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$ROOT" ] || [ ! -f "$ROOT/.claude/factory/project.json" ]; then
+  [ -n "${CLAUDE_PROJECT_DIR:-}" ] && ROOT="$CLAUDE_PROJECT_DIR"
+fi
+[ -n "$ROOT" ] || ROOT="$(pwd)"
 PROJ="$ROOT/.claude/factory/project.json"
 ACTIVE="$ROOT/.claude/factory/.active"
 [ -f "$PROJ" ] || exit 0   # not initialised yet -> do not interfere

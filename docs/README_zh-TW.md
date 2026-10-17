@@ -6,13 +6,15 @@
 清單檔（`.claude/factory/project.json`）驅動。全端、純前端、純後端專案皆適用。
 
 ## 延伸閱讀
-- **[訓練指南](factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線、各項機制，以及
-  Fable 5 升級內容（供新人上手）。
+- **[訓練指南](factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線，以及核心與
+  進階機制（供新人上手）。
 - **[速查表](factory-cheatsheet_zh-TW.md)** — 單一畫面快速參考：安裝、命令流程、卡住狀態對照表、
   不可妥協事項（供日常使用）。
 
 ## 環境需求
-- Claude Code（CLI）。agents／commands／hooks 只在其中生效。
+- Claude Code（CLI）**2.1.295 以上**。agents／commands／hooks 只在其中生效。
+  hooks 設定了 `onFailure: "block"`：hook 無法執行（script 不見、找不到 `bash`）時會擋下
+  該次工具呼叫，而不是略過檢查。安裝程式偵測到較舊版本時會提出警告。
 - PATH 上要有 `bash` 與 `jq`（hooks 會用到）。在 Windows 上請從 Git Bash 或 WSL 啟動
   Claude Code 以便 hooks 能執行，並安裝 `jq`。缺少 `jq` 時 hooks 會安全降級（放行）並印出
   提示——亦即略過強制檢查，不會壞掉任何東西。
@@ -26,20 +28,34 @@
 ```
 安裝程式會把 `.claude/` 複製進 repo，並讓 hooks 具備執行權限。若 repo 已有 `CLAUDE.md`，
 它**不會**被修改——安裝程式會把 `CLAUDE.factory-snippet.md` 放在旁邊供你自行合併。若沒有
-`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、17 個 commands、
+`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、19 個 commands、
 3 個 hooks。
 
+重新執行安裝程式（升級）會更新模板的檔案，並保留 repo 自己的檔案：
+- `.claude/factory/MEMORY.md` 只在 repo 還沒有時才安裝，之後絕不覆蓋。若 `artifactsDir`
+  不是預設值，則完全不安裝：記憶層位於 `<artifactsDir>/MEMORY.md`。
+- `.claude/settings.json` 會被合併（`install.sh` 使用 `jq`）：`hooks` 取自模板，其他所有鍵
+  （`permissions`、`env`…）都保留。若你的 `hooks` 與模板不同，舊檔會另存為
+  `.claude/settings.json.bak`，請從中補回你自己的 hooks。無法合併時（`install.sh` 缺少
+  `jq`，或檔案不是有效的 JSON），會先備份成同一個 `.bak` 再整份取代，並印出警告。
+
 ## 在 repo 內的首次設定（3 步驟）
-1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`（在檔案上方加入兩行 `@import` ——
-   `CONVENTIONS.md` 與 `terminology-zh-tw.md`；並把該區塊貼進「Project-Specific Rules」）。
-   若你讓 snippet 直接當起始檔則可略過。`.claude/factory/` 底下的三份伴隨文件是以 pointer
-   觸達、不匯入的，請勿把它們列入 `@import`。
+1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`：在檔案上方加入它的兩行 `@import`
+   （`CONVENTIONS.md` 與 `terminology-zh-tw.md`），合併就只有這樣。若你讓 snippet 直接當起始檔
+   則可略過。從 2026-09-20 之前的版本升級：請刪除「Project-Specific Rules」底下舊的
+   「### Feature Factory」區塊——那些規則現在都在 `CONVENTIONS.md` 裡。`.claude/factory/`
+   底下的四份伴隨文件是以 pointer 觸達、不匯入的，請勿把它們列入 `@import`。
 2. 在 repo 內開啟 Claude Code 並執行 `/feat-init`（偵測技術堆疊或詢問你；寫出
    `project.json`，含 `docsDir`；**不會**產生任何程式碼骨架）。
 3. 確認產出的清單檔。
 
 ## 跑一個功能
 ```
+# 選用，適合超過一個 feature 的大型工作——先在產線上游做規劃：
+/feat-epic <epic> "你想要什麼"  # 繪製 map：終點 + 決策 ticket
+/feat-epic <epic>       # 解決下一張 ticket；重複執行，直到 map 清空、產出
+                        # 可直接貼上的 /feat-new 指令（每個 feature 一行）
+
 /feat-new <slug> "你想要什麼"
 /feat-research <slug>
 /feat-grill <slug>      # 逐輪次訪談 -> decisions.md（story 以此為前置條件）
@@ -47,35 +63,38 @@
 /feat-spec <slug>       # 審閱 brief.md，然後：
 /feat-backend <slug>    # 若後端軌道啟用
 /feat-frontend <slug>   # 若前端軌道啟用
-/feat-ship <slug>       # FABLE 5（選用）：在單一 /goal 下收斂 verify→validate→fix
+/feat-ship <slug>       # 選用：在單一 /goal 下收斂 verify→validate→fix
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # 僅在有發現時；受 loopMaxRetries 限制
 /feat-unblock <slug>    # `blocked` 之後：人工授權復工——重置 retry 額度
 /feat-docs <slug>       # validate 乾淨後：README + 指南／範例（先英文，再 zh-TW）
-/feat-distill <slug>    # FABLE 5：收尾步驟——把已驗證的教訓存入 MEMORY.md
-/feat-status <slug>     # 任何時候
+/feat-distill <slug>    # 收尾步驟——把已驗證的教訓存入 MEMORY.md
+/feat-status <slug>     # 任何時候（feature 或 epic 皆可）
 
-# 維護指令（產線之外——無 slug、不產 artifacts）
+# 維護指令（產線之外——無 slug、無 state.json）
 /feat-recomment [path]  # 把舊的交錯式雙語註解轉成區塊形式
+/feat-sweep [path]      # 唯讀掃描淺模組 -> sweep-report.md
 ```
-FABLE 5 的增補（模型路由、classifier 拒絕處理、記憶層、收斂迴圈）記載於
-`.claude/factory/CONVENTIONS.md` 的「Fable 5 addendum」。在其他模型上執行時，這些增補
-無作用但也無害。完整設計請見 `.claude/factory/CONVENTIONS.md`。
+整體設計與每個機制背後的理由（包括模型路由、classifier 拒絕處理、記憶層、收斂迴圈），
+請見 `.claude/factory/CLAUDE-rationale.md`。
 
 ## 代理恆常載入什麼，又在何時去取用什麼
 
-`CLAUDE.md` 承載行為契約並 `@import` 兩份文件，因此這三份每一輪都在 context 內。另有三份
-文件放在它們旁邊，只在對應分支觸發時才被取用——藉此把它們排除在恆常載入的預算之外：
+`CLAUDE.md` 承載行為契約並 `@import` 兩份文件，因此這三份每一輪都在 context 內——主 session
+如此，每個 factory agent 也再載入一次，因為每個 subagent 都會重新載入 `CLAUDE.md` 與其匯入檔。
+所以 `CONVENTIONS.md` 只放跨指令的內容（流水線、其不變式、證據與遮蔽、classifier 拒絕）；
+各指令與 agent 的流程由各自的檔案負責。另有四份文件放在它們旁邊，只在對應分支觸發時才被取用：
 
 | 檔案 | 何時被取用 |
 |---|---|
 | `.claude/factory/EXPLORE-MODE.md` | 開始探索性工作時（`explore mode`／`spike`／POC） |
 | `.claude/factory/PHASE-BOUNDARIES.md` | 你正站在階段邊界、決定這份 context 該怎麼處理時 |
-| `.claude/factory/CLAUDE-rationale.md` | 由人判斷某條規則是否仍值得保留時——代理永遠不讀這一份 |
+| `.claude/factory/WRITING-FOR-AGENTS.md` | 任何人要編輯 `CLAUDE.md` 或 `.claude/` 底下的檔案時 |
+| `.claude/factory/CLAUDE-rationale.md` | 由人判斷某條規則或機制是否仍值得保留時——代理永遠不讀這一份 |
 
-每條規則的**設計理由**都在 `CLAUDE-rationale.md`。修改規則前先讀它；修改時在同一個 PR 內
-一併更新它。
+每條規則與每個機制的**設計理由**都在 `CLAUDE-rationale.md`。修改前先讀它；修改時在同一個
+PR 內一併更新它。
 
 ## 註解、文件與台灣術語
 `.claude/factory/terminology-zh-tw.md`（由 `CLAUDE.md` 匯入）是以下三件事的單一真實來源：
@@ -98,4 +117,7 @@ FABLE 5 的增補（模型路由、classifier 拒絕處理、記憶層、收斂�
 ——那些留在原處，作為流水線的紀錄。
 
 
-本模板刻意不自動 commit，也不自動開 PR。
+本模板刻意不自動 commit，也不自動開 PR。PR 描述可搭配
+[mattpocock/skills](https://github.com/mattpocock/skills) 的 `pr` skill（Claude Code
+plugin `mattpocock-skills`），它在產線之外運作：摘要圖示、修改前後的證據，以及合併風險判斷。
+它不屬於工廠產線，也不需要修改任何工廠設定。

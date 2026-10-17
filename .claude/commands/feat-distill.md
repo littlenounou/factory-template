@@ -1,8 +1,8 @@
 ---
-description: FABLE 5 memory layer. After a clean validation, distill verified lessons from this feature into the cross-feature MEMORY.md.
+description: Closing step — distill this feature's verified lessons into the cross-feature MEMORY.md (after a clean validation or a block).
 argument-hint: <slug>
 ---
-Distill step for feature `$1` (FABLE 5 memory layer).
+Distill step for feature `$1` (memory layer).
 
 1. GUARD: read `<artifactsDir>/$1/validation.md`. If it does not exist, or still has open
    🔴/🟠 findings, STOP — distill only runs on validated features. Two exceptions, because
@@ -15,5 +15,7 @@ Distill step for feature `$1` (FABLE 5 memory layer).
    current `<artifactsDir>/MEMORY.md`, and update MEMORY.md per its entry contract.
 4. Update `state.json` step to `distilled`. Remove `.claude/factory/.active`.
 5. Report what changed in MEMORY.md: entries added / merged / dropped, or "no new lessons".
+   List every `Proposed check` from the distiller: each is a lint rule, `project.json`
+   command or hook for the human to add, tracked as `check pending` until it exists.
    This is the last factory step for a feature — the code itself is still yours to review
    and commit (this template does not auto-commit).

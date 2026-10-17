@@ -1,8 +1,8 @@
-# Feature Factory Cheatsheet (Fable 5 Edition)
+# Feature Factory Cheatsheet
 
 **Language 語言:** [繁體中文](factory-cheatsheet_zh-TW.md) · English
 
-> Full training: `docs/factory-training_en.html` · Design details: `.claude/factory/CONVENTIONS.md`
+> Full training: `docs/factory-training_en.html` · Design rationale: `.claude/factory/CLAUDE-rationale.md`
 > Core belief: reliability comes from the system, not the model — sequence via commands, scope via hooks, bounded loops, independent verification.
 
 ## Install (once per repo)
@@ -10,12 +10,29 @@
 ```bash
 ./install.sh /path/to/repo   # copies .claude/; Windows: install.ps1 (run Claude Code via Git Bash/WSL)
 jq --version                 # hooks need jq; missing = enforcement is OFF (fail-safe allow)
+claude --version             # 2.1.295+: hooks use onFailure "block" (a hook that can't run blocks the call)
 /feat-init                   # inside Claude Code: detects the stack, writes project.json, no scaffolding
 ```
 
-Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfield repo → the snippet auto-becomes your starter CLAUDE.md.
+Existing CLAUDE.md → add the two `@import` lines from the `<<< FEATURE FACTORY >>>` block (upgrading: delete the old "### Feature Factory" block); greenfield repo → the snippet auto-becomes your starter CLAUDE.md.
 
-**Contract files.** `CLAUDE.md` `@import`s `CONVENTIONS.md` + `terminology-zh-tw.md` — those three load every turn. Three more under `.claude/factory/` are reached by pointer, never imported: `EXPLORE-MODE.md`, `PHASE-BOUNDARIES.md`, and `CLAUDE-rationale.md` (why each rule exists — human reading only; edit it in the same PR when you change a rule). The installer lists all five ok/MISSING.
+**Contract files.** `CLAUDE.md` `@import`s `CONVENTIONS.md` + `terminology-zh-tw.md` — those three load every turn, in the main session and again in every factory agent, so `CONVENTIONS.md` holds only what crosses commands. Four more under `.claude/factory/` are reached by pointer, never imported: `EXPLORE-MODE.md`, `PHASE-BOUNDARIES.md`, `WRITING-FOR-AGENTS.md` (read before editing `CLAUDE.md` or `.claude/`), and `CLAUDE-rationale.md` (why each rule and mechanism exists — human reading only; edit it in the same PR when you change one). The installer lists all six ok/MISSING.
+
+## Plan an epic (optional, above the line)
+
+```
+/feat-epic <epic> "description" → chart: Destination + decision tickets → epics/<epic>/map.md
+/feat-epic <epic> [ticket]      → resolve the next ticket; repeat until the map clears
+```
+
+For an effort bigger than one feature whose route is still foggy. It plans, it never builds:
+each ticket is a question whose answer is a decision (research runs in the background;
+grilling and prototype need you), one HITL ticket per run. When nothing is left to decide,
+the map clears into a Feature breakdown of paste-ready `/feat-new … [epic: <epic>]` lines —
+you run them, and each feature walks the normal line with the epic's decisions already
+settled in its research. No `state.json`, no `.active`, safe mid-feature. Epic and feature
+slugs share one namespace (and `epics` is reserved). Small effort, no fog → it tells you to
+skip the map and use `/feat-new`.
 
 ## Run a feature
 
@@ -28,7 +45,7 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 /feat-backend <slug>            → code + backend-summary.md (only if track enabled)
 /feat-frontend <slug>           → UI (consumes the contract; reports gaps, never invents endpoints)
 
-# Path A: manual                 # Path B: autonomous (FABLE5)
+# Path A: manual                 # Path B: autonomous
 /feat-verify <slug>              /feat-ship <slug>
 /feat-validate <slug>            → paste the /goal line it prints; evaluator judges each turn
   findings → /feat-fix (cap: loopMaxRetries=3) → back to verify
@@ -36,8 +53,9 @@ Existing CLAUDE.md → merge the two `<<< FEATURE FACTORY >>>` blocks; greenfiel
 
 /feat-unblock <slug>            → after `blocked`: human-authorized resume (resets retries)
 /feat-docs <slug>               → user docs: README + docsDir guides (EN → zh-TW, Mermaid)
-/feat-distill <slug>            → closing step: bank lessons into MEMORY.md (distill failures too)
-/feat-status <slug>             → check progress any time
+/feat-distill <slug>            → closing step: bank lessons into MEMORY.md (distill failures too);
+                                  mechanical lessons come back as proposed lint/hook checks for you to add
+/feat-status <slug>             → check progress any time (a feature or an epic)
 ```
 
 The line never commits or opens PRs for you — review and commit yourself at the end.
@@ -46,13 +64,20 @@ The line never commits or opens PRs for you — review and commit yourself at th
 
 ```
 /feat-recomment [path]          → migrate legacy interleaved bilingual comments to block form
+/feat-sweep [path]              → read-only sweep for shallow modules → sweep-report.md
 ```
 
-No slug, no artifacts. Guards on a clean git tree, dry-runs first, then drives
+`/feat-recomment`: no slug, no `state.json`. Guards on a clean git tree, dry-runs first, then drives
 `.claude/factory/comment-migrate.py`, which only REORDERS comment lines — never translates or
 rewords, and never changes code (each file is verified before writing). Blocks it refuses
 (commented-out code, mixed-language lines, unclear language split, missing separator) land in
 `comment-migration-report.md` for a human. `--check` exits non-zero while interleaving remains.
+
+`/feat-sweep` is read-only: no slug, no `state.json`, safe to run mid-feature. It applies the
+deletion test across the repo (recently changed code first) and overwrites `sweep-report.md`
+with up to 7 ranked candidates, each ending in a paste-ready `/feat-new` line. It never edits
+code or creates a feature — you pick what enters the line. Run it on your own cadence, e.g.
+every few shipped features or once a quarter; commit the report so git history shows the trend.
 
 ## When you're stuck
 
@@ -65,6 +90,8 @@ rewords, and never changes code (each file is verified before writing). Blocks i
 | Write blocked by a hook | By design — don't work around it. If truly needed: `rm .claude/factory/.active` (= leaving factory mode) |
 | context feels bloated / you're repeating yourself | You're mid-phase — finish it. At the next boundary walk the ladder in `PHASE-BOUNDARIES.md`: continue → `/clear` → hand off → subagent → `/compact` last. `/clear` is the default: artifacts on disk rebuild the context |
 | `jq not found` | Enforcement is actually OFF. Install jq, then continue |
+| `… hook error` … `failed; blocking because onFailure is "block"` | A hook could not run (script missing, `bash` not found), so the tool call was blocked on purpose rather than let through unchecked. If `protect-secrets.sh` is the missing one, Bash **and** Edit/Write are all blocked and Claude cannot repair it. Restore it yourself from a terminal at the repo root: `git checkout -- .claude/` (or re-run the installer). Never fall back to `disableAllHooks` |
+| `… hook error` `Failed with non-blocking status code` … `No such file or directory` | The hook never ran and the call went through: that protection is OFF. `settings.json` predates 2026-10-17 (cwd-relative hook paths that break after a `cd`). Copy the current `.claude/settings.json` + `.claude/hooks/`, confirm `claude --version` is 2.1.295+, restart the session |
 | `/usage` shows orchestrator + Haiku only, zero Sonnet | Routing overridden by env. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL` and settings.json at each scope (see CONVENTIONS "Known issues") |
 | gate shows `(none configured, skipped)` | That command is blank in the manifest; add the script, then fill project.json back in |
 
@@ -75,6 +102,7 @@ rewords, and never changes code (each file is verified before writing). Blocks i
 3. **MEMORY.md is code**: review its diffs — bad memory compounds as fast as good memory.
 4. **Comments are block-after-block**: full English block → one empty comment line → full zh-TW block. Never alternate line by line; migrate legacy code with `/feat-recomment`, not by hand.
 5. **Decide context at boundaries**: the seam between `/feat-*` steps is where you choose — `/compact` is the last option there, not the first. Mid-phase: continue, or split into subagents.
-6. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
+6. **Redact before you paste**: evidence is mandatory (Rule 7) and artifacts are version-controlled — credential values go in as `<REDACTED>`, reproduction commands reference them through environment variables, and you quote the signal-carrying lines instead of the whole dump. `protect-secrets.sh` catches secret files by name, not a token pasted into `verification.md`.
+7. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
 
-<sub>The FABLE5 upgrades (model routing / classifier triage / memory layer / /goal convergence) are inert-but-harmless on other models — maintain one template for the whole team; pick the model with `/model`.</sub>
+<sub>Maintain one template for the whole team; pick the session's model with `/model`.</sub>

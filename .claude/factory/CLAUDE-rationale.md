@@ -1,7 +1,9 @@
 # Why the rules are what they are (human reading — NOT loaded by the agent)
 
-Companion to the root `CLAUDE.md`. Every rule there once carried an inline *Why* note;
-those notes are here instead. Nothing in this file instructs the agent — it is not
+Companion to the root `CLAUDE.md` and to `CONVENTIONS.md`. Every rule there once carried an
+inline *Why* note; those notes are here instead, together with the design history of the
+factory's mechanisms (moved out of `CONVENTIONS.md` on 2026-09-20, because each factory
+agent reloads that file on every run). Nothing in this file instructs the agent — it is not
 `@import`ed and no pointer reaches it, so it costs no context load. Read it when you are
 deciding whether a rule still earns its place, or when onboarding someone who is about to
 ask "why can't I just…".
@@ -112,4 +114,114 @@ Rules adapted from [Andrej Karpathy's observations](https://x.com/karpathy/statu
 and [forrestchang/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills),
 layered for our team's needs. The pipeline's grill / slices / smells / prompt-style
 material comes from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT) — see
-the provenance notes in `CONVENTIONS.md`.
+"Pocock provenance" below.
+
+---
+
+# Factory mechanisms
+
+## Why commands + hooks, not a natural-language orchestrator
+- **Order** = a human invoking discrete commands, not a model deciding the sequence.
+- **Scope** = hooks (`scope-track.sh`) hard-block writes; a `tools:` list is only a hint.
+- **Loop** = `/feat-fix` increments `retries` and stops at `loopMaxRetries` (default 3).
+  Re-entry after a stop is itself a command (`/feat-unblock`), never a silent state edit.
+- **Hand-off** = files on disk: cheap, reviewable, resumable — never re-pasted context.
+  Each subagent starts with a fresh, isolated context and shares only the filesystem.
+
+## Blocked handling
+`/feat-fix` increments `retries` BEFORE checking, so with `loopMaxRetries = 3` the 1st–3rd
+runs fix and the 4th stops. At the cap it writes the open findings, sets `blocked`, and
+removes `.active` so the human regains normal editing. `retries` persists, and nothing
+used to reset it: after a manual fix the next `/feat-fix` computed `4 > 3` and re-blocked
+at once. `/feat-unblock` is the audited way back — it shows the evidence, records how the
+block was handled in `unblock.md` (the distiller later reads the human's own diagnosis),
+and resets the budget. Blocks are often spec problems rather than code problems, so a
+second block on the same feature pushes the human upstream (revise the ⏸ gates, or split
+the slug) instead of resetting again. Distill-before-unblock keeps open findings in the
+Watchlist while the trail is warm. Unblocking stays outside any `/goal` loop: it is a
+judgment call, not a convergence step.
+
+## Routing, refusals, memory and convergence
+Called the "Fable 5 addendum" until 2026-10, when every current model ran it and the label
+was dropped.
+- **Model routing.** The main session carries the expensive model; every factory agent is
+  pinned to `sonnet` in its frontmatter, with the reason in a comment beside it. The
+  validator's value is independence (a different context), not cheapness; the
+  test-verifier writes real tests, so it is an author, not a Haiku-grade grader.
+  Security-sensitive work (an Off-Limits area) is the most classifier-prone: switch that
+  builder to `model: opus` for the feature, or keep the work outside the factory.
+- **Classifier refusals.** A loop that cannot tell "the classifier said no" from "my code
+  is wrong" burns its retry budget rephrasing a refusal — hence the separate token, the ⛔
+  heading, and `blocked-classifier` outside the retry count. The API's fallback to another
+  model is opt-in, not automatic.
+- **Memory layer.** `MEMORY.md` holds verified facts, general rules, and a dated
+  Watchlist. `/feat-distill` closes a feature — after `/feat-docs`, straight after a clean
+  validate, or after a block (open findings go to the Watchlist, never to General rules).
+  Only evidence-backed entries, capped near 150 lines, English, version-controlled: review
+  its diffs like code.
+- **Prevention pass (2026-10).** Each fixed failure is asked "what would have caught it
+  earlier?" A mechanical pattern written as a General rule only asks a model to re-derive
+  the same call on every future diff, and spends memory's line budget doing it; a lint
+  rule or hook pays once, and `quality-gate.sh` then runs it in every build step and inside
+  `/feat-ship`. So mechanical lessons become proposed checks (the distiller cannot edit
+  config, so a human adds them, tracked as `check pending`), and General rules keep the
+  judgement calls. The validator reads General rules because review is where standards
+  belong: the builders carry the most context pressure, the reviewer the least. A blank
+  `lint`/`test` command is itself a Watchlist entry, since the gate silently skips it.
+  The validator also reads `check pending` entries: until the human adds the check, the
+  lesson would otherwise sit where no reviewer looks, leaving mechanical lessons less
+  guarded than judgement calls. Once the check exists the distiller removes the entry,
+  and the gate takes over from review.
+  Adapted from upstream `retro` (v1.3.0) and v1.3.1's "fix, then ask what would have
+  prevented it".
+- **Convergence loop.** `/feat-ship` + `/goal` automates only the mechanical tail; the two
+  ⏸ checkpoints stay human. The goal text follows three constraints: every condition is
+  provable from output shown in the transcript (the evaluator, default Haiku, sees only
+  the conversation); it carries its own turn cap (`/goal` has no hard iteration limit);
+  and it names `blocked`, `blocked-classifier` and ⛔ as goal-cannot-be-met, so a refusal
+  or a capped loop ends loudly. `loopMaxRetries` stays the binding stop.
+- **References.** Motivated by 0xCodez's self-improving-agent thread
+  (https://x.com/0xCodez/status/2065089060104720776) and its BlockTempo zh-TW translation
+  (https://www.blocktempo.com/self-improving-agent-fable-5-2/). Inspiration, not
+  specification: every product-behaviour claim was re-verified against Anthropic's
+  official documentation before adoption.
+
+## Maintenance commands
+- `/feat-recomment`'s `--check` is deliberately not wired into `quality-gate.sh`: comment
+  style is not a build failure. The script only reorders lines, so the migration diff is
+  mechanical and reviewable, and it refuses a dirty tree so the change lands as one commit.
+- `/feat-sweep` reports shallow modules only; the smells baseline stays with the
+  validator, on per-feature diffs. Cadence is the human's; no step prompts for it.
+
+## Pocock provenance
+Adapted from mattpocock/skills (MIT), verified against the repo and the author's own posts
+(2026-07) before adoption: the grill step, Implementation slices, the validator's smells
+baseline and deletion test, and the prompt-style rules.
+- v1.2.0 re-sync (2026-08): grill moved to round-by-round frontier interviewing; the cache
+  test joined the prompt style; the smells baseline grew 8 → 12; Context Health was
+  rebuilt around the phase-boundary ladder (continue → clear → hand off → subagent →
+  compact).
+- v1.2.3 re-sync (2026-09): Evidence & redaction, from `diagnosing-bugs`' Redact section —
+  the transferable part is redact-before-you-show, which pasted evidence makes
+  load-bearing the same way.
+- `/feat-sweep` (2026-09) from `improve-codebase-architecture`; `/feat-epic` (2026-09) from
+  `/wayfinder` as read on main 2026-09-20 — kept the destination, map-as-index, decision
+  tickets, blocking frontier, fog of war and plan-don't-do; dropped the issue tracker,
+  ticket claims, and the `task` type.
+- `writing-for-agents` re-sync (2026-09-20): `WRITING-FOR-AGENTS.md` now carries the full
+  current reference (context pointers, the two loads, the information hierarchy,
+  completion criteria, sprawl, single source of truth, sediment), disclosed behind a
+  pointer instead of imported.
+- v1.3.1 re-sync (2026-10): the prevention pass in `/feat-distill` and the validator's
+  memory-rules check, from `retro`; the grill round's `---` separator; the
+  user-invoked-skill invariant, applied as "commands tell the human the next command";
+  the frontmatter-quoting and punctuation lines in `WRITING-FOR-AGENTS.md`.
+- Deliberately NOT adopted: CONTEXT.md (covered by MEMORY.md plus per-slug decisions.md,
+  keeping the single writer; upstream renamed it GLOSSARY.md in v1.3.0), the setup skill
+  (covered by `/feat-init` + `project.json`), and v1.2.3's harness-portability pass — this
+  template is Claude Code only by design, since model routing, hooks and `.active` are
+  Claude Code mechanisms. From v1.3.x: `implement-spec` (parallel worktrees merged by a
+  subagent conflict with the human-commits rule and the single per-feature `state.json`;
+  `/feat-epic` already splits large work into features), `pr` as a factory step (the
+  upstream skill runs beside the line, see README), and the repo-wide em-dash sweep (new
+  English lines follow the punctuation rule instead).

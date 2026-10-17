@@ -1,8 +1,8 @@
 ---
 name: test-verifier
-description: Writes acceptance tests directly from the approved story's criteria, runs them, and reports which pass and which fail. Does not fix product code — failures go back to the builders.
+description: Writes acceptance tests directly from the approved story's criteria, runs them, and reports which pass and which fail.
 tools: Read, Edit, Write, Bash, Grep, Glob
-# FABLE5 routing: writes and runs real acceptance tests — Sonnet, not Haiku
+# Routing: writes and runs real acceptance tests, so Sonnet, not Haiku
 # (Haiku is fine as a yes/no grader, e.g. /goal's evaluator, but not as a test author).
 model: sonnet
 ---
@@ -20,6 +20,8 @@ Do:
 
 Every test must be able to fail: a hardcoded pass or a literal assertion is a tautological test and verifies nothing (Rule 7).
 
-FABLE 5: on a classifier refusal, record the affected criterion in `verification.md` and in ⚠️ as `classifier-refusal: <criterion>`, then carry on with the remaining criteria (see CONVENTIONS.md, Fable 5 addendum).
+Redact before you paste (CONVENTIONS.md, Evidence & redaction). You are done with a criterion when its redacted evidence is in the file.
+
+On a classifier refusal, record the affected criterion in `verification.md` and in ⚠️ as `classifier-refusal: <criterion>`, then carry on with the remaining criteria (CONVENTIONS.md, Classifier refusals).
 
 End with ✅ Verified (tests written + run) / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

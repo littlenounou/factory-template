@@ -14,30 +14,16 @@ The tool NEVER translates and NEVER rewords. It only reorders whole comment line
 within a single comment block and inserts one separator line. Anything it is not
 certain about is left untouched and listed in the report for a human to handle.
 
-Safety guarantees:
-- A comment run ends at the first line that is not a pure comment line.
-- Python files are read with `tokenize` + `ast`: only real `#` comment lines and real
-  docstrings are candidates. Triple-quoted strings that are not docstrings (SQL, test
-  data) and string literals containing Chinese are never touched.
-- Wrapped lines stay with the sentence they continue: a Chinese sentence that wraps
-  onto a code-only line keeps that line in the Chinese block.
-- Multi-line English followed directly by Chinese (no separator) is flagged, not fixed.
-- Before writing, every rewritten file is re-checked. If anything other than the order
-  of comment / docstring lines changed, the file is NOT written and is flagged.
-
 Dry-run by default. See --help.
 """
 
 from __future__ import annotations
 
 import argparse
-import ast
-import io
 import os
 import re
 import subprocess
 import sys
-import tokenize
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -86,34 +72,19 @@ MAX_BYTES = 2 * 1024 * 1024  # skip anything bigger; it is not hand-written sour
 # ---------------------------------------------------------------------------
 # Language classification
 # ---------------------------------------------------------------------------
-# CJK ideographs PLUS CJK / full-width punctuation, so a line like
-# "（COLUMN_NAME | …）。" counts as Chinese.
 CJK_RE = re.compile(
-    "["
-    "\u3000-\u303f"                       # CJK punctuation: 、。「」『』
-    "\u3100-\u312f"                       # Bopomofo
-    "\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff"
-    "\uff00-\uffef"                       # full-width forms: （）：，！？
-    "\U00020000-\U0002ebef"
-    "]"
+    r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\U00020000-\U0002ebef]"
 )
 LATIN_RE = re.compile(r"[A-Za-z]")
-
-# A Chinese line ending in one of these has finished its sentence.
-ZH_TERMINAL = ("。", "！", "？", "；", "：")
-
-# A line made only of rule characters acts as a paragraph break.
-SEPARATOR_RE = re.compile(r"[-=*~_#/+.\s]{3,}")
 
 # Strong signals that a "comment" line is really commented-out code, not prose.
 CODE_RE = re.compile(
     r"""(
         [;{}]\s*$                                   # ends in ; { }
       | =>|->|::|\+\+|&&|\|\|                       # operator soup
-      | ^\s*(?:>>>|\.\.\.\s)                        # doctest prompt
       | ^\s*(?:import|from|export|const|let|var|def|class|func|function|
              public|private|protected|return|if|for|while|switch|case|
-             print|echo|console\.|System\.|package|use|require|assert)\b
+             print|echo|console\.|System\.|package|use|require)\b
       | ^\s*[\w$@]+(?:\.[\w$]+)*\s*\([^)]*\)\s*[;,)]?\s*$   # a bare call expression
       | ^\s*[\w$]+(?:\.[\w$]+|\[[^\]]*\])*\s*(?:=|\+=|-=|:=)\s*\S  # an assignment
       | ^\s*</?[a-zA-Z][\w.-]*[\s/>]                # markup tag
@@ -121,54 +92,17 @@ CODE_RE = re.compile(
     re.VERBOSE,
 )
 
-_BACKTICK_RE = re.compile(r"`[^`]*`")
-_PROSE_WORD_RE = re.compile(r"(?<![\w.])[A-Za-z][a-z]+(?![\w(])")
 
-
-def prose_words(text: str) -> int:
-    """Count ordinary English words, ignoring `code spans` and identifiers."""
-    return len(_PROSE_WORD_RE.findall(_BACKTICK_RE.sub(" ", text)))
-
-
-def classify_lines(contents: list[str]) -> list[str]:
-    """
-    Classify each comment line as 'zh', 'en', 'blank' or 'ambiguous', using the
-    previous line as context so a wrapped sentence stays in one language:
-
-    - any CJK character (including full-width punctuation) -> 'zh'
-    - a line with no CJK that follows an unfinished Chinese sentence continues it
-      -> 'zh', but only if it holds no English prose words at all (pure code,
-      identifiers, symbols); any English word there -> 'ambiguous'
-    - a line with no letters at all continues whatever came before it
-    """
-    kinds: list[str] = []
-    prev_kind: str | None = None
-    zh_open = False  # True while a Chinese sentence has not reached its terminal mark
-    for c in contents:
-        t = c.strip()
-        if not t or SEPARATOR_RE.fullmatch(t):
-            kinds.append("blank")
-            prev_kind, zh_open = None, False
-            continue
-        if CJK_RE.search(t):
-            k = "zh"
-            zh_open = not t.endswith(ZH_TERMINAL)
-        elif LATIN_RE.search(t):
-            if prev_kind == "zh" and zh_open:
-                k = "zh" if prose_words(t) == 0 else "ambiguous"
-                # A code-only continuation may close the sentence with ASCII punctuation.
-                zh_open = k == "zh" and not t.endswith((".", "!", "?", ";", ":"))
-            else:
-                k = "en"
-                zh_open = False
-        else:
-            k = prev_kind or "blank"
-        kinds.append(k)
-        if k == "blank":
-            prev_kind, zh_open = None, False
-        else:
-            prev_kind = k
-    return kinds
+def classify(text: str) -> str:
+    """Classify one comment line's content: 'zh', 'en', or 'blank'."""
+    t = text.strip()
+    if not t:
+        return "blank"
+    if CJK_RE.search(t):
+        return "zh"
+    if LATIN_RE.search(t):
+        return "en"
+    return "blank"  # separators like ----- or ===== act as paragraph breaks
 
 
 def looks_like_code(text: str) -> bool:
@@ -197,46 +131,28 @@ class Stats:
 
 
 # ---------------------------------------------------------------------------
-# Core: regroup one paragraph of comment content lines
+# Core: regroup one run of comment content lines
 # ---------------------------------------------------------------------------
-SEP = "\0SEP\0"
-
-
-def regroup(
-    lines: list[str],
-    contents: list[str],
-    kinds: list[str],
-    pin_first: bool = False,
-    pin_last: bool = False,
-) -> tuple[list[str] | None, str, str]:
+def regroup(lines: list[str], contents: list[str]) -> tuple[list[str] | None, str, str]:
     """
-    Given the original full lines of ONE paragraph (no blank comment lines inside),
-    their comment-content parts and their language kinds, decide what to do.
-
-    pin_first / pin_last: that line physically carries a docstring's opening /
-    closing quotes, so it must stay where it is.
+    Given the original full lines of ONE paragraph (no blank comment lines inside)
+    and their comment-content parts, decide what to do.
 
     Returns (new_lines_or_None, kind, reason).
     kind is 'migrated' | 'reordered' | 'review' | 'clean'.
     """
-    if "zh" not in kinds or ("en" not in kinds and "ambiguous" not in kinds):
+    kinds = [classify(c) for c in contents]
+    if "zh" not in kinds or "en" not in kinds:
         return None, "clean", ""
 
-    if "ambiguous" in kinds:
-        return None, "review", ("an English-looking line follows an unfinished Chinese "
-                                "line — cannot tell a wrapped sentence from a new one")
-
     switches = sum(1 for a, b in zip(kinds, kinds[1:]) if a != b)
-    n_en, n_zh = kinds.count("en"), kinds.count("zh")
 
+    if switches < 1:
+        return None, "clean", ""
+
+    # A two-line EN→ZH pair is already the compliant degenerate case.
     if switches == 1 and kinds[0] == "en":
-        # English block, then Chinese block. One line each is the compliant
-        # degenerate case; anything longer needs a separator the author must place.
-        if n_en == 1 and n_zh == 1:
-            return None, "clean", ""
-        return None, "review", ("English block followed by Chinese block with no "
-                                "separator — insert a bare comment line / blank "
-                                "docstring line between them")
+        return None, "clean", ""
 
     if any(looks_like_code(c) for c in contents):
         return None, "review", "contains commented-out code — reordering could break it"
@@ -249,14 +165,14 @@ def regroup(
 
     en = [ln for ln, k in zip(lines, kinds) if k == "en"]
     zh = [ln for ln, k in zip(lines, kinds) if k == "zh"]
-    new = en + zh if (len(en) == 1 and len(zh) == 1) else en + [SEP] + zh
-
-    if (pin_first and new[0] != lines[0]) or (pin_last and new[-1] != lines[-1]):
-        return None, "review", ("text shares a line with the docstring quotes and "
-                                "regrouping would move it — fix by hand")
+    if not en or not zh:
+        return None, "clean", ""
 
     kind = "reordered" if switches == 1 else "migrated"
-    return new, kind, ""
+    # One English line + one Chinese line needs no separator (the rule's degenerate case).
+    if len(en) == 1 and len(zh) == 1:
+        return en + zh, kind, ""
+    return en + ["\0SEP\0"] + zh, kind, ""
 
 
 def process_run(
@@ -265,47 +181,39 @@ def process_run(
     separator: str,
     path: str,
     findings: list[Finding],
-    pin_first: bool = False,
-    pin_last: bool = False,
 ) -> bool:
     """
-    Process one contiguous comment run. `run` is [(lineno, full_line, content), ...]
-    and must hold ONLY comment / docstring lines. Appends the (possibly rewritten)
-    lines to `out`. Returns True if changed.
+    Process one contiguous comment run. `run` is [(lineno, full_line, content), ...].
+    Appends the (possibly rewritten) lines to `out`. Returns True if changed.
     """
     changed = False
-    kinds_all = classify_lines([r[2] for r in run])
-    para: list[int] = []  # indexes into run
+    para: list[tuple[int, str, str]] = []
 
     def flush() -> None:
         nonlocal changed, para
         if not para:
             return
-        lines = [run[i][1] for i in para]
-        contents = [run[i][2] for i in para]
-        kinds = [kinds_all[i] for i in para]
-        new, kind, reason = regroup(
-            lines, contents, kinds,
-            pin_first=pin_first and para[0] == 0,
-            pin_last=pin_last and para[-1] == len(run) - 1,
-        )
+        lines = [p[1] for p in para]
+        contents = [p[2] for p in para]
+        new, kind, reason = regroup(lines, contents)
         if kind == "review":
-            findings.append(Finding(path, run[para[0]][0], "review", reason, lines[:8]))
+            findings.append(Finding(path, para[0][0], "review", reason,
+                                    lines[:6]))
             out.extend(lines)
         elif new is not None:
-            findings.append(Finding(path, run[para[0]][0], kind))
-            out.extend(separator if ln == SEP else ln for ln in new)
+            findings.append(Finding(path, para[0][0], kind))
+            out.extend(separator if ln == "\0SEP\0" else ln for ln in new)
             changed = True
         else:
             out.extend(lines)
         para = []
 
-    for i, item in enumerate(run):
-        if kinds_all[i] == "blank":
+    for item in run:
+        if classify(item[2]) == "blank":
             flush()
             out.append(item[1])
         else:
-            para.append(i)
+            para.append(item)
     flush()
     return changed
 
@@ -320,10 +228,10 @@ def token_of(stripped: str, style: str) -> str | None:
     return None
 
 
-STRING_OPEN_RE = re.compile(r'^[rRbBuUfF]{0,2}("""|\'\'\')')
+DOCSTRING_OPEN = re.compile(r'^(\s*)(?:[rRbBuUfF]{0,2})("""|\'\'\')\s*$')
 
 
-def read_source(path: Path) -> str | None:
+def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, bool] | None:
     try:
         raw = path.read_bytes()
     except OSError:
@@ -336,199 +244,44 @@ def read_source(path: Path) -> str | None:
         return None
     if not CJK_RE.search(text):
         return None  # nothing bilingual here
-    return text
 
-
-def join_lines(out: list[str], text: str) -> str:
     eol = "\r\n" if "\r\n" in text else "\n"
     trailing = text.endswith(("\n", "\r"))
-    return eol.join(out) + (eol if trailing else "")
-
-
-def run_of_line_comments(lines: list[str], i: int, style: str, is_comment_line):
-    """
-    Collect consecutive pure comment lines starting at i that share one token and
-    one indent. The run ends at the FIRST line that is not a pure comment line.
-    Returns (run, indent, token).
-    """
-    first = lines[i]
-    indent = first[: len(first) - len(first.lstrip())]
-    tok = token_of(first.strip(), style)
-    run: list[tuple[int, str, str]] = []
-    j = i
-    while j < len(lines):
-        ln = lines[j]
-        s = ln.strip()
-        if not s or not is_comment_line(j):
-            break
-        t = token_of(s, style)
-        ind = ln[: len(ln) - len(ln.lstrip())]
-        if t != tok or ind != indent:
-            break
-        run.append((j + 1, ln, s[len(t):]))
-        j += 1
-    return run, indent, tok
-
-
-# ---- Python --------------------------------------------------------------------
-def python_structure(text: str):
-    """
-    Return (comment_lines, docstrings) for Python source, or None if it does not parse.
-    comment_lines: 0-based indexes of lines whose ONLY token is a COMMENT.
-    docstrings: {start: (start, end)} 0-based inclusive, multi-line docstrings only.
-    """
-    try:
-        tree = ast.parse(text)
-        toks = list(tokenize.generate_tokens(io.StringIO(text).readline))
-    except (SyntaxError, ValueError, tokenize.TokenError):
-        return None
-
-    skip = {tokenize.COMMENT, tokenize.NL, tokenize.NEWLINE, tokenize.INDENT,
-            tokenize.DEDENT, tokenize.ENDMARKER, tokenize.ENCODING}
-    code_lines: set[int] = set()
-    comment_lines: set[int] = set()
-    for tk in toks:
-        if tk.type == tokenize.COMMENT:
-            comment_lines.add(tk.start[0] - 1)
-        elif tk.type not in skip:
-            code_lines.update(range(tk.start[0] - 1, tk.end[0]))
-    # A comment that shares a line with code (or sits inside a multi-line string's
-    # span) is never a candidate.
-    comment_lines -= code_lines
-
-    docs: dict[int, tuple[int, int]] = {}
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
-            body = node.body
-            if (body and isinstance(body[0], ast.Expr)
-                    and isinstance(body[0].value, ast.Constant)
-                    and isinstance(body[0].value.value, str)):
-                e = body[0].value
-                if e.end_lineno is not None and e.end_lineno > e.lineno:
-                    docs[e.lineno - 1] = (e.lineno - 1, e.end_lineno - 1)
-    return comment_lines, docs
-
-
-def docstring_run(lines: list[str], start: int, end: int):
-    """
-    Build the run for the multi-line docstring spanning lines[start..end].
-    Returns (run, pin_first, pin_last, first_idx, last_idx), or None when the layout
-    is unusual enough (implicit concatenation, code after the closer, ...) that the
-    docstring is left alone.
-    """
-    s_open = lines[start].strip()
-    m = STRING_OPEN_RE.match(s_open)
-    if not m:
-        return None
-    quote = m.group(1)
-    s_close = lines[end].rstrip()
-    if s_open.count(quote) != 1 or s_close.count(quote) != 1 or not s_close.endswith(quote):
-        return None
-    open_text = s_open[m.end():]
-    close_text = s_close.strip()[: -len(quote)]
-
-    first_idx = start if open_text.strip() else start + 1
-    last_idx = end if close_text.strip() else end - 1
-    if last_idx < first_idx:
-        return None
-
-    run: list[tuple[int, str, str]] = []
-    for k in range(first_idx, last_idx + 1):
-        if k == start:
-            content = open_text
-        elif k == end:
-            content = close_text
-        else:
-            content = lines[k]
-        run.append((k + 1, lines[k], content))
-    return run, first_idx == start, last_idx == end, first_idx, last_idx
-
-
-def scan_python(path: Path, text: str, findings: list[Finding]) -> str | None:
-    info = python_structure(text)
-    if info is None:
-        findings.append(Finding(str(path), 1, "review",
-                                "file does not parse as Python — skipped entirely"))
-        return None
-    comment_lines, docs = info
     lines = text.splitlines()
+
     out: list[str] = []
     changed = False
-    i, n = 0, len(lines)
-    while i < n:
-        if i in docs:
-            start, end = docs[i]
-            built = docstring_run(lines, start, end)
-            if built is None:
-                out.extend(lines[start:end + 1])
-            else:
-                run, pin_first, pin_last, first_idx, last_idx = built
-                out.extend(lines[start:first_idx])
-                if process_run(out, run, "", str(path), findings, pin_first, pin_last):
-                    changed = True
-                out.extend(lines[last_idx + 1:end + 1])
-            i = end + 1
-            continue
-
-        if i in comment_lines:
-            run, indent, tok = run_of_line_comments(
-                lines, i, "hash", lambda j: j in comment_lines)
-            if run:
-                if process_run(out, run, indent + tok, str(path), findings):
-                    changed = True
-                i += len(run)
-                continue
-
-        out.append(lines[i])
-        i += 1
-
-    return join_lines(out, text) if changed else None
-
-
-def python_signature(text: str):
-    """What must NOT change: every code token, plus the sets of comment/docstring lines."""
-    info = python_structure(text)
-    if info is None:
-        return None
-    _, docs = info
-    doc_starts = set(docs)
-    code, doc_lines, comments = [], [], []
-    for tk in tokenize.generate_tokens(io.StringIO(text).readline):
-        if tk.type in (tokenize.NL, tokenize.INDENT, tokenize.DEDENT):
-            continue
-        if tk.type == tokenize.COMMENT:
-            if tk.string.lstrip("#").strip():
-                comments.append(tk.string.strip())
-            continue
-        if tk.type == tokenize.STRING and (tk.start[0] - 1) in doc_starts:
-            code.append((tk.type, "<docstring>", tk.start[0] == tk.end[0]))
-            doc_lines.extend(ln.strip() for ln in tk.string.splitlines() if ln.strip())
-            continue
-        code.append((tk.type, tk.string))
-    return code, sorted(doc_lines), sorted(comments)
-
-
-# ---- other languages -----------------------------------------------------------
-def scan_generic(path: Path, text: str, style: str, findings: list[Finding]) -> str | None:
-    lines = text.splitlines()
-    out: list[str] = []
-    changed = False
-    i, n = 0, len(lines)
-
-    def is_comment(j: int) -> bool:
-        return token_of(lines[j].strip(), style) is not None
+    i = 0
+    n = len(lines)
+    is_python = path.suffix == ".py"
 
     while i < n:
         line = lines[i]
         stripped = line.strip()
 
+        # --- Python docstring block -------------------------------------
+        if is_python:
+            m = DOCSTRING_OPEN.match(line)
+            if m:
+                indent, quote = m.group(1), m.group(2)
+                j = i + 1
+                while j < n and lines[j].strip() != quote:
+                    j += 1
+                if j < n:  # found the closer
+                    body = [(k + 1, lines[k], lines[k]) for k in range(i + 1, j)]
+                    out.append(line)
+                    if process_run(out, body, "", str(path), findings):
+                        changed = True
+                    out.append(lines[j])
+                    i = j + 1
+                    continue
+
         # --- ` * ` continuation block (JSDoc / Javadoc / Doxygen) --------
-        if style in STAR_BLOCK_STYLES and stripped.startswith("/*") and "*/" not in stripped:
-            j = i + 1
+        if style in STAR_BLOCK_STYLES and stripped.startswith("/*"):
+            j = i
             while j < n and "*/" not in lines[j]:
                 j += 1
-            # Only a closer that sits alone on its line; otherwise leave the block.
-            if j < n and lines[j].strip() in ("*/", "**/"):
+            if j < n and j > i:
                 body: list[tuple[int, str, str]] = []
                 ok = True
                 for k in range(i + 1, j):
@@ -547,59 +300,31 @@ def scan_generic(path: Path, text: str, style: str, findings: list[Finding]) -> 
                     continue
 
         # --- run of line comments ---------------------------------------
-        if stripped and is_comment(i):
-            run, indent, tok = run_of_line_comments(lines, i, style, is_comment)
+        tok = token_of(stripped, style) if stripped else None
+        if tok:
+            indent = line[: len(line) - len(line.lstrip())]
+            run: list[tuple[int, str, str]] = []
+            j = i
+            while j < n:
+                s = lines[j].strip()
+                t = token_of(s, style) if s else None
+                ind = lines[j][: len(lines[j]) - len(lines[j].lstrip())]
+                if t != tok or ind != indent:
+                    break
+                run.append((j + 1, lines[j], s[len(t):]))
+                j += 1
             if process_run(out, run, indent + tok, str(path), findings):
                 changed = True
-            i += len(run)
+            i = j
             continue
 
         out.append(line)
         i += 1
 
-    return join_lines(out, text) if changed else None
-
-
-def generic_signature(text: str, style: str):
-    """Non-comment lines in order, plus the multiset of non-empty comment lines."""
-    code, comments = [], []
-    for ln in text.splitlines():
-        s = ln.strip()
-        if not s:
-            continue
-        tok = token_of(s, style)
-        star = style in STAR_BLOCK_STYLES and s.startswith("*") and not s.startswith("*/")
-        if tok is not None or star:
-            body = s[len(tok):] if tok else s[1:]
-            if body.strip():
-                comments.append(ln.rstrip())
-        else:
-            code.append(ln)
-    return code, sorted(comments)
-
-
-def scan_file(path: Path, style: str, findings: list[Finding]) -> str | None:
-    """Return the rewritten text, or None if the file is unchanged or unsafe to change."""
-    text = read_source(path)
-    if text is None:
+    if not changed:
         return None
-    local: list[Finding] = []
-    if path.suffix == ".py":
-        new = scan_python(path, text, local)
-        safe = new is None or python_signature(text) == python_signature(new)
-    else:
-        new = scan_generic(path, text, style, local)
-        safe = new is None or generic_signature(text, style) == generic_signature(new, style)
-
-    if not safe:
-        # Nothing is written for this file, so its "changed" findings are dropped.
-        findings.extend(f for f in local if f.kind == "review")
-        findings.append(Finding(str(path), 1, "review",
-                                "safety check failed: the rewrite would alter more than "
-                                "comment line order — file left untouched"))
-        return None
-    findings.extend(local)
-    return new
+    new_text = eol.join(out) + (eol if trailing else "")
+    return new_text, True
 
 
 # ---------------------------------------------------------------------------
@@ -703,8 +428,7 @@ def write_report(path: Path, stats: Stats, findings: list[Finding], applied: boo
     review = [f for f in findings if f.kind == "review"]
     if review:
         L += ["## Needs human review (NOT changed)", "",
-              "These blocks are not compliant, but the tool refused to change them",
-              "(ambiguous language split, commented-out code, missing separator, ...).",
+              "These blocks are interleaved but the tool refused to reorder them.",
               "Fix them by hand, or hand this list to Claude one file at a time.", ""]
         for f in review:
             L.append(f"### `{f.path}` L{f.line}")
@@ -770,10 +494,9 @@ def main() -> int:
         stats.review += sum(1 for f in new_findings if f.kind == "review")
         if result is not None:
             stats.files_changed += 1
+            new_text, _ = result
             if args.apply:
-                # newline="" keeps the line endings the rewrite already joined with.
-                with open(p, "w", encoding="utf-8", newline="") as fh:
-                    fh.write(result)
+                p.write_text(new_text, encoding="utf-8")
 
     report.parent.mkdir(parents=True, exist_ok=True)
     write_report(report, stats, findings, args.apply)

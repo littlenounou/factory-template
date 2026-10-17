@@ -1,3 +1,699 @@
+# v1.0.0 (2026-10-17)
+
+First release. `main` had never been tagged; v1.0.0 is `develop` as of PR #36, merged to
+`main`. Every dated entry below this one predates v1.0.0 and is part of it.
+
+## What ships
+- **8 agents**: backend-builder, doc-writer, frontend-builder, memory-distiller, spec-writer,
+  story-writer, test-verifier, validator.
+- **19 commands**: `/feat-backend`, `/feat-distill`, `/feat-docs`, `/feat-epic`, `/feat-fix`,
+  `/feat-frontend`, `/feat-grill`, `/feat-init`, `/feat-new`, `/feat-recomment`,
+  `/feat-research`, `/feat-ship`, `/feat-spec`, `/feat-status`, `/feat-story`, `/feat-sweep`,
+  `/feat-unblock`, `/feat-validate`, `/feat-verify`.
+- **3 hooks**: protect-secrets, quality-gate, scope-track (project-root anchored,
+  `onFailure: "block"`).
+- **Installers**: `install.sh` and `install.ps1`; reinstalling keeps the repo's `MEMORY.md`
+  and merges `settings.json`.
+- **Docs**: README (en, zh-TW), cheatsheet and training guide (en, zh-TW).
+
+## Requirements
+Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
+## Release housekeeping
+PR #37 recorded `main`'s #22/#23 history (the `/feat-sweep` merge and its revert, net
+effect nothing) in `develop`, so the `develop` -> `main` merge is conflict-free and equals
+`develop`.
+
+# Installers keep the repo's MEMORY.md and settings (2026-10-17)
+
+Issue #33 · PR #36
+
+Both installers copied the whole template `.claude/` over the target, so re-running one to
+upgrade replaced two files the repo owns: `.claude/factory/MEMORY.md` (the memory layer,
+written by `/feat-distill`) was reset to the empty starter, and `.claude/settings.json` lost
+the repo's own keys such as `permissions`. Reproduced on `develop` with `install.sh`.
+
+## If a reinstall already wiped your memory
+The old content is in git history unless the wiped file was committed and the history
+rewritten. From the target repo's root:
+```
+git log --oneline -- .claude/factory/MEMORY.md     # find the last commit before the reinstall
+git checkout <commit> -- .claude/factory/MEMORY.md  # restore it into the working tree
+```
+If the reinstall is not committed yet, `git checkout -- .claude/factory/MEMORY.md` is enough.
+Restore `.claude/settings.json` the same way, then re-run the fixed installer: it keeps your
+keys and refreshes `hooks`.
+
+## Decisions (grilled with the maintainer)
+- **MEMORY.md is installed only when absent**, and the installer says whether it was kept
+  or installed. Every other template file is still overwritten.
+- **Non-default `artifactsDir`**: MEMORY.md is not installed at all (memory lives in
+  `<artifactsDir>/MEMORY.md`); the installer prints where, and does not create it there.
+- **settings.json is merged**: the template owns `hooks`, the repo owns every other key.
+  Repo keys are kept, keys only the template has are added, `hooks` is replaced. Rejected:
+  overwrite-with-backup (wipes `permissions` on every upgrade) and skip-and-merge-by-hand
+  (hook fixes such as `onFailure: "block"` would never reach an upgraded repo).
+- **No per-hook merge**: a repo whose `hooks` differ from the template's gets
+  `.claude/settings.json.bak` and a note to re-add its own hooks from it.
+- **Fallback**: when the file cannot be merged (`install.sh` without `jq`, or not a JSON
+  object), it is backed up to `.bak` and replaced, with a warning.
+- **No test file in the repo**: the repro (six scenarios) is recorded in the PR.
+
+## Modified
+- **install.sh**: copies `.claude/` item by item, skipping `settings.json` and
+  `factory/MEMORY.md`; reads `artifactsDir` from `project.json` with `jq` (default
+  `.claude/factory`, as the hooks do); merges `settings.json` with `jq` and rewrites it only
+  when something changes. Without `jq`, `artifactsDir` cannot be read and the default is
+  assumed; an existing MEMORY.md is still kept.
+- **install.ps1**: the same, with `ConvertFrom-Json`; the merged file is written as UTF-8
+  without a BOM.
+- **README.md / docs/README_zh-TW.md**: "Install into a repo" says what a reinstall keeps.
+
+## Unchanged, checked
+Which files ship, `CLAUDE.md` handling (still left untouched, snippet dropped beside it),
+agent/command/hook counts (8 / 19 / 3), the contract-file check, the Claude Code version
+check, MEMORY.md content. The cheatsheets' "re-run the installer" recovery tip stays
+correct. The Follow-ups item in the Pocock v1.3.1 sync entry keeps its wording.
+
+---
+
+# Model-neutral wording: the Fable 5 label dropped (2026-10-17)
+
+Issue #34 · PR #35 (same PR as the hook-path fix below)
+
+Model routing, classifier-refusal handling, the memory layer and the `/goal` convergence
+loop were labelled `FABLE5` / `FABLE 5` (92 mentions in 25 files, plus 30 violet badge and
+highlight marks in the training pages), with a disclaimer that they are "inert-but-harmless
+on other models". Every current Claude model (Opus, Sonnet, Fable) now runs them, so the
+label and the disclaimer described nothing. Behaviour is
+unchanged: no step, gate, state or `model:` value moved.
+
+## Decisions (grilled with the maintainer)
+- **Drop the marker** rather than rename it (to "Claude 5" or an "advanced" tag). Where a
+  name is needed, the mechanism's own name is used: memory layer, convergence loop,
+  classifier guard.
+- **Delete the disclaimer.** The one real model dependence moves into the refusal text:
+  any model's classifier can refuse; Claude Fable carries extra classifiers (biology,
+  cybersecurity, LLM R&D), so it refuses most often.
+- **Routing comments name no model** for the orchestrator: "the orchestrating session
+  keeps its own model (chosen with /model)". Workers stay `model: sonnet`.
+- **History stays.** Earlier entries in this file keep their original wording.
+
+## Modified
+- **8 agents**: frontmatter comments read `# Routing: …`; the `FABLE 5:` prefix dropped
+  from each classifier-refusal line.
+- **feat-fix.md**: step 0 is the `CLASSIFIER GUARD`; **feat-ship.md** refers to it by that
+  name, and its `description` no longer starts with the label.
+- **feat-backend / feat-frontend / feat-distill / feat-docs / feat-research /
+  feat-validate.md**: the inline `FABLE 5:` labels dropped.
+- **CONVENTIONS.md**: §Classifier refusals opens model-neutral, with the Fable note.
+- **CLAUDE-rationale.md**: "Fable 5 addendum" renamed "Routing, refusals, memory and
+  convergence", with a one-line note on the old name for anyone searching it.
+- **MEMORY.md**: title line.
+- **README.md / docs/README_zh-TW.md**: training-guide line, `/feat-ship` and
+  `/feat-distill` comments, disclaimer paragraph removed.
+- **factory-cheatsheet_{en,zh-TW}.md**: "(Fable 5 Edition)" title, Path B label, closing
+  `<sub>` line (keeps "one template for the whole team; pick the model with `/model`").
+- **factory-training_{en,zh-TW}.html**: title and hero; the violet `FABLE5` badges, station
+  highlights, belt colour and their CSS removed; §04 "What Fable 5 Changed" is now
+  "Advanced Mechanisms" / 「進階機制」 (anchor `#advanced`); the inert box became the
+  one-template note; footer edition 2026-09 → 2026-10. Verified: HTMLParser-clean, 14
+  stations, 8 rules, 22 table rows, 4 cards, EN/zh-TW at parity; rendered and checked.
+
+## Unchanged, checked
+`blocked-classifier`, the `classifier-refusal` token, the ⛔ heading, every `model:` field,
+the reference URL (its path contains "fable-5"), and the earlier entries in this file.
+
+---
+
+# Hook paths: project-root anchored, fail closed (2026-10-17)
+
+Issue #34 · PR #35
+
+Field report: every Bash call in a target repo showed
+`PreToolUse:Bash hook error` / `Failed with non-blocking status code: bash:
+.claude/hooks/protect-secrets.sh: No such file or directory`. The error is non-blocking, so
+the tool call ran anyway and **the hook never executed**: secret-staging protection was
+silently off for the rest of the session.
+
+## Root cause
+`settings.json` called every hook by a path relative to the cwd
+(`bash .claude/hooks/protect-secrets.sh`). Claude Code runs a command hook in the shell's
+current directory, which follows Claude's `cd`. One `cd src && …` in a Bash call and every
+later hook in the session resolves to `src/.claude/hooks/…` and fails. Reproduced: exit 127
+with the exact message above.
+
+## Fixed
+- **settings.json**: all three hook commands now run
+  `bash "${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.sh"`. `CLAUDE_PROJECT_DIR` is the
+  project root Claude Code sets for every hook, independent of the cwd. Shell form is kept
+  (not exec form with `args`): exec form needs `bash` to resolve as an executable on PATH,
+  which a default Git for Windows install does not provide, and this template supports
+  Windows via `install.ps1`. The placeholder is double-quoted, so roots with spaces work.
+- **scope-track.sh**: the repo root is still the cwd's `git rev-parse --show-toplevel`
+  (this follows Claude into a worktree, where `CLAUDE_PROJECT_DIR` stays on the main
+  checkout). When the cwd has left the repo, or its root has no `project.json`, the root
+  now falls back to `CLAUDE_PROJECT_DIR`. Before, it fell back to the bare cwd, found no
+  manifest and exited 0: an active build step's scope enforcement was silently skipped.
+- **quality-gate.sh**: same root resolution, and each manifest command now runs from the
+  repo root in its own subshell. Before, commands ran in whatever directory the caller sat
+  in, and a `cd` inside one phase (e.g. `cd backend && tsc`) leaked into the next.
+- **settings.json: `onFailure: "block"` on all three hooks.** A hook that cannot run
+  (script missing, `bash` not found, timeout, exit code other than 0/2) now blocks the tool
+  call instead of letting it through unchecked: the root cause above becomes a loud stop
+  rather than a silent hole (Fail-Loud). The scripts themselves only ever exit 0 or 2, so
+  normal operation is unchanged; the jq-missing path still exits 0 (see below). Requires
+  Claude Code 2.1.295+.
+- **install.sh / install.ps1**: after copying, read `claude --version` and warn (never
+  fail) when it is older than 2.1.295, or say the version could not be checked when
+  `claude` is not on PATH in the installer's shell.
+
+## Verified
+Scratch repo, hooks driven through `sh -c` with the exact `settings.json` strings, cwd
+drifted to `src/` or `/`: `git add .env` blocked (2); `ls` allowed (0); backend step
+writing `web/` blocked (2) and `src/` allowed (0), both from `src/` and from outside the
+repo; protected `dist/` blocked (2); `Write .env` blocked (2); quality-gate run from `src/`
+executes each phase at the root with no `cd` leak; project root containing a space works.
+`bash -n` clean on all three scripts; `settings.json` parses.
+
+End to end in real `claude -p` sessions (Claude Code 2.1.302), scratch repo: `cd src && ls`
+runs normally with all hooks present; with `protect-secrets.sh` removed, a plain `ls` is
+blocked with `failed; blocking because onFailure is "block"`; across two separate Bash
+calls (`cd src`, then `git add ../.env`) the second is blocked by `protect-secrets.sh` and
+nothing is staged; with `scope-track.sh` removed, every Write is blocked, including a Write
+that tries to recreate the hook itself.
+
+Installers: version check run against stubbed `claude` binaries (2.1.29, 2.1.294, 2.0.999,
+1.9.999 → warn; 2.1.295, 2.1.296-beta, 2.1.1000, 2.2.0, 3.0 → ok; unparseable output and no
+`claude` on PATH → note) and the real 2.1.302. `install.ps1` checked the same way under
+PowerShell 7.4.6 on Linux; not run on Windows PowerShell 5.1.
+
+## Modified: human-facing docs
+- **factory-cheatsheet_{en,zh-TW}.md**: Install block gains `claude --version` (2.1.295+).
+  Stuck table gains two rows: the blocking notice (`failed; blocking because onFailure is
+  "block"`), with the lockout recovery spelled out (restore `.claude/` from a terminal with
+  `git checkout -- .claude/` or re-run the installer, because a missing
+  `protect-secrets.sh` blocks every tool Claude would use to repair it; never
+  `disableAllHooks`); and the old non-blocking notice, which now only means a pre-2026-10-17
+  `settings.json`. EN/zh-TW at parity.
+- **README.md / docs/README_zh-TW.md**: Requirements: Claude Code 2.1.295+, with one line
+  on what `onFailure: "block"` does and that the installer warns.
+
+## Upgrading an installed repo
+Confirm `claude --version` is 2.1.295 or later on every machine that opens the repo. Copy
+the template's `.claude/settings.json` and `.claude/hooks/*.sh` over the repo's copies (or
+re-run `install.sh` / `install.ps1`, which overwrite `.claude/`), then restart the Claude
+Code session. If the repo's `settings.json` carries local additions, change only the three
+hook entries (`command` string plus `"onFailure": "block"`).
+
+## Deliberately not done
+- **`protect-secrets.sh` untouched.** It reads only stdin, never a path.
+- **jq missing still fails open.** Both hook scripts exit 0 with a notice when `jq` is
+  absent, so `onFailure` never sees it as a failure. That is the documented fail-safe
+  contract (README, cheatsheet, training guide); making it block is a separate decision.
+- **Callers of `quality-gate.sh` unchanged.** The commands and builders (feat-backend, feat-frontend, feat-fix, feat-ship,
+  backend-builder, frontend-builder) invoke it as
+  `bash .claude/hooks/quality-gate.sh`, including the `/goal` condition users paste
+  verbatim from `/feat-ship`. That call runs through the Bash tool, where a drifted cwd
+  fails loudly (exit 127 in the transcript) and Claude retries from the root; a hook
+  failure was the silent case.
+- **The installer warns, never fails, on an old version.** `claude` is often absent from
+  the shell the installer runs in, and the template copy itself is harmless.
+- Agent/command/hook counts unchanged (8 / 19 / 3).
+- `factory-training_{en,zh-TW}.html` stuck table not extended in this pass.
+
+## Follow-ups (not in this pass)
+- Unverified on Claude Code older than 2.1.295 (no older build was reachable to test).
+  Per the settings docs, a value the schema rejects may make Claude Code skip that hook
+  entry or the whole file, which would switch the hooks off entirely. The installer
+  warning and the README requirement are the guard; upgrade before installing.
+- Unverified on native Windows: Claude's `file_path` there may use `\` while
+  `git rev-parse` prints `C:/…`, so `scope-track.sh`'s repo-relative path would never match
+  and an active step would block every write. Test on a Windows install before relying on
+  scope enforcement there; this predates the current change.
+- Mirror the new stuck-table row into `factory-training_{en,zh-TW}.html`.
+
+---
+
+# Pocock v1.3.1 sync: prevention pass, grill separator, command hand-offs (2026-10-07)
+
+Read against mattpocock/skills v1.3.1 (MIT; tagged 2026-10-05; changelog and `SKILL.md`
+files read from a clone, since the GitHub Releases page still showed v1.2.3). v1.3.0
+added `implement-spec`, `pr` and `retro`, removed `resolving-merge-conflicts`, renamed
+`CONTEXT.md` to `GLOSSARY.md`, and swept em-dashes from the repo; v1.3.1 points a fixed
+bug at `retro` to ask what would have prevented it.
+
+## Decisions (grilled with the maintainer)
+- **Adopt `retro`'s mechanical/judgement split into `/feat-distill`.** A fixed failure is
+  asked "what would have caught it earlier?". Mechanical patterns become proposed checks
+  (lint rule, `project.json` command or hook) that a human adds; judgement calls stay
+  General rules. The distiller cannot edit config, so it only proposes.
+- **Validator reads General rules and `check pending` entries** (Q1a, Q1d). Verified facts
+  describe the codebase and serve research, not diff review, so they stay out. A
+  `check pending` entry is a rule waiting for its check: without it, a mechanical lesson
+  sat where no reviewer looked until the human added the check, leaving it less guarded
+  than a judgement call. Once the check exists the distiller removes the entry and the
+  gate takes over.
+- **Proposed checks are tracked** (Q1b): a `check pending: <rule>` Watchlist entry stays
+  until the check exists in the repo, so a one-time report cannot drop it.
+- **A blank gate command is a finding** (Q1c): `no guardrail: <track> <lint|test>`.
+  `quality-gate.sh` prints `(none configured, skipped)` and moves on, so nothing else
+  surfaces it.
+- **`pr`: point to upstream, do not vendor** (Q2). One README line; the factory still never
+  opens PRs.
+- **`implement-spec`: declined** (Q3), a non-item rather than a Watchlist entry. Its
+  parallel worktrees are merged by a subagent, which conflicts with the rule that the
+  human commits, and its implementers would share one `state.json` (`retries`, `step`) and
+  one `backend-summary.md`. Large work is already split into features by `/feat-epic`.
+- **Em-dashes: new English lines use fewer** (Q4). No repo-wide sweep. Upstream gives no
+  stated reason for its ban (PRs #879 and #905 describe only the change); the rule kept
+  here is the one with a reason for agents: a colon, comma, period or parentheses names
+  the relation a dash leaves open. zh-TW 破折號 is untouched.
+
+## Modified
+- **memory-distiller.md**: new step 2 Prevention pass (mechanical / judgement /
+  upstream gap); General rules now take only judgement and upstream-gap answers; Watchlist
+  gains `check pending` and `no guardrail` entries and their removal conditions; reads
+  `project.json`; ❓ lists every Proposed check.
+- **validator.md**: reads MEMORY.md's General rules and the Watchlist's `check pending`
+  entries; new **Memory rules** check (cite `[date slug]`, root `CLAUDE.md` overrides,
+  🟠/⚪ only).
+- **feat-distill.md**: step 5 reports every Proposed check.
+- **MEMORY.md**: header names the validator as a reader (General rules, `check pending`); General rules and Watchlist
+  comments describe the split, with a `check pending` example. Note that `install.sh`
+  overwrites this file in a target repo (see Follow-ups).
+- **feat-grill.md**: round shape matches upstream: ` - ` after `Q<n>`, a blank line
+  before ➡️, and `---` between questions. `/feat-epic` inherits it by pointer.
+- **feat-sweep.md / feat-recomment.md**: `argument-hint` quoted. Unquoted, a value
+  starting with `[` is invalid YAML (PyYAML rejects both files); the same class of bug as
+  upstream #911.
+- **feat-spec.md / feat-unblock.md**: the next step is told to the human, matching every
+  other command. Upstream v1.3.0 (#880) found that skills telling the agent to invoke a
+  user-invoked skill fail silently; these two lines would break the same way once
+  `disable-model-invocation` lands on the `/feat-*` commands (the deferred follow-up from
+  writing-for-agents pass 2).
+- **spec-writer.md**: "slices with no blockers may be built in parallel" replaced by an
+  ordering rule (every slice after its blockers; builders work top to bottom). Nothing in
+  the factory builds slices in parallel.
+- **WRITING-FOR-AGENTS.md**: new section "Punctuation and frontmatter" (dash rule for new
+  English lines; quote frontmatter values containing `: ` or starting with `[`, `{`, `*`,
+  `&`).
+- **CLAUDE-rationale.md**: Fable 5 addendum gains the Prevention pass rationale; Pocock
+  provenance gains the v1.3.1 re-sync and the v1.3.x declines (`implement-spec`, `pr` as a
+  step, the em-dash sweep) and notes the `GLOSSARY.md` rename.
+- **README.md / docs/README_zh-TW.md**: one paragraph pointing to upstream `pr`.
+- **factory-cheatsheet_{en,zh-TW}.md**: `/feat-distill` line mentions proposed checks.
+- **factory-training_{en,zh-TW}.html**: `/feat-distill` station and Memory-layer row
+  describe the prevention pass and what the validator reads. Stations, house
+  rules and table row counts unchanged.
+
+## Not taken, no action needed
+- `resolving-merge-conflicts` removal: nothing here referenced it.
+- #878 "Call the Skill tool with ...": commands delegate with "Use the **X** subagent",
+  already explicit, and no command loads a skill.
+- `GLOSSARY.md` rename: `CONTEXT.md` was declined on 2026-07-23; provenance notes the new
+  name so an upstream search finds it.
+
+## Unchanged, checked
+`CONVENTIONS.md` (the always-loaded layer is unchanged: the MEMORY.md single-writer
+invariant still holds, the validator only reads), agent and command descriptions, agent
+and command counts (8 / 19), `install.sh` / `install.ps1`, `quality-gate.sh`,
+`scope-track.sh`, `feat-epic.md`, `feat-ship.md`.
+
+## Follow-ups (not in this pass)
+- **`install.sh` / `install.ps1` overwrite `.claude/factory/MEMORY.md`** on reinstall
+  (`cp -R` / `Copy-Item -Force` over the whole `.claude/`), so upgrading a repo whose
+  `artifactsDir` is the default wipes its memory. Found while checking this change;
+  fix as its own issue (copy MEMORY.md only when absent).
+- `disable-model-invocation` on `/feat-*` (deferred from pass 2) can now proceed: every
+  command hands off by telling the human.
+- Watch the first few distills for checks proposed but never added; if `check pending`
+  entries pile up, raise them in `/feat-status`.
+
+---
+
+# /feat-epic: delegate, and human-ruled scope drops (2026-09-20)
+
+Follow-up to `/feat-epic`. Two gaps found while walking the WORK loop: a ticket that turns
+out to move only one feature had no exit except being answered in the epic or squeezed into
+Out of scope, and both scope drops were decided by the agent alone, at the point in the run
+where the pull to finish is strongest (upstream's premature completion). CHART is unchanged.
+
+- **Third way to close a ticket: `delegated`.** The question moves one feature only, so
+  that feature's `/feat-grill` settles it. Its Decisions-so-far line reads
+  `delegated to <feature-slug> — <the open question>`, and step 6 carries it into the
+  Feature breakdown as `open: <ticket titles>` beside that feature's `/feat-new` line. A
+  question that shapes the split, or that several features depend on, stays with the epic.
+- **The human rules on every scope drop.** Out of scope and delegated are now raised in the
+  same grilling round as the ticket being resolved (`❓` + `➡️`, no extra round), and step 5
+  acts on the answer. The Destination's own Out of scope, agreed while charting, is already
+  the human's.
+- **Closing report** names every ticket closed without being answered, with its new owner,
+  so a drop cannot pass silently.
+- Clearing the map is unchanged: no open ticket, no fog. Delegating closes a ticket, so no
+  condition had to be relaxed.
+
+## Modified
+- **feat-epic.md** — ticket `Status` gains `delegated`; new "Three ways a ticket closes"
+  paragraph; WORK steps 3, 5, 6 and the closing report. 1,007 → ~1,140 words.
+
+## writing-for-agents check on the change
+- **Step ordering fixed.** Step 4 set `closed` on the ticket in hand before step 5 could
+  apply a ruling to it, so dropping the ticket you just resolved contradicted itself. Step 3
+  now says the ticket in hand may itself be dropped, and step 4 covers answered tickets.
+- **Co-location.** `Decisions so far` was defined as "one line per closed ticket", which
+  invited out-of-scope tickets in and needed a "never in Decisions so far" ban in step 5.
+  The definition now reads "answered or delegated", and the ban is gone — a boundary stated
+  once where the concept is defined, not repeated as a prohibition at the point of use.
+- **No-ops cut.** "No separate round" restated "in the same round"; "which step 6 carries
+  into the breakdown" restated step 6's own instruction.
+
+---
+
+# writing-for-agents pass 2 — always-loaded layer (2026-09-20)
+
+Second audit against upstream `writing-for-agents` (read on main, 2026-09-20). The finding
+that drove it: Claude Code loads `CLAUDE.md` **and its `@import`s into every custom
+subagent** (only built-in Explore and Plan skip them), so the always-loaded layer is paid
+once per turn in the main session and again on every factory agent run. `CONVENTIONS.md`
+had grown into a design document — mostly procedures already owned by command files,
+caches of the environment, and history. Measured (HTML comments excluded, as they are
+stripped before loading): always-loaded words **5,217 → 2,644 (-49%)**; `CONVENTIONS.md`
+2,810 → ~530; snippet 1,619 → 1,391; agent descriptions 238 → 181; command descriptions
+382 → 313 (descriptions are always-loaded pointers too).
+
+## Decisions (grilled with the maintainer)
+- **`CONVENTIONS.md` stays the imported file, shrunk to the core** — existing repos keep
+  their `@import` line; reinstalling upgrades them. Design narrative moved to
+  `CLAUDE-rationale.md` (human-only, never loaded).
+- **Duplicated procedure is deleted, not moved** — the command/agent file is the single
+  source of truth; README, cheatsheets and training carry the human overview.
+- **Prompt style disclosed** to `WRITING-FOR-AGENTS.md`, reached by one pointer, and
+  re-synced to upstream's current reference.
+- **Snippet block 2/2 deleted**; its unique rules folded into the core.
+- **Scope includes commands and agents**, at least everything added since the
+  2026-08-14 pass (`/feat-recomment`, `/feat-unblock`, `/feat-sweep`, `/feat-epic`) plus
+  lines the core change touched.
+- **Verification by traceability** (table below) plus a live `/context` check by the
+  maintainer.
+
+## New file
+- **`.claude/factory/WRITING-FOR-AGENTS.md`** — disclosed reference: the two loads (with
+  the per-subagent multiplier), context pointers, information hierarchy and the branching
+  test, co-location, sprawl, completion criteria (clarity + demand, premature completion),
+  leading words and the positive prompt, and pruning (single source of truth per context,
+  cache test, relevance/sediment, no-ops). Contract files 5 → 6.
+
+## Modified
+- **CONVENTIONS.md** — rewritten as the core: Pipeline (manifest + diagram), Invariants,
+  Evidence & redaction, Classifier refusals (the definition the agents point at), and the
+  pointer to `WRITING-FOR-AGENTS.md`. Human notes sit in an HTML comment. Supersedes the
+  §Epic planning section added earlier today.
+- **CLAUDE-rationale.md** — new "Factory mechanisms" part: why commands + hooks, blocked
+  handling, the Fable 5 addendum (routing, refusals, memory layer, convergence loop,
+  references), maintenance commands, Pocock provenance.
+- **CLAUDE.factory-snippet.md** — block 2/2 removed; merge is now the two `@import` lines;
+  header comment lists the fourth companion file and the upgrade step.
+- **Agents** — backend/frontend-builder: restated Rules 5/7/9 removed (CLAUDE.md reaches
+  them), slice rule and hook line phrased positively, a no-op parenthetical cut.
+  test-verifier: description negation cut, redaction restatement → pointer. validator:
+  description negation + rationale cut, ⛔ line phrased positively. memory-distiller:
+  description trimmed, "never modify" → "you write one file". doc-writer: scope stated
+  three times → once, positively; doc-language line (a cache of terminology §2) cut.
+  spec-writer: restated Rule 1 cut. Classifier pointers retargeted to the new section.
+- **Commands** — feat-recomment: identity trimmed, a duplicate approval ban cut, the
+  word-for-word guardrail labelled and paired. feat-unblock: dead pointer to §Blocked
+  handling removed. feat-sweep, feat-ship, feat-distill, feat-init: descriptions pruned.
+  feat-docs: doc-writer's procedure and the scope-token cache removed (the agent owns
+  both); completion criterion added. feat-fix: redaction and refusal restatements →
+  pointers. feat-grill: MEMORY single-writer restatement cut. feat-epic: provenance moved
+  to rationale; state paragraph tightened.
+- **install.sh / install.ps1** — contract list gains `WRITING-FOR-AGENTS.md`; merge
+  message now says "add the two @import lines" plus the upgrade step.
+- **README.md / docs/README_zh-TW.md, cheatsheets, training HTML (EN/zh-TW)** — merge
+  instructions, the loads table (four companions), the per-subagent reload, and pointers
+  from "full design in CONVENTIONS.md" to `CLAUDE-rationale.md`.
+
+- **Dangling `CHANGES.md` references fixed** — `CHANGES.md` stays at this repo's root, but
+  the installer ships only `.claude/` and the snippet, so a bare "`CHANGES.md`" in an
+  installed file pointed at nothing in a target repo (or at that repo's own changelog).
+  The snippet's footer (always loaded, since 2026-08-14), the CONVENTIONS header comment,
+  and WRITING-FOR-AGENTS' Relevance rule now name the factory template repo's `CHANGES.md`
+  explicitly; the Relevance rule also routes a target repo's own adjustments to that
+  repo's changelog or commit message.
+
+## Traceability — every removed CONVENTIONS.md line and where it lives now
+| Removed section | Single source of truth now |
+|---|---|
+| Tracks & the manifest | core §Pipeline (condensed) |
+| The pipeline (per-step detail) | core diagram + each command file |
+| What makes this reliable | CLAUDE-rationale.md; order/Rule 9 line kept in core |
+| Grill step | feat-grill.md |
+| Epic planning | feat-epic.md; slug namespace kept in core §Invariants |
+| Blocked handling | feat-fix.md steps 1–2, feat-unblock.md, feat-status.md; why → rationale |
+| Maintenance commands | feat-sweep.md, feat-recomment.md; core diagram line |
+| Prompt style | WRITING-FOR-AGENTS.md (superset) |
+| Scope enforcement | core §Invariants; token list = scope-track.sh; each command removes `.active` itself |
+| User-facing documentation | feat-docs.md + doc-writer.md; terminology-zh-tw.md §2 |
+| Legacy comment migration | feat-recomment.md + comment-migrate.py; `--check` rationale → rationale |
+| Disclosed reference table | snippet pointers (EXPLORE, PHASE-BOUNDARIES); core pointer (WRITING-FOR-AGENTS) |
+| Mode contract | core §Invariants |
+| Honesty | CLAUDE.md Rule 0 + each agent's closing line |
+| Fable 5: model routing | agent frontmatter `model:` + its comment; why → rationale |
+| Fable 5: classifier refusals | core §Classifier refusals, feat-fix.md step 0, validator.md |
+| Fable 5: memory layer | feat-distill.md, memory-distiller.md, feat-research.md, MEMORY.md header |
+| Fable 5: convergence loop | feat-ship.md; design constraints → rationale |
+| References, Pocock provenance | CLAUDE-rationale.md |
+| Snippet block 2/2 | core §Pipeline/§Invariants; Fail-Loud = Rule 0; comment rule = terminology-zh-tw.md |
+| Builders' Rules 5/7/9, spec-writer's Rule 1 | CLAUDE.md (loaded into every factory agent) |
+
+## Upgrade note
+The `/feat-epic` delivery zip placed `README_zh-TW.md` at the repo root by mistake; its home
+is `docs/README_zh-TW.md` (the language links in both READMEs point there). If a root copy
+exists, delete it — `docs/README_zh-TW.md` in this change carries both updates.
+Reinstall. In an existing `CLAUDE.md`, delete the old "### Feature Factory" block under
+Project-Specific Rules; keeping it is harmless duplication, not an error.
+
+## Follow-ups
+- Run `/context` before and after in a real repo and compare Memory files; then ship one
+  small feature to confirm no rule stopped binding (the no-op test is model-relative).
+- ❓ Open: mark all 19 commands `disable-model-invocation: true` (they are user-invoked by
+  design). Upside: the model can never self-start a pipeline step, and descriptions may
+  leave the context. Not applied — reports disagree on whether descriptions actually
+  leave the context, and one open bug has the model refusing a user-typed command.
+
+---
+
+# /feat-epic: epic planning layer (2026-09-20)
+
+Resolves the last Watchlist item, the `/wayfinder`-style epic planning layer (parked
+2026-07-23). An optional command ABOVE `/feat-new`, for an effort bigger than one feature
+whose route is still foggy. Adapted from mattpocock/skills `/wayfinder` (MIT; read on
+upstream main, 2026-09-20). Kept: name the Destination first, the map as an index (a
+decision lives only in its ticket), decision tickets (plan, don't do), the blocking
+frontier, fog of war (Not yet specified), Out of scope, one ticket per session with
+research tickets burned down in parallel. NOT taken: the issue tracker, ticket claims,
+and the `task` type.
+
+## Decisions (grilled with the maintainer)
+- **One command, two modes.** `/feat-epic <epic> "<desc>"` charts; `/feat-epic <epic>
+  [ticket]` works the next frontier ticket. Mode is chosen by whether the map exists.
+- **Local markdown, no state machinery.** `<artifactsDir>/epics/<epic>/map.md` +
+  `tickets/NN-<name>.md`, blocking by a `Blocked by:` line. No `state.json` (the map is
+  the state; `state.json` stays per feature), `.active` untouched — artifacts are always
+  writable, so it runs safely mid-feature. A tracker would need `gh`, auth, and writes the
+  hooks cannot see.
+- **Three ticket types.** research (AFK: background Explore, parallel; the main session
+  does web lookups when Explore is denied them), grilling (HITL: `/feat-grill`'s round
+  shape), prototype (HITL: text inline, code via EXPLORE Mode under `prototype/`, linked).
+  `task` dropped — human-only steps are rare here (see the 2026-09-19 triage); they become
+  a Notes ❓ item plus `Blocked by: human — …`. Claims dropped: single driver.
+- **One HITL ticket per run**; the seam between tickets is a phase boundary.
+- **Reference, not inherit or re-grill.** Features carry `[epic: <epic>]` in `idea.md`;
+  `/feat-research` copies the epic decisions a feature relies on into `research.md` →
+  Epic context, and `/feat-grill` treats them as settled (re-open only with new evidence).
+- **Hand-off by paste-ready lines.** A cleared map ends in a Feature breakdown of
+  `/feat-new <slug> … [epic: <epic>]` lines in build order (`after:` for dependencies,
+  advisory). The command creates no feature folder; no fog at chart time means no map.
+- **No MEMORY.md path.** Epic decisions are plans, and MEMORY.md takes only verified
+  entries. They reach it the normal way: the child feature's `research.md` carries them,
+  and `/feat-distill` banks what shipping confirmed. Single-writer contract unchanged;
+  `memory-distiller.md` unchanged (it already reads `research.md`).
+- **`/feat-status` shows epics** (status, Destination, decision count, frontier/blocked
+  tickets, fog, and each child feature's step once cleared); a child feature shows
+  `Epic: <epic>`.
+- **One slug namespace.** `/feat-new` and `/feat-epic` each refuse a slug the other uses,
+  and `epics` is reserved. `/feat-epic` ends every run by reminding the user of this.
+
+## New file
+- **feat-epic.md** — `/feat-epic`. Uses the built-in Explore subagent; no new agent
+  (agent count stays 8). Command count 18 → 19.
+
+## Modified
+- **feat-new.md** — slug GUARD (shared namespace, `epics` reserved).
+- **feat-research.md** — step 2: `[epic: <e>]` → Epic context section, settled decisions.
+- **feat-grill.md** — step 3: Epic context decisions are settled.
+- **feat-status.md** — epic view; child feature prints its epic.
+- **CONVENTIONS.md** — pipeline diagram gains `/feat-epic`; new §Epic planning;
+  provenance note records what was kept and dropped from `/wayfinder`.
+- **install.sh / install.ps1** — expected commands 18 → 19.
+- **README.md / docs/README_zh-TW.md** — count 18 → 19; `/feat-epic` atop the Run-a-feature
+  block; `/feat-status` note.
+- **factory-cheatsheet_{en,zh-TW}.md** — new "Plan an epic" section; `/feat-status` note.
+- **factory-training_{en,zh-TW}.html** — spec box commands 18 → 19; "Plan an epic" terminal
+  block before the standard path. Stations, house rules, and table rows unchanged.
+- **CHANGES.md** — `/feat-epic` Watchlist lines struck in the 2026-08-14 and 2026-07-23
+  entries; the Watchlist is empty.
+
+## Unchanged, checked
+`memory-distiller.md`, `feat-story.md`, `PHASE-BOUNDARIES.md` (its ladder already covers
+any `/feat-*` seam), `CLAUDE.factory-snippet.md`, `scope-track.sh`.
+
+---
+
+# /feat-sweep: periodic deep-module sweep (2026-09-19)
+
+Resolves the Watchlist item "periodic deep-module sweep" (2026-07-23). New maintenance
+command, outside the per-feature pipeline. Shape adapted from mattpocock/skills
+`improve-codebase-architecture` (MIT; read at v1.2.3): scope before scanning, weight
+recently changed code, deletion test as the filter, three strength tiers, never edits
+code. NOT taken from upstream: the HTML report, `CONTEXT.md` / ADR updates, and the
+post-pick grilling (`/feat-grill` already owns that once a candidate enters the line).
+
+## Decisions (grilled with the maintainer)
+- **A maintenance command, not an EXPLORE-MODE section.** The Watchlist called it an
+  "explore-mode tool", but `EXPLORE-MODE.md` is a rule-relaxation table for prototype
+  work; a read-only sweep relaxes no rule. `/feat-recomment` is the precedent.
+- **Named `/feat-sweep [path]`** — every command carries the `feat-` prefix.
+- **One report, overwritten**: `<artifactsDir>/sweep-report.md`, version-controlled, so
+  git history is the trend. Each candidate ends in a paste-ready `/feat-new` line; the
+  command never creates a feature folder.
+- **Shallow modules only.** The 12-smell baseline stays with the validator on per-feature
+  diffs; repo-wide it would bury the candidates in ⚪ noise. Cap: 7 candidates, tiers
+  Strong / Worth exploring / Speculative, plus a Top recommendation.
+- **No reminder mechanism.** Cadence is the human's. A nudge from `/feat-distill` would
+  couple an outside-the-line tool into the pipeline.
+
+## New file
+- **feat-sweep.md** — `/feat-sweep [path]`. Uses the built-in read-only Explore subagent
+  (no new agent; agent count stays 8). Reads root `CLAUDE.md` (documented conventions
+  override), MEMORY.md (`[durable]` decisions are not re-litigated), and the previous
+  report (candidates marked `new` / `repeat`). Leaves `.active`, `state.json`, and
+  MEMORY.md alone, so it needs no GUARD and may run mid-feature. Command count 17 → 18.
+
+## Modified
+- **CONVENTIONS.md** — §Maintenance commands describes `/feat-sweep`; the group is now
+  "no slug, no `state.json`" (both maintenance commands do write a report file).
+- **install.sh / install.ps1** — expected commands 17 → 18.
+- **README.md / README_zh-TW.md** — count 17 → 18; `/feat-sweep` in the Maintenance list.
+- **factory-cheatsheet_{en,zh-TW}.md** — `/feat-sweep` in the Maintenance block plus one
+  paragraph (read-only, report shape, suggested cadence); the existing paragraph is now
+  labelled as `/feat-recomment`'s, since the block lists two commands.
+- **factory-training_{en,zh-TW}.html** — spec box commands 17 → 18; `/feat-sweep` added
+  to the Maintenance terminal block. Stations, house rules, and table rows unchanged.
+- **CHANGES.md** — the 2026-07-23 Watchlist line struck through for the sweep half
+  (`/feat-epic` remains open).
+
+---
+
+# Upstream standalone skills triage: change summary (2026-09-19)
+
+Closes the "Watchlist candidates" left open by the 2026-08-14 v1.2 sync. Each skill was
+read at mattpocock/skills v1.2.3 (latest; released 2026-08-06). All three are declined.
+A decline is a non-item, not a deferral: none of these stays on the Watchlist. No template
+file changes other than this one.
+
+## Declined
+- **`/wait-what`**: re-pitches a message that did not land, in ASD-STE100 Simplified
+  Technical English with the vocabulary from `CONTEXT.md`. The factory declined
+  `CONTEXT.md` on 2026-07-23 (the glossary lives per feature in `decisions.md`), so half
+  the skill has nothing to read. It repairs one chat message and touches no step, gate, or
+  artifact. ASD-STE100 is an English register; it does nothing for zh-TW conversations.
+- **`/to-questionnaire`**: turns a decision the user cannot answer alone into a Markdown
+  questionnaire for the one person who can. Its only contact point is `/feat-grill`, which
+  has no exit for a decision only a third party can settle. The maintainer confirmed that
+  case does not come up: the person running the grill is the decision-maker. No gap, so
+  nothing to adopt. If that changes, the fix is a "parked decision" outcome in
+  `/feat-grill` and the `/feat-story` guard, not this skill.
+- **`/wizard`**: generates an interactive bash script that walks a human through steps only
+  they can perform and writes captured values to `.env` files and GitHub Actions secrets.
+  Human-only setup steps are rare in the repos using this template, and the builders'
+  ❓ Needs-human-input section covers them. Vendoring would also mean carrying upstream's
+  fixed `template.sh` library through every sync (v1.2.3 already changed it) and adding a
+  model-invoked skill to a template whose agents are name-invoked by design. A repo that
+  needs it can install the upstream skill directly; it runs outside the factory line.
+
+## Modified
+- **CHANGES.md**: "Watchlist candidates" in the 2026-08-14 entry struck through with a
+  pointer to this entry.
+
+---
+
+# Pocock v1.2.3 sync — evidence redaction (2026-09-18)
+
+Adapted from mattpocock/skills v1.2.3 (MIT), PR #779 "Make `diagnosing-bugs` redact
+secrets". One adoption: redaction as the first move on pasted evidence. Upstream applies it
+to a diagnosis loop; the transferable part is the ordering, which our Rule 7 evidence
+requirement makes load-bearing the same way.
+
+**The gap it closes.** Rule 7 mandates pasted evidence, and that evidence lands in
+version-controlled artifacts (`verification.md`, `validation.md`, `decisions.md`,
+`MEMORY.md`). The only existing defence, `protect-secrets.sh`, matches secret FILES by name
+(`.env*`, `*.key|pem|p12|pfx`, `secrets.*`) and `git add|commit` command strings — it never
+inspects content. A token echoed by a failing test or an `Authorization:` header in a
+reproduction line was written and committed with nothing firing.
+
+NOT adopted from the same release: PR #781 (dropping Claude Code tool and agent-type names
+from subagent dispatch, for Codex portability) — this template is Claude Code only by
+design, and cross-harness support is out of scope, not a deferred item; PR #783 (`wizard`
+time-estimate removal, skill never adopted); v1.2.2 (`writing-for-agents` Codex metadata —
+we borrowed its prose rules, not its packaging). Upstream published no 1.2.1 changelog
+section.
+
+## Modified — contract
+- **CONVENTIONS.md** — new **Evidence & redaction** section after §Honesty, the single
+  source of truth: credential values enter as `<REDACTED>`; reproduction commands reference
+  the credential through its environment variable; a captured run is quoted at its
+  signal-carrying lines. States plainly that `protect-secrets.sh` covers secret files by
+  name and artifact CONTENT is this rule's job, and names Rule 7 as what it serves (the
+  house-rule number is deliberately not cross-referenced — it would go stale). Pocock
+  provenance note bumped to v1.2.3 / 2026-09 with the non-adoptions recorded.
+- **test-verifier.md** — completion criterion for a criterion is now its REDACTED evidence
+  in `verification.md`; points at CONVENTIONS.md rather than restating the rationale.
+- **feat-fix.md** — step 3 gains a per-track reporting bullet: a fix counts as done when its
+  redacted gate/test evidence is shown.
+- **validator.md** — Security check extended to the artifacts themselves; a live credential
+  in one is a finding graded by impact. Guardrails unchanged (🔴 stays reserved for security
+  and failing criteria, so an exposed credential can still reach 🔴 on its own merits).
+
+## Modified — human-facing docs
+- **factory-cheatsheet_{en,zh-TW}.md** — new non-negotiable #6 "Redact before you paste";
+  Fail-Loud renumbered #6 → #7, keeping it last as in the 2026-08-12 and 2026-08-14 passes.
+  Rules #1–#5 unchanged.
+- **factory-training_{en,zh-TW}.html** — matching House Rule card inserted before
+  "No workarounds, no varnish"; footer edition date 2026-08 → 2026-09. Pipeline belt, stage
+  diagram and Under-the-Hood table untouched: this is a contract rule, not a pipeline step.
+  Verified: 14 stations, 7 rules, 22 table rows, balanced tags, HTMLParser-clean, EN/zh-TW
+  at parity.
+
+## Deliberately not done
+- **No CI gate.** No content scan in `quality-gate.sh`, on the same reasoning as
+  `comment-migrate.py --check`: a high-false-positive check that can leave a repo
+  permanently red does not belong in the build.
+- **`protect-secrets.sh` untouched.** Its filename/command contract is a different defence;
+  the two are complementary and neither subsumes the other.
+- Agent/command/hook counts, the `.active` scope mechanism, and the MEMORY.md single-writer
+  contract are unchanged, so `install.sh` / `install.ps1` need no edit.
+
+## Follow-ups (not in this pass)
+- The rule is enforced by reading, not by tooling. Watch the next few features for evidence
+  that landed unredacted; if it recurs, the cheap next step is a PostToolUse hook that warns
+  (never blocks) on high-entropy strings written into `artifactsDir`, not a gate.
+- `README.md` / `README_zh-TW.md` were not touched: they summarise commands and counts, and
+  neither changed. Revisit only if the redaction rule gets a line in the setup steps.
+
+---
+
 # comment-migrate.py — correctness fixes (2026-09-16)
 
 Field report from `/feat-recomment --apply` on a Python repo: all 9 changed blocks were
@@ -233,9 +929,10 @@ Adapted from mattpocock/skills v1.2.0 (MIT; released 2026-08-05). Four adoptions
 round-by-round grilling + phase-boundary context rules + the "cache" prompt-pruning term
 + validator smells 8 → 12. NOT adopted: plugin/Codex/docs-site packaging (distribution
 channel only), `/wizard` / `/to-questionnaire` / `/wait-what` (standalone skills,
-Watchlist candidates), `/prototype` branch retention (EXPLORE Mode is outside the
-factory), `/wayfinder` decision tickets (stays a Watchlist item — upstream now offers a
-mature model to copy when `/feat-epic` is built).
+~~Watchlist candidates~~ all declined 2026-09-19, PR #__), `/prototype` branch
+retention (EXPLORE Mode is outside the
+factory), ~~`/wayfinder` decision tickets (stays a Watchlist item — upstream now offers a
+mature model to copy when `/feat-epic` is built)~~ — built 2026-09-20 as `/feat-epic` (PR #__).
 
 ## Modified
 - **feat-grill.md** — step 3 rewritten: map decisions as a design tree and ask the whole
@@ -269,8 +966,8 @@ mature model to copy when `/feat-epic` is built).
 - `README.md` / `README_zh-TW.md`: the `/feat-grill` comment line still reads
   "interactive interview" (still true); no change strictly required, but the training
   guide link text may warrant a refresh alongside the docs above.
-- Watchlist (`/feat-epic`): when built, copy upstream's decision-ticket + parallel
-  research burn-down model from `/wayfinder` v1.2.
+- ~~Watchlist (`/feat-epic`): when built, copy upstream's decision-ticket + parallel
+  research burn-down model from `/wayfinder` v1.2.~~ — shipped 2026-09-20 (PR #__).
 
 ---
 
@@ -355,8 +1052,9 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
   — done in the 2026-08-14 passes (grill station added, counts corrected to 17).
 - ~~Optional maintenance pass: prune all 8 agents per the new Prompt style rules~~ — done
   in the 2026-08-14 writing-for-agents pass; the commands were pruned selectively, not all.
-- Watchlist: /wayfinder-style epic planning layer (`/feat-epic`); periodic deep-module
-  sweep as an explore-mode tool.
+- ~~Watchlist: /wayfinder-style epic planning layer (`/feat-epic`)~~ — shipped 2026-09-20
+  (PR #__); ~~periodic deep-module sweep as an explore-mode tool~~ — shipped 2026-09-19 as
+  `/feat-sweep` (PR #__). The Watchlist is now empty.
 
 
 ---
@@ -373,3 +1071,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-08-14 | (fill in) | Pocock v1.2 sync: grill round-by-round (frontier), Context Health rewritten as phase-boundary decision list, prompt-style "cache" term, validator smells 8 → 12 |
 | 2026-08-14 | (fill in) | writing-for-agents pass: prohibitions rephrased positively, rationale/EXPLORE Mode/phase-boundary ladder disclosed to companion files, changelog moved here |
 | 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
+| 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules and `check pending`, grill round separator, commands hand off to the human |

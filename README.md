@@ -8,12 +8,15 @@ full-stack, frontend-only, or backend-only projects.
 
 ## Learn more
 - **[Training guide](docs/factory-training_en.html)** — one-page walkthrough of the design
-  philosophy, the assembly line, the mechanisms, and the Fable 5 upgrade (for onboarding).
+  philosophy, the assembly line, and the core and advanced mechanisms (for onboarding).
 - **[Cheatsheet](docs/factory-cheatsheet_en.md)** — one-screen quick reference: install,
   command flow, stuck-state table, non-negotiables (for daily use).
 
 ## Requirements
-- Claude Code (CLI). Agents / commands / hooks only take effect there.
+- Claude Code (CLI) **2.1.295 or later**. Agents / commands / hooks only take effect there.
+  The hooks set `onFailure: "block"`: a hook that cannot run (script missing, `bash` not
+  found) blocks the tool call instead of being skipped. The installer warns when it finds
+  an older version.
 - `bash` and `jq` available on PATH (hooks use them). On Windows, run Claude Code from
   Git Bash or WSL so the hooks execute; install `jq`. Without `jq`, hooks fail safe
   (allow) and print a notice — i.e. enforcement is skipped, nothing breaks.
@@ -28,19 +31,36 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 17 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 19 commands, 3 hooks.
+
+Re-running the installer (to upgrade) refreshes the template's files and keeps the repo's own:
+- `.claude/factory/MEMORY.md` is installed only when the repo has none, and never overwritten.
+  If `artifactsDir` is not the default, it is not installed at all: memory lives in
+  `<artifactsDir>/MEMORY.md`.
+- `.claude/settings.json` is merged (`install.sh` uses `jq`): `hooks` comes from the
+  template, every other key (`permissions`, `env`, …) is kept. If your `hooks` differed, the
+  old file is saved as `.claude/settings.json.bak`; re-add any hooks of your own from it. If it
+  cannot be merged (`jq` missing for `install.sh`, or the file is not valid JSON), it is backed
+  up to the same `.bak` and replaced, with a warning.
 
 ## First-time setup in the repo (3 steps)
-1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md` (add the two `@import` lines near
-   the top — `CONVENTIONS.md` and `terminology-zh-tw.md`; paste the block into
-   "Project-Specific Rules"). Skip if you let it be the starter. The three companion files
-   under `.claude/factory/` are reached by pointer, never imported — leave them unlisted.
+1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md`: add its two `@import` lines near
+   the top (`CONVENTIONS.md` and `terminology-zh-tw.md`). That is the whole merge. Skip if you
+   let it be the starter. Upgrading from before 2026-09-20: delete the old "### Feature
+   Factory" block under "Project-Specific Rules" — its rules now live in `CONVENTIONS.md`.
+   The four companion files under `.claude/factory/` are reached by pointer, never
+   imported — leave them unlisted.
 2. Open Claude Code in the repo and run `/feat-init` (detects stack or asks; writes
    `project.json` including `docsDir`; does NOT scaffold code).
 3. Confirm the manifest.
 
 ## Run a feature
 ```
+# Optional, for an effort bigger than one feature — plan above the line first:
+/feat-epic <epic> "what you want"  # chart the map: destination + decision tickets
+/feat-epic <epic>       # resolve the next ticket; repeat until the map clears into
+                        # paste-ready /feat-new lines (one per feature)
+
 /feat-new <slug> "what you want"
 /feat-research <slug>
 /feat-grill <slug>      # round-by-round interview -> decisions.md (story is gated on it)
@@ -48,37 +68,40 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 17 comm
 /feat-spec <slug>       # review brief.md, then:
 /feat-backend <slug>    # if backend enabled
 /feat-frontend <slug>   # if frontend enabled
-/feat-ship <slug>       # FABLE 5 (optional): converge verify→validate→fix under one /goal
+/feat-ship <slug>       # optional: converge verify→validate→fix under one /goal
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # only if findings; bounded by loopMaxRetries
 /feat-unblock <slug>    # after `blocked`: human-authorized resume — resets the retry budget
 /feat-docs <slug>       # after a clean validate: README + guides/examples (EN, then zh-TW)
-/feat-distill <slug>    # FABLE 5: closing step — bank verified lessons into MEMORY.md
-/feat-status <slug>     # any time
+/feat-distill <slug>    # closing step: bank verified lessons into MEMORY.md
+/feat-status <slug>     # any time (a feature or an epic)
 
-# Maintenance (outside the line — no slug, no artifacts)
+# Maintenance (outside the line — no slug, no state.json)
 /feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
+/feat-sweep [path]      # read-only sweep for shallow modules -> sweep-report.md
 ```
-FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
-loop) are documented in the "Fable 5 addendum" of `.claude/factory/CONVENTIONS.md`. They
-are inert-but-harmless when the session runs another model.
-See `.claude/factory/CONVENTIONS.md` for the full design.
+The design and the reason behind each mechanism (model routing, classifier-refusal
+handling, memory layer, convergence loop included) are in `.claude/factory/CLAUDE-rationale.md`.
 
 ## What the agent loads, and what it reaches for
 
 `CLAUDE.md` holds the behavioural contract and `@import`s two files, so those three are in
-context on every turn. Three more sit beside them and are reached only when their branch
-fires — keeping them out of the always-loaded budget:
+context on every turn — for the main session and again for every factory agent, since each
+subagent reloads `CLAUDE.md` and its imports. `CONVENTIONS.md` therefore carries only what
+crosses commands (the pipeline, its invariants, evidence & redaction, classifier refusals);
+each command and agent file owns its own procedure. Four more files sit beside them and
+are reached only when their branch fires:
 
 | File | Reached when |
 |---|---|
 | `.claude/factory/EXPLORE-MODE.md` | exploratory work opens (`explore mode` / `spike` / POC) |
 | `.claude/factory/PHASE-BOUNDARIES.md` | you are at a phase boundary deciding what to do with the context |
-| `.claude/factory/CLAUDE-rationale.md` | a human is weighing whether a rule still earns its place — the agent never reads this one |
+| `.claude/factory/WRITING-FOR-AGENTS.md` | anyone edits `CLAUDE.md` or a file under `.claude/` |
+| `.claude/factory/CLAUDE-rationale.md` | a human is weighing whether a rule or mechanism still earns its place — the agent never reads this one |
 
-`CLAUDE-rationale.md` is where each rule's *why* lives. Read it before changing a rule;
-edit it in the same PR when you do.
+`CLAUDE-rationale.md` is where each rule's and each mechanism's *why* lives. Read it before
+changing one; edit it in the same PR when you do.
 
 ## Comments, documentation & TW terminology
 `.claude/factory/terminology-zh-tw.md` (imported by `CLAUDE.md`) is the single source of truth for:
@@ -100,4 +123,7 @@ before writing a file it verifies that only comment / docstring line order chang
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
 artifacts — they stay in place as the pipeline's record.
 
-This template does not auto-commit or open PRs by design.
+This template does not auto-commit or open PRs by design. For the PR body, the `pr` skill
+from [mattpocock/skills](https://github.com/mattpocock/skills) (Claude Code plugin
+`mattpocock-skills`) works beside the line: a summary visual, before/after evidence, and a
+merge-danger call. It is not part of the factory and needs no factory changes.

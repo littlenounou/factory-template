@@ -1,15 +1,14 @@
 ---
-description: One-off maintenance — convert legacy line-interleaved bilingual comments in existing code to the block-after-block form. Not part of the per-feature pipeline.
-argument-hint: [path] (default: whole repo)
+description: Maintenance — migrate legacy line-interleaved bilingual comments to the block-after-block form.
+argument-hint: "[path] (default: whole repo)"
 ---
 Migrate existing comments to the block-after-block bilingual form defined in
 `.claude/factory/terminology-zh-tw.md` §1. Target: `$1` (default: the whole repo).
 
-This is a MAINTENANCE command, not a pipeline step. It has no slug and writes no artifacts.
-The mechanical reordering is done by a deterministic script — you do NOT rewrite comments
-by hand except for the leftovers the script explicitly refuses to touch.
+A MAINTENANCE command, not a pipeline step: no slug, no `state.json`. A deterministic
+script does the reordering; your hands touch only the leftovers it refuses.
 
-1. GUARD — refuse to proceed and tell the user why if either holds:
+1. GUARD — STOP and tell the user why if either holds:
    - `.claude/factory/.active` exists (a build step is mid-flight; a repo-wide edit would
      fight the scope hook). Tell them to finish or `rm` it.
    - `git status --porcelain` is non-empty. This migration must land as ONE reviewable
@@ -18,33 +17,19 @@ by hand except for the leftovers the script explicitly refuses to touch.
 2. DRY RUN — `python3 .claude/factory/comment-migrate.py $1`
    Report to the user: files scanned, files that would change, blocks regrouped, pairs
    reordered (Chinese was first), and blocks needing human review. Then STOP and ask for
-   approval. Do not apply on your own initiative.
+   approval.
 
 3. APPLY (after approval) — `python3 .claude/factory/comment-migrate.py $1 --apply`
    Then show `git diff --stat`. Spot-check 2-3 of the changed blocks by reading them and
    confirm the English block, separator, and Chinese block are in the right order.
-   Also confirm, across the whole diff, that every changed line is a comment or docstring
-   line and each block still sits directly above the code it describes. If any code line
-   moved, run `git checkout -- .` and report it as a script bug; keep the tree clean.
 
 4. LEFTOVERS — read `.claude/factory/comment-migration-report.md`. The "Needs human review"
-   section lists blocks the script refused to change. Each entry states its reason:
-   - commented-out code mixed in with prose;
-   - one line holding both languages;
-   - an English-looking line right after an unfinished Chinese sentence (wrapped sentence
-     or new English sentence — the script cannot tell);
-   - English block followed by Chinese block with no separator (only the separator is
-     missing — insert it between the two blocks);
-   - text sharing a line with docstring quotes that regrouping would move;
-   - "safety check failed" — the script caught itself about to change non-comment content
-     and wrote nothing for that file. Fix that file by hand and report it as a script bug.
-   Work through them ONE FILE AT A TIME:
+   section lists blocks the script refused to reorder (usually commented-out code mixed in
+   with prose, or one line holding both languages). Work through them ONE FILE AT A TIME:
    - Reorder into English block → separator → Chinese block.
-   - A wrapped sentence keeps all its lines together, including a continuation line that
-     holds only code or punctuation.
    - Keep commented-out code as its own separate comment block, adjacent to nothing else.
-   - Do NOT translate, reword, add, or delete any comment text. If a comment is wrong or
-     missing a translation, say so in your report — do not silently author new prose.
+   - Move lines only: every comment keeps its text word for word (hard guardrail). A
+     comment that is wrong or missing its translation goes in your report.
    If a block is genuinely ambiguous, leave it and list it for the human.
 
 5. Tell the user to review and commit this as a standalone comment-style commit, and that

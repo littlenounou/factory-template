@@ -1,8 +1,9 @@
-# Factory Memory (FABLE 5 memory layer — cross-feature, version-controlled)
+# Factory Memory (memory layer: cross-feature, version-controlled)
 
 > Written ONLY by the memory-distiller agent via `/feat-distill`, after a feature passes
-> validation. Read at the start of `/feat-research`. Humans may edit freely — this file is
-> part of the repo and reviewable in PRs like any other change.
+> validation. Read at the start of `/feat-research`; the validator also checks each diff
+> against General rules and the Watchlist's `check pending` entries. Humans may edit
+> freely — this file is part of the repo and reviewable in PRs like any other change.
 >
 > Entry contract (enforced by the distiller):
 > - Every entry is VERIFIED: it traces to something that actually happened in a shipped
@@ -19,13 +20,16 @@
 
 ## General rules
 <!-- Reusable do/don't patterns distilled from fixes and findings, written so the NEXT
-     feature can apply them without context.
+     feature can apply them without context. Judgement calls only: a pattern a linter,
+     hook or CI job could catch becomes a proposed check instead (see Watchlist).
      e.g. - [2026-07-06 csv-export] Streaming responses bypass the global error handler; wrap them explicitly. -->
-- [2026-07-17 template] Worker tier bumped to claude-sonnet-5 (env pin). Expect ~1.0–1.35× token counts vs 4.6 (new tokenizer) and possible safety refusals from workers (cyber safeguards default-on) — refusal triage in /feat-fix covers this. Lessons above this line were produced under Sonnet 4.6-or-earlier behavior.
-- [2026-07-09 template] Subagent model routing is enforced by the project settings env pin (`CLAUDE_CODE_SUBAGENT_MODEL`), not by frontmatter (claude-code#44385; any-scope env overrides it). Before a factory run, `echo $CLAUDE_CODE_SUBAGENT_MODEL` — a shell export beats settings. Broken-routing signature: /usage shows orchestrator + Haiku only, Sonnet at zero.
+(none yet)
 
 ## Watchlist
 <!-- Known-flaky things, deferred cleanups surfaced under Rule 5, and open risks that are
-     not defects of any single feature. Remove entries when resolved.
-     e.g. - [2026-07-06 report-gen] tests/e2e/pdf.spec is timing-sensitive on CI; reruns usually pass. -->
+     not defects of any single feature, plus `check pending: <rule>` (a proposed check
+     not yet added) and `no guardrail: <track> <lint|test>` (a blank gate command).
+     Remove entries when resolved.
+     e.g. - [2026-07-06 report-gen] tests/e2e/pdf.spec is timing-sensitive on CI; reruns usually pass.
+     e.g. - [2026-07-06 csv-export] check pending: ban naive datetime.now(), in ruff DTZ rules -->
 (none yet)
