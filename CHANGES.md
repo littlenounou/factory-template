@@ -1,6 +1,6 @@
 # Model-neutral wording: the Fable 5 label dropped (2026-10-17)
 
-Issue #34 · PR #__ (same PR as the hook-path fix below)
+Issue #34 · PR #35 (same PR as the hook-path fix below)
 
 Model routing, classifier-refusal handling, the memory layer and the `/goal` convergence
 loop were labelled `FABLE5` / `FABLE 5` (92 mentions in 25 files, plus 30 violet badge and
@@ -49,7 +49,7 @@ the reference URL (its path contains "fable-5"), and the earlier entries in this
 
 # Hook paths: project-root anchored, fail closed (2026-10-17)
 
-Issue #34 · PR #__
+Issue #34 · PR #35
 
 Field report: every Bash call in a target repo showed
 `PreToolUse:Bash hook error` / `Failed with non-blocking status code: bash:
