@@ -1,6 +1,6 @@
 # Installers keep the repo's MEMORY.md and settings (2026-10-17)
 
-Issue #33
+Issue #33 · PR #36
 
 Both installers copied the whole template `.claude/` over the target, so re-running one to
 upgrade replaced two files the repo owns: `.claude/factory/MEMORY.md` (the memory layer,
