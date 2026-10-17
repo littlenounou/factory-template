@@ -1,6 +1,6 @@
 # Training guides published with GitHub Pages (2026-10-17)
 
-Issue #42
+Issue #42 · PR #43
 
 GitHub's file view shows `.html` as source, so the README's training-guide links opened
 markup instead of the page. `docs/` is now meant to be served by GitHub Pages.
