@@ -7,7 +7,7 @@ behaviour is driven by a per-repo manifest (`.claude/factory/project.json`). Wor
 full-stack, frontend-only, or backend-only projects.
 
 ## Learn more
-- **[Training guide](docs/factory-training_en.html)** — one-page walkthrough of the design
+- **[Training guide](https://littlenounou.github.io/factory-template/factory-training_en.html)** — one-page walkthrough of the design
   philosophy, the assembly line, and the core and advanced mechanisms (for onboarding).
 - **[Cheatsheet](docs/factory-cheatsheet_en.md)** — one-screen quick reference: install,
   command flow, stuck-state table, non-negotiables (for daily use).

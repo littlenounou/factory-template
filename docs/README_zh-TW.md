@@ -6,7 +6,7 @@
 清單檔（`.claude/factory/project.json`）驅動。全端、純前端、純後端專案皆適用。
 
 ## 延伸閱讀
-- **[訓練指南](factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線，以及核心與
+- **[訓練指南](https://littlenounou.github.io/factory-template/factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線，以及核心與
   進階機制（供新人上手）。
 - **[速查表](factory-cheatsheet_zh-TW.md)** — 單一畫面快速參考：安裝、命令流程、卡住狀態對照表、
   不可妥協事項（供日常使用）。

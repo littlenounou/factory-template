@@ -1,3 +1,23 @@
+# Training guides published with GitHub Pages (2026-10-17)
+
+Issue #42 · PR #43
+
+GitHub's file view shows `.html` as source, so the README's training-guide links opened
+markup instead of the page. `docs/` is now meant to be served by GitHub Pages.
+
+## Modified
+- **docs/.nojekyll** (new, empty): Pages publishes `docs/` as-is, without a Jekyll build.
+- **README.md**, **docs/README_zh-TW.md**: the training-guide links point at the Pages URLs
+  (`https://littlenounou.github.io/factory-template/factory-training_{en,zh-TW}.html`).
+
+## Kept, deliberately
+The cheatsheets still name `docs/factory-training_*.html` by path: they are read in a
+checked-out repo, where the file opens in a browser.
+
+## Manual step
+Pages is a repo setting: **Settings → Pages → Deploy from a branch → `main` / `/docs`**. The
+new links resolve once Pages is on and this change reaches `main`.
+
 # CLAUDE.md snippet: no-op rules pruned (2026-10-17)
 
 Issue #40 · PR #41
