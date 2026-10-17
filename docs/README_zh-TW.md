@@ -6,8 +6,8 @@
 清單檔（`.claude/factory/project.json`）驅動。全端、純前端、純後端專案皆適用。
 
 ## 延伸閱讀
-- **[訓練指南](factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線、各項機制，以及
-  Fable 5 升級內容（供新人上手）。
+- **[訓練指南](factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線，以及核心與
+  進階機制（供新人上手）。
 - **[速查表](factory-cheatsheet_zh-TW.md)** — 單一畫面快速參考：安裝、命令流程、卡住狀態對照表、
   不可妥協事項（供日常使用）。
 
@@ -55,21 +55,21 @@
 /feat-spec <slug>       # 審閱 brief.md，然後：
 /feat-backend <slug>    # 若後端軌道啟用
 /feat-frontend <slug>   # 若前端軌道啟用
-/feat-ship <slug>       # FABLE 5（選用）：在單一 /goal 下收斂 verify→validate→fix
+/feat-ship <slug>       # 選用：在單一 /goal 下收斂 verify→validate→fix
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # 僅在有發現時；受 loopMaxRetries 限制
 /feat-unblock <slug>    # `blocked` 之後：人工授權復工——重置 retry 額度
 /feat-docs <slug>       # validate 乾淨後：README + 指南／範例（先英文，再 zh-TW）
-/feat-distill <slug>    # FABLE 5：收尾步驟——把已驗證的教訓存入 MEMORY.md
+/feat-distill <slug>    # 收尾步驟——把已驗證的教訓存入 MEMORY.md
 /feat-status <slug>     # 任何時候（feature 或 epic 皆可）
 
 # 維護指令（產線之外——無 slug、無 state.json）
 /feat-recomment [path]  # 把舊的交錯式雙語註解轉成區塊形式
 /feat-sweep [path]      # 唯讀掃描淺模組 -> sweep-report.md
 ```
-FABLE 5 的增補（模型路由、classifier 拒絕處理、記憶層、收斂迴圈）在其他模型上執行時
-無作用但也無害。整體設計與每個機制背後的理由，請見 `.claude/factory/CLAUDE-rationale.md`。
+整體設計與每個機制背後的理由（包括模型路由、classifier 拒絕處理、記憶層、收斂迴圈），
+請見 `.claude/factory/CLAUDE-rationale.md`。
 
 ## 代理恆常載入什麼，又在何時去取用什麼
 

@@ -2,7 +2,7 @@
 name: frontend-builder
 description: Implements the frontend portion of an approved brief — UI, components/pages, state, loading/error handling, and component tests. Consumes the backend contract; never invents endpoints.
 tools: Read, Edit, Write, Bash, Grep, Glob
-# FABLE5 routing: worker — run on Sonnet; keep Fable 5 for the orchestrating session.
+# Routing: worker, runs on Sonnet; the orchestrating session keeps its own model (chosen with /model).
 model: sonnet
 ---
 
@@ -19,6 +19,6 @@ Do:
 - Stay inside the frontend track's directories (hook-enforced).
 - Run `bash .claude/hooks/quality-gate.sh frontend` before declaring done.
 
-FABLE 5: on a classifier refusal, record it in ⚠️ as `classifier-refusal: <what was declined>` and move on to the rest of the work (CONVENTIONS.md, Classifier refusals).
+On a classifier refusal, record it in ⚠️ as `classifier-refusal: <what was declined>` and move on to the rest of the work (CONVENTIONS.md, Classifier refusals).
 
 End with ✅ Verified / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

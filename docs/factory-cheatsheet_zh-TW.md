@@ -1,4 +1,4 @@
-# Feature Factory 速查表(Fable 5 版)
+# Feature Factory 速查表
 
 **語言 Language:** 繁體中文 · [English](factory-cheatsheet_en.md)
 
@@ -44,7 +44,7 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 /feat-backend <slug>           → 程式碼 + backend-summary.md(該 track 啟用才跑)
 /feat-frontend <slug>          → UI(消費契約,缺什麼回報缺口、不發明 endpoint)
 
-# A 手動收斂                    # B 自動收斂(FABLE5)
+# A 手動收斂                    # B 自動收斂
 /feat-verify <slug>            /feat-ship <slug>
 /feat-validate <slug>          → 貼上它印出的 /goal,評估者逐回合判定
   有 findings → /feat-fix(上限 loopMaxRetries=3)→ 回 verify
@@ -104,4 +104,4 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 6. **貼證據前先遮蔽**:證據是必要的(Rule 7),而 artifacts 進版控——憑證值一律寫成 `<REDACTED>`,重現指令改用環境變數引用,輸出只引帶訊號的那幾行,不貼整份。`protect-secrets.sh` 擋的是檔名像機密的檔案,不是被貼進 `verification.md` 的 token。
 7. **Fail-Loud**:每步以 ✅/⚠️/❓ 收尾;「tests pass」不准掩蓋跳過的測試;絕不在 `disableAllHooks` 下跑產線。
 
-<sub>FABLE5 升級(model 路由 / classifier 分流 / 記憶層 / /goal 收斂)在其他模型下惰性無害——全團隊只維護這一套,模型用 `/model` 選。</sub>
+<sub>全團隊只維護這一套;session 的模型用 `/model` 選。</sub>

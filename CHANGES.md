@@ -1,3 +1,52 @@
+# Model-neutral wording: the Fable 5 label dropped (2026-10-17)
+
+Issue #34 · PR #__ (same PR as the hook-path fix below)
+
+Model routing, classifier-refusal handling, the memory layer and the `/goal` convergence
+loop were labelled `FABLE5` / `FABLE 5` (92 mentions in 25 files, plus 30 violet badge and
+highlight marks in the training pages), with a disclaimer that they are "inert-but-harmless
+on other models". Every current Claude model (Opus, Sonnet, Fable) now runs them, so the
+label and the disclaimer described nothing. Behaviour is
+unchanged: no step, gate, state or `model:` value moved.
+
+## Decisions (grilled with the maintainer)
+- **Drop the marker** rather than rename it (to "Claude 5" or an "advanced" tag). Where a
+  name is needed, the mechanism's own name is used: memory layer, convergence loop,
+  classifier guard.
+- **Delete the disclaimer.** The one real model dependence moves into the refusal text:
+  any model's classifier can refuse; Claude Fable carries extra classifiers (biology,
+  cybersecurity, LLM R&D), so it refuses most often.
+- **Routing comments name no model** for the orchestrator: "the orchestrating session
+  keeps its own model (chosen with /model)". Workers stay `model: sonnet`.
+- **History stays.** Earlier entries in this file keep their original wording.
+
+## Modified
+- **8 agents**: frontmatter comments read `# Routing: …`; the `FABLE 5:` prefix dropped
+  from each classifier-refusal line.
+- **feat-fix.md**: step 0 is the `CLASSIFIER GUARD`; **feat-ship.md** refers to it by that
+  name, and its `description` no longer starts with the label.
+- **feat-backend / feat-frontend / feat-distill / feat-docs / feat-research /
+  feat-validate.md**: the inline `FABLE 5:` labels dropped.
+- **CONVENTIONS.md**: §Classifier refusals opens model-neutral, with the Fable note.
+- **CLAUDE-rationale.md**: "Fable 5 addendum" renamed "Routing, refusals, memory and
+  convergence", with a one-line note on the old name for anyone searching it.
+- **MEMORY.md**: title line.
+- **README.md / docs/README_zh-TW.md**: training-guide line, `/feat-ship` and
+  `/feat-distill` comments, disclaimer paragraph removed.
+- **factory-cheatsheet_{en,zh-TW}.md**: "(Fable 5 Edition)" title, Path B label, closing
+  `<sub>` line (keeps "one template for the whole team; pick the model with `/model`").
+- **factory-training_{en,zh-TW}.html**: title and hero; the violet `FABLE5` badges, station
+  highlights, belt colour and their CSS removed; §04 "What Fable 5 Changed" is now
+  "Advanced Mechanisms" / 「進階機制」 (anchor `#advanced`); the inert box became the
+  one-template note; footer edition 2026-09 → 2026-10. Verified: HTMLParser-clean, 14
+  stations, 8 rules, 22 table rows, 4 cards, EN/zh-TW at parity; rendered and checked.
+
+## Unchanged, checked
+`blocked-classifier`, the `classifier-refusal` token, the ⛔ heading, every `model:` field,
+the reference URL (its path contains "fable-5"), and the earlier entries in this file.
+
+---
+
 # Hook paths: project-root anchored, fail closed (2026-10-17)
 
 Issue #34 · PR #__

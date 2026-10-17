@@ -2,7 +2,7 @@
 description: Closing step — distill this feature's verified lessons into the cross-feature MEMORY.md (after a clean validation or a block).
 argument-hint: <slug>
 ---
-Distill step for feature `$1` (FABLE 5 memory layer).
+Distill step for feature `$1` (memory layer).
 
 1. GUARD: read `<artifactsDir>/$1/validation.md`. If it does not exist, or still has open
    🔴/🟠 findings, STOP — distill only runs on validated features. Two exceptions, because

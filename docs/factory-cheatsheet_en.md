@@ -1,4 +1,4 @@
-# Feature Factory Cheatsheet (Fable 5 Edition)
+# Feature Factory Cheatsheet
 
 **Language 語言:** [繁體中文](factory-cheatsheet_zh-TW.md) · English
 
@@ -45,7 +45,7 @@ skip the map and use `/feat-new`.
 /feat-backend <slug>            → code + backend-summary.md (only if track enabled)
 /feat-frontend <slug>           → UI (consumes the contract; reports gaps, never invents endpoints)
 
-# Path A: manual                 # Path B: autonomous (FABLE5)
+# Path A: manual                 # Path B: autonomous
 /feat-verify <slug>              /feat-ship <slug>
 /feat-validate <slug>            → paste the /goal line it prints; evaluator judges each turn
   findings → /feat-fix (cap: loopMaxRetries=3) → back to verify
@@ -105,4 +105,4 @@ every few shipped features or once a quarter; commit the report so git history s
 6. **Redact before you paste**: evidence is mandatory (Rule 7) and artifacts are version-controlled — credential values go in as `<REDACTED>`, reproduction commands reference them through environment variables, and you quote the signal-carrying lines instead of the whole dump. `protect-secrets.sh` catches secret files by name, not a token pasted into `verification.md`.
 7. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
 
-<sub>The FABLE5 upgrades (model routing / classifier triage / memory layer / /goal convergence) are inert-but-harmless on other models — maintain one template for the whole team; pick the model with `/model`.</sub>
+<sub>Maintain one template for the whole team; pick the session's model with `/model`.</sub>
