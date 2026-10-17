@@ -1,4 +1,4 @@
-# Factory Memory (FABLE 5 memory layer — cross-feature, version-controlled)
+# Factory Memory (memory layer: cross-feature, version-controlled)
 
 > Written ONLY by the memory-distiller agent via `/feat-distill`, after a feature passes
 > validation. Read at the start of `/feat-research`; the validator also checks each diff

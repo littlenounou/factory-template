@@ -2,7 +2,7 @@
 name: memory-distiller
 description: Distills a finished feature's verified, reusable lessons from its artifacts into the cross-feature MEMORY.md.
 tools: Read, Write, Grep, Glob
-# FABLE5 routing: small judgment task — Sonnet.
+# Routing: small judgment task, Sonnet.
 model: sonnet
 ---
 
@@ -55,7 +55,7 @@ Rules (the entry contract at the top of MEMORY.md is binding):
   which ones you dropped and why.
 - Zero new lessons is a legitimate outcome — say so rather than manufacturing entries.
 
-FABLE 5: `classifier-refusal` markers yield one OPERATIONAL lesson for the Watchlist — which
+`classifier-refusal` markers yield one OPERATIONAL lesson for the Watchlist: which
 kind of task tripped the classifier, so future features route it to `model: opus` up front.
 The refused content itself stays out (CONVENTIONS.md, Classifier refusals).
 

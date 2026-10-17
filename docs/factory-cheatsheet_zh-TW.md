@@ -1,4 +1,4 @@
-# Feature Factory 速查表(Fable 5 版)
+# Feature Factory 速查表
 
 **語言 Language:** 繁體中文 · [English](factory-cheatsheet_en.md)
 
@@ -10,6 +10,7 @@
 ```bash
 ./install.sh /path/to/repo   # 複製 .claude/;Windows 用 install.ps1(Claude Code 走 Git Bash/WSL)
 jq --version                 # hooks 依賴 jq;缺少 = 強制機制沒開(fail-safe 放行)
+claude --version             # 需 2.1.295 以上:hooks 用 onFailure "block"(hook 無法執行就擋下該次呼叫)
 /feat-init                   # 在 Claude Code 內執行:偵測技術棧、寫 project.json,不 scaffold
 ```
 
@@ -43,7 +44,7 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 /feat-backend <slug>           → 程式碼 + backend-summary.md(該 track 啟用才跑)
 /feat-frontend <slug>          → UI(消費契約,缺什麼回報缺口、不發明 endpoint)
 
-# A 手動收斂                    # B 自動收斂(FABLE5)
+# A 手動收斂                    # B 自動收斂
 /feat-verify <slug>            /feat-ship <slug>
 /feat-validate <slug>          → 貼上它印出的 /goal,評估者逐回合判定
   有 findings → /feat-fix(上限 loopMaxRetries=3)→ 回 verify
@@ -88,6 +89,8 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 | 寫入被 hook 擋下 | 設計如此,不要繞過。真有需要:`rm .claude/factory/.active` 離開產線模式 |
 | context 感覺臃腫 / 自己在重複發問 | 你在階段中途——先做完。到下一個邊界時照 `PHASE-BOUNDARIES.md` 的階梯走:continue → `/clear` → 交接 → 子代理 → `/compact` 墊底。預設是 `/clear`:磁碟上的 artifacts 會把 context 重建起來 |
 | `jq not found` | 強制其實沒開。裝 jq 再繼續 |
+| `… hook error` … `failed; blocking because onFailure is "block"` | hook 無法執行(script 不見、找不到 `bash`),所以刻意擋下這次工具呼叫,而不是讓它未經檢查就放行。若不見的是 `protect-secrets.sh`,Bash **與** Edit/Write 會全部被擋,Claude 無法自行修復——請你在 repo 根目錄的終端機自己還原:`git checkout -- .claude/`(或重跑安裝程式)。絕不改用 `disableAllHooks` 繞過 |
+| `… hook error` `Failed with non-blocking status code` … `沒有此一檔案或目錄` | 該 hook 根本沒執行、指令照樣放行:那道防護等於關閉。`settings.json` 是 2026-10-17 之前的版本(用相對 cwd 的路徑呼叫 hook,一 `cd` 就找不到)。複製最新的 `.claude/settings.json` 與 `.claude/hooks/`,確認 `claude --version` 為 2.1.295 以上,再重開 session |
 | `/usage` 只見編排模型+Haiku,Sonnet 掛零 | 路由被 env 覆蓋。查 `echo $CLAUDE_CODE_SUBAGENT_MODEL` 與各層 settings.json(見 CONVENTIONS「Known issues」) |
 | gate 顯示 `(none configured, skipped)` | manifest 該指令留空;補上 script 後回填 project.json |
 
@@ -101,4 +104,4 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 6. **貼證據前先遮蔽**:證據是必要的(Rule 7),而 artifacts 進版控——憑證值一律寫成 `<REDACTED>`,重現指令改用環境變數引用,輸出只引帶訊號的那幾行,不貼整份。`protect-secrets.sh` 擋的是檔名像機密的檔案,不是被貼進 `verification.md` 的 token。
 7. **Fail-Loud**:每步以 ✅/⚠️/❓ 收尾;「tests pass」不准掩蓋跳過的測試;絕不在 `disableAllHooks` 下跑產線。
 
-<sub>FABLE5 升級(model 路由 / classifier 分流 / 記憶層 / /goal 收斂)在其他模型下惰性無害——全團隊只維護這一套,模型用 `/model` 選。</sub>
+<sub>全團隊只維護這一套;session 的模型用 `/model` 選。</sub>

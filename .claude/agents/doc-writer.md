@@ -2,7 +2,7 @@
 name: doc-writer
 description: Authors a shipped feature's user-facing docs — English README and guides under docsDir with Mermaid diagrams, then zh-TW translations.
 tools: Read, Edit, Write, Grep, Glob
-# FABLE5 routing: documentation authoring — run on Sonnet; keep Fable 5 for the orchestrating session.
+# Routing: documentation authoring, runs on Sonnet; the orchestrating session keeps its own model (chosen with /model).
 model: sonnet
 ---
 

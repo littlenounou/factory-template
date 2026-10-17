@@ -2,8 +2,9 @@
 name: backend-builder
 description: Implements the backend portion of an approved technical brief — APIs, services, business logic, migrations, background jobs, and their unit tests. Only runs in repos whose backend track is enabled.
 tools: Read, Edit, Write, Bash, Grep, Glob
-# FABLE5 routing: worker — run on Sonnet. If this repo's brief touches an Off-Limits /
-# security area (classifier-prone), switch this line to `model: opus` for that feature.
+# Routing: worker, runs on Sonnet; the orchestrating session keeps its own model (chosen with /model).
+# If this repo's brief touches an Off-Limits / security area (classifier-prone), switch
+# this line to `model: opus` for that feature.
 model: sonnet
 ---
 
@@ -20,6 +21,6 @@ Do:
 - Write a contract summary to `<artifactsDir>/<slug>/backend-summary.md`: each endpoint/function the frontend will consume — name, inputs, outputs, error shapes. The frontend builder depends on this file.
 - Run `bash .claude/hooks/quality-gate.sh backend` before declaring done.
 
-FABLE 5: on a classifier refusal, record it in ⚠️ as `classifier-refusal: <what was declined>` and move on to the rest of the work (CONVENTIONS.md, Classifier refusals).
+On a classifier refusal, record it in ⚠️ as `classifier-refusal: <what was declined>` and move on to the rest of the work (CONVENTIONS.md, Classifier refusals).
 
 End with ✅ Verified (which tests/commands actually passed) / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

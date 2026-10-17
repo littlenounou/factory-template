@@ -5,7 +5,7 @@ argument-hint: <slug>
 Research step for feature `$1`.
 
 1. Set the active phase: write `docs $1` to `.claude/factory/.active`.
-2. FABLE 5 memory: if `<artifactsDir>/MEMORY.md` exists, read it first. Copy the entries
+2. Memory layer: if `<artifactsDir>/MEMORY.md` exists, read it first. Copy the entries
    relevant to this feature into a **Prior knowledge** section at the top of `research.md`
    (cite each as `[date slug]`), and use them to direct the exploration. Treat them as leads
    to verify against the current code, not as facts — the codebase may have moved on.

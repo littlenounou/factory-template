@@ -11,6 +11,6 @@ The per-slug artifacts stay where they are, as the pipeline's record.
    it wrote in both languages.
 4. Update `state.json` step to `docs`, then set it to `done`.
 5. Remove `.claude/factory/.active` (re-enable normal editing). Tell the user the docs are
-   written (list the files created), ready for their own review/commit. FABLE 5: suggest
-   `/feat-distill $1` as the closing step — bank this feature's verified lessons into
+   written (list the files created), ready for their own review/commit. Suggest
+   `/feat-distill $1` as the closing step, to bank this feature's verified lessons into
    MEMORY.md while the artifacts are fresh.

@@ -60,8 +60,9 @@ evidence, not narration. Artifacts are version-controlled, so redaction comes fi
 `protect-secrets.sh` guards secret FILES by name; artifact CONTENT is this rule's job.
 
 ## Classifier refusals
-On Fable 5 a safety classifier can decline a request (`stop_reason: "refusal"`). A refusal
-is not a defect:
+A safety classifier can decline a request (`stop_reason: "refusal"`), on any model; Claude
+Fable carries extra classifiers (biology, cybersecurity, LLM R&D), so it refuses most often.
+A refusal is not a defect:
 - Record it as `classifier-refusal: <what>` in ⚠️ and continue with the rest of the work.
   Hard guardrail: the refused content is never rephrased, retried by rewording, or
   paraphrased into an artifact.

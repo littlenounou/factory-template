@@ -141,9 +141,9 @@ the slug) instead of resetting again. Distill-before-unblock keeps open findings
 Watchlist while the trail is warm. Unblocking stays outside any `/goal` loop: it is a
 judgment call, not a convergence step.
 
-## Fable 5 addendum
-Applies when the orchestrating session runs Claude Fable 5; on other models it is inert:
-the `model:` fields are plain subagent routing and the refusal path never triggers.
+## Routing, refusals, memory and convergence
+Called the "Fable 5 addendum" until 2026-10, when every current model ran it and the label
+was dropped.
 - **Model routing.** The main session carries the expensive model; every factory agent is
   pinned to `sonnet` in its frontmatter, with the reason in a comment beside it. The
   validator's value is independence (a different context), not cheapness; the

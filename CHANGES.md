@@ -1,3 +1,161 @@
+# Model-neutral wording: the Fable 5 label dropped (2026-10-17)
+
+Issue #34 · PR #35 (same PR as the hook-path fix below)
+
+Model routing, classifier-refusal handling, the memory layer and the `/goal` convergence
+loop were labelled `FABLE5` / `FABLE 5` (92 mentions in 25 files, plus 30 violet badge and
+highlight marks in the training pages), with a disclaimer that they are "inert-but-harmless
+on other models". Every current Claude model (Opus, Sonnet, Fable) now runs them, so the
+label and the disclaimer described nothing. Behaviour is
+unchanged: no step, gate, state or `model:` value moved.
+
+## Decisions (grilled with the maintainer)
+- **Drop the marker** rather than rename it (to "Claude 5" or an "advanced" tag). Where a
+  name is needed, the mechanism's own name is used: memory layer, convergence loop,
+  classifier guard.
+- **Delete the disclaimer.** The one real model dependence moves into the refusal text:
+  any model's classifier can refuse; Claude Fable carries extra classifiers (biology,
+  cybersecurity, LLM R&D), so it refuses most often.
+- **Routing comments name no model** for the orchestrator: "the orchestrating session
+  keeps its own model (chosen with /model)". Workers stay `model: sonnet`.
+- **History stays.** Earlier entries in this file keep their original wording.
+
+## Modified
+- **8 agents**: frontmatter comments read `# Routing: …`; the `FABLE 5:` prefix dropped
+  from each classifier-refusal line.
+- **feat-fix.md**: step 0 is the `CLASSIFIER GUARD`; **feat-ship.md** refers to it by that
+  name, and its `description` no longer starts with the label.
+- **feat-backend / feat-frontend / feat-distill / feat-docs / feat-research /
+  feat-validate.md**: the inline `FABLE 5:` labels dropped.
+- **CONVENTIONS.md**: §Classifier refusals opens model-neutral, with the Fable note.
+- **CLAUDE-rationale.md**: "Fable 5 addendum" renamed "Routing, refusals, memory and
+  convergence", with a one-line note on the old name for anyone searching it.
+- **MEMORY.md**: title line.
+- **README.md / docs/README_zh-TW.md**: training-guide line, `/feat-ship` and
+  `/feat-distill` comments, disclaimer paragraph removed.
+- **factory-cheatsheet_{en,zh-TW}.md**: "(Fable 5 Edition)" title, Path B label, closing
+  `<sub>` line (keeps "one template for the whole team; pick the model with `/model`").
+- **factory-training_{en,zh-TW}.html**: title and hero; the violet `FABLE5` badges, station
+  highlights, belt colour and their CSS removed; §04 "What Fable 5 Changed" is now
+  "Advanced Mechanisms" / 「進階機制」 (anchor `#advanced`); the inert box became the
+  one-template note; footer edition 2026-09 → 2026-10. Verified: HTMLParser-clean, 14
+  stations, 8 rules, 22 table rows, 4 cards, EN/zh-TW at parity; rendered and checked.
+
+## Unchanged, checked
+`blocked-classifier`, the `classifier-refusal` token, the ⛔ heading, every `model:` field,
+the reference URL (its path contains "fable-5"), and the earlier entries in this file.
+
+---
+
+# Hook paths: project-root anchored, fail closed (2026-10-17)
+
+Issue #34 · PR #35
+
+Field report: every Bash call in a target repo showed
+`PreToolUse:Bash hook error` / `Failed with non-blocking status code: bash:
+.claude/hooks/protect-secrets.sh: No such file or directory`. The error is non-blocking, so
+the tool call ran anyway and **the hook never executed**: secret-staging protection was
+silently off for the rest of the session.
+
+## Root cause
+`settings.json` called every hook by a path relative to the cwd
+(`bash .claude/hooks/protect-secrets.sh`). Claude Code runs a command hook in the shell's
+current directory, which follows Claude's `cd`. One `cd src && …` in a Bash call and every
+later hook in the session resolves to `src/.claude/hooks/…` and fails. Reproduced: exit 127
+with the exact message above.
+
+## Fixed
+- **settings.json**: all three hook commands now run
+  `bash "${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.sh"`. `CLAUDE_PROJECT_DIR` is the
+  project root Claude Code sets for every hook, independent of the cwd. Shell form is kept
+  (not exec form with `args`): exec form needs `bash` to resolve as an executable on PATH,
+  which a default Git for Windows install does not provide, and this template supports
+  Windows via `install.ps1`. The placeholder is double-quoted, so roots with spaces work.
+- **scope-track.sh**: the repo root is still the cwd's `git rev-parse --show-toplevel`
+  (this follows Claude into a worktree, where `CLAUDE_PROJECT_DIR` stays on the main
+  checkout). When the cwd has left the repo, or its root has no `project.json`, the root
+  now falls back to `CLAUDE_PROJECT_DIR`. Before, it fell back to the bare cwd, found no
+  manifest and exited 0: an active build step's scope enforcement was silently skipped.
+- **quality-gate.sh**: same root resolution, and each manifest command now runs from the
+  repo root in its own subshell. Before, commands ran in whatever directory the caller sat
+  in, and a `cd` inside one phase (e.g. `cd backend && tsc`) leaked into the next.
+- **settings.json: `onFailure: "block"` on all three hooks.** A hook that cannot run
+  (script missing, `bash` not found, timeout, exit code other than 0/2) now blocks the tool
+  call instead of letting it through unchecked: the root cause above becomes a loud stop
+  rather than a silent hole (Fail-Loud). The scripts themselves only ever exit 0 or 2, so
+  normal operation is unchanged; the jq-missing path still exits 0 (see below). Requires
+  Claude Code 2.1.295+.
+- **install.sh / install.ps1**: after copying, read `claude --version` and warn (never
+  fail) when it is older than 2.1.295, or say the version could not be checked when
+  `claude` is not on PATH in the installer's shell.
+
+## Verified
+Scratch repo, hooks driven through `sh -c` with the exact `settings.json` strings, cwd
+drifted to `src/` or `/`: `git add .env` blocked (2); `ls` allowed (0); backend step
+writing `web/` blocked (2) and `src/` allowed (0), both from `src/` and from outside the
+repo; protected `dist/` blocked (2); `Write .env` blocked (2); quality-gate run from `src/`
+executes each phase at the root with no `cd` leak; project root containing a space works.
+`bash -n` clean on all three scripts; `settings.json` parses.
+
+End to end in real `claude -p` sessions (Claude Code 2.1.302), scratch repo: `cd src && ls`
+runs normally with all hooks present; with `protect-secrets.sh` removed, a plain `ls` is
+blocked with `failed; blocking because onFailure is "block"`; across two separate Bash
+calls (`cd src`, then `git add ../.env`) the second is blocked by `protect-secrets.sh` and
+nothing is staged; with `scope-track.sh` removed, every Write is blocked, including a Write
+that tries to recreate the hook itself.
+
+Installers: version check run against stubbed `claude` binaries (2.1.29, 2.1.294, 2.0.999,
+1.9.999 → warn; 2.1.295, 2.1.296-beta, 2.1.1000, 2.2.0, 3.0 → ok; unparseable output and no
+`claude` on PATH → note) and the real 2.1.302. `install.ps1` checked the same way under
+PowerShell 7.4.6 on Linux; not run on Windows PowerShell 5.1.
+
+## Modified: human-facing docs
+- **factory-cheatsheet_{en,zh-TW}.md**: Install block gains `claude --version` (2.1.295+).
+  Stuck table gains two rows: the blocking notice (`failed; blocking because onFailure is
+  "block"`), with the lockout recovery spelled out (restore `.claude/` from a terminal with
+  `git checkout -- .claude/` or re-run the installer, because a missing
+  `protect-secrets.sh` blocks every tool Claude would use to repair it; never
+  `disableAllHooks`); and the old non-blocking notice, which now only means a pre-2026-10-17
+  `settings.json`. EN/zh-TW at parity.
+- **README.md / docs/README_zh-TW.md**: Requirements: Claude Code 2.1.295+, with one line
+  on what `onFailure: "block"` does and that the installer warns.
+
+## Upgrading an installed repo
+Confirm `claude --version` is 2.1.295 or later on every machine that opens the repo. Copy
+the template's `.claude/settings.json` and `.claude/hooks/*.sh` over the repo's copies (or
+re-run `install.sh` / `install.ps1`, which overwrite `.claude/`), then restart the Claude
+Code session. If the repo's `settings.json` carries local additions, change only the three
+hook entries (`command` string plus `"onFailure": "block"`).
+
+## Deliberately not done
+- **`protect-secrets.sh` untouched.** It reads only stdin, never a path.
+- **jq missing still fails open.** Both hook scripts exit 0 with a notice when `jq` is
+  absent, so `onFailure` never sees it as a failure. That is the documented fail-safe
+  contract (README, cheatsheet, training guide); making it block is a separate decision.
+- **Callers of `quality-gate.sh` unchanged.** The commands and builders (feat-backend, feat-frontend, feat-fix, feat-ship,
+  backend-builder, frontend-builder) invoke it as
+  `bash .claude/hooks/quality-gate.sh`, including the `/goal` condition users paste
+  verbatim from `/feat-ship`. That call runs through the Bash tool, where a drifted cwd
+  fails loudly (exit 127 in the transcript) and Claude retries from the root; a hook
+  failure was the silent case.
+- **The installer warns, never fails, on an old version.** `claude` is often absent from
+  the shell the installer runs in, and the template copy itself is harmless.
+- Agent/command/hook counts unchanged (8 / 19 / 3).
+- `factory-training_{en,zh-TW}.html` stuck table not extended in this pass.
+
+## Follow-ups (not in this pass)
+- Unverified on Claude Code older than 2.1.295 (no older build was reachable to test).
+  Per the settings docs, a value the schema rejects may make Claude Code skip that hook
+  entry or the whole file, which would switch the hooks off entirely. The installer
+  warning and the README requirement are the guard; upgrade before installing.
+- Unverified on native Windows: Claude's `file_path` there may use `\` while
+  `git rev-parse` prints `C:/…`, so `scope-track.sh`'s repo-relative path would never match
+  and an active step would block every write. Test on a Windows install before relying on
+  scope enforcement there; this predates the current change.
+- Mirror the new stuck-table row into `factory-training_{en,zh-TW}.html`.
+
+---
+
 # Pocock v1.3.1 sync: prevention pass, grill separator, command hand-offs (2026-10-07)
 
 Read against mattpocock/skills v1.3.1 (MIT; tagged 2026-10-05; changelog and `SKILL.md`

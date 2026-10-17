@@ -8,12 +8,15 @@ full-stack, frontend-only, or backend-only projects.
 
 ## Learn more
 - **[Training guide](docs/factory-training_en.html)** — one-page walkthrough of the design
-  philosophy, the assembly line, the mechanisms, and the Fable 5 upgrade (for onboarding).
+  philosophy, the assembly line, and the core and advanced mechanisms (for onboarding).
 - **[Cheatsheet](docs/factory-cheatsheet_en.md)** — one-screen quick reference: install,
   command flow, stuck-state table, non-negotiables (for daily use).
 
 ## Requirements
-- Claude Code (CLI). Agents / commands / hooks only take effect there.
+- Claude Code (CLI) **2.1.295 or later**. Agents / commands / hooks only take effect there.
+  The hooks set `onFailure: "block"`: a hook that cannot run (script missing, `bash` not
+  found) blocks the tool call instead of being skipped. The installer warns when it finds
+  an older version.
 - `bash` and `jq` available on PATH (hooks use them). On Windows, run Claude Code from
   Git Bash or WSL so the hooks execute; install `jq`. Without `jq`, hooks fail safe
   (allow) and print a notice — i.e. enforcement is skipped, nothing breaks.
@@ -55,22 +58,21 @@ snippet is copied as a starter. Expected counts after install: 8 agents, 19 comm
 /feat-spec <slug>       # review brief.md, then:
 /feat-backend <slug>    # if backend enabled
 /feat-frontend <slug>   # if frontend enabled
-/feat-ship <slug>       # FABLE 5 (optional): converge verify→validate→fix under one /goal
+/feat-ship <slug>       # optional: converge verify→validate→fix under one /goal
 /feat-verify <slug>
 /feat-validate <slug>
 /feat-fix <slug>        # only if findings; bounded by loopMaxRetries
 /feat-unblock <slug>    # after `blocked`: human-authorized resume — resets the retry budget
 /feat-docs <slug>       # after a clean validate: README + guides/examples (EN, then zh-TW)
-/feat-distill <slug>    # FABLE 5: closing step — bank verified lessons into MEMORY.md
+/feat-distill <slug>    # closing step: bank verified lessons into MEMORY.md
 /feat-status <slug>     # any time (a feature or an epic)
 
 # Maintenance (outside the line — no slug, no state.json)
 /feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
 /feat-sweep [path]      # read-only sweep for shallow modules -> sweep-report.md
 ```
-FABLE 5 additions (model routing, classifier-refusal handling, memory layer, convergence
-loop) are inert-but-harmless when the session runs another model. The design and the
-reason behind each mechanism are in `.claude/factory/CLAUDE-rationale.md`.
+The design and the reason behind each mechanism (model routing, classifier-refusal
+handling, memory layer, convergence loop included) are in `.claude/factory/CLAUDE-rationale.md`.
 
 ## What the agent loads, and what it reaches for
 

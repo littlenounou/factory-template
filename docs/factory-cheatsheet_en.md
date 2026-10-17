@@ -1,4 +1,4 @@
-# Feature Factory Cheatsheet (Fable 5 Edition)
+# Feature Factory Cheatsheet
 
 **Language 語言:** [繁體中文](factory-cheatsheet_zh-TW.md) · English
 
@@ -10,6 +10,7 @@
 ```bash
 ./install.sh /path/to/repo   # copies .claude/; Windows: install.ps1 (run Claude Code via Git Bash/WSL)
 jq --version                 # hooks need jq; missing = enforcement is OFF (fail-safe allow)
+claude --version             # 2.1.295+: hooks use onFailure "block" (a hook that can't run blocks the call)
 /feat-init                   # inside Claude Code: detects the stack, writes project.json, no scaffolding
 ```
 
@@ -44,7 +45,7 @@ skip the map and use `/feat-new`.
 /feat-backend <slug>            → code + backend-summary.md (only if track enabled)
 /feat-frontend <slug>           → UI (consumes the contract; reports gaps, never invents endpoints)
 
-# Path A: manual                 # Path B: autonomous (FABLE5)
+# Path A: manual                 # Path B: autonomous
 /feat-verify <slug>              /feat-ship <slug>
 /feat-validate <slug>            → paste the /goal line it prints; evaluator judges each turn
   findings → /feat-fix (cap: loopMaxRetries=3) → back to verify
@@ -89,6 +90,8 @@ every few shipped features or once a quarter; commit the report so git history s
 | Write blocked by a hook | By design — don't work around it. If truly needed: `rm .claude/factory/.active` (= leaving factory mode) |
 | context feels bloated / you're repeating yourself | You're mid-phase — finish it. At the next boundary walk the ladder in `PHASE-BOUNDARIES.md`: continue → `/clear` → hand off → subagent → `/compact` last. `/clear` is the default: artifacts on disk rebuild the context |
 | `jq not found` | Enforcement is actually OFF. Install jq, then continue |
+| `… hook error` … `failed; blocking because onFailure is "block"` | A hook could not run (script missing, `bash` not found), so the tool call was blocked on purpose rather than let through unchecked. If `protect-secrets.sh` is the missing one, Bash **and** Edit/Write are all blocked and Claude cannot repair it. Restore it yourself from a terminal at the repo root: `git checkout -- .claude/` (or re-run the installer). Never fall back to `disableAllHooks` |
+| `… hook error` `Failed with non-blocking status code` … `No such file or directory` | The hook never ran and the call went through: that protection is OFF. `settings.json` predates 2026-10-17 (cwd-relative hook paths that break after a `cd`). Copy the current `.claude/settings.json` + `.claude/hooks/`, confirm `claude --version` is 2.1.295+, restart the session |
 | `/usage` shows orchestrator + Haiku only, zero Sonnet | Routing overridden by env. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL` and settings.json at each scope (see CONVENTIONS "Known issues") |
 | gate shows `(none configured, skipped)` | That command is blank in the manifest; add the script, then fill project.json back in |
 
@@ -102,4 +105,4 @@ every few shipped features or once a quarter; commit the report so git history s
 6. **Redact before you paste**: evidence is mandatory (Rule 7) and artifacts are version-controlled — credential values go in as `<REDACTED>`, reproduction commands reference them through environment variables, and you quote the signal-carrying lines instead of the whole dump. `protect-secrets.sh` catches secret files by name, not a token pasted into `verification.md`.
 7. **Fail-Loud**: every step ends with ✅/⚠️/❓; "tests pass" never masks skipped tests; never run the factory with `disableAllHooks`.
 
-<sub>The FABLE5 upgrades (model routing / classifier triage / memory layer / /goal convergence) are inert-but-harmless on other models — maintain one template for the whole team; pick the model with `/model`.</sub>
+<sub>Maintain one template for the whole team; pick the session's model with `/model`.</sub>

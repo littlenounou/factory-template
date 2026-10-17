@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feature Factory — Fable 5 Edition · Team Training</title>
+<title>Feature Factory · Team Training</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Archivo:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -11,7 +11,7 @@
   --concrete:#F2F3F1;      /* concrete white */
   --ink:#1C1E21;           /* carbon ink */
   --safety:#FFC400;        /* safety yellow: human checkpoints */
-  --signal:#6B4FD8;        /* signal violet: FABLE5 additions */
+  --signal:#6B4FD8;        /* signal violet: advanced mechanisms */
   --stop:#C63D2F;          /* stop red: blocked states */
   --grid:#D8DAD5;          /* grid gray */
   --ok:#2E7D4F;            /* pass green */
@@ -49,7 +49,6 @@ header{border-bottom:3px solid var(--ink);background:var(--concrete)}
 @keyframes belt{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .belt span{margin-right:34px;opacity:.85}
 .belt .gate{color:#8a6d00;font-weight:600}
-.belt .f5{color:var(--signal);font-weight:600}
 
 /* ============ Section skeleton ============ */
 section{padding:66px 0 26px}
@@ -59,7 +58,6 @@ section{padding:66px 0 26px}
 .sec-head .en{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.22em;text-transform:uppercase;opacity:.55;margin-left:auto}
 .lead{max-width:820px;margin-bottom:32px;font-size:17px}
 
-.tag-f5{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;color:#fff;background:var(--signal);padding:1px 8px 2px;border-radius:2px;vertical-align:2px}
 code,.cmd{font-family:var(--mono);font-size:.92em;background:#fff;border:1px solid var(--grid);padding:1px 6px;border-radius:2px}
 
 /* ============ 01 Philosophy ============ */
@@ -81,7 +79,6 @@ code,.cmd{font-family:var(--mono);font-size:.92em;background:#fff;border:1px sol
 .stage p{font-size:14px;margin-top:5px;line-height:1.65}
 .stage.gate{border-color:#8a6d00;background:#FFF7DE;box-shadow:6px 6px 0 var(--safety)}
 .stage.gate::before{background:var(--safety);border-color:var(--ink);content:"⏸"}
-.stage.f5{border-left:8px solid var(--signal)}
 .stage.loop{border-style:dashed}
 .badge{font-family:var(--mono);font-size:11px;font-weight:600;padding:1px 8px 2px;border-radius:2px}
 .badge.human{background:var(--safety);color:var(--ink)}
@@ -98,7 +95,7 @@ code,.cmd{font-family:var(--mono);font-size:.92em;background:#fff;border:1px sol
 .tech td:first-child{white-space:nowrap;font-weight:700}
 .tech .path{font-family:var(--mono);font-size:12px;opacity:.6;display:block;margin-top:2px;font-weight:400}
 
-/* ============ 04 Fable 5 ============ */
+/* ============ 04 Advanced mechanisms ============ */
 .f5grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 .f5card{background:#fff;border:2px solid var(--ink);border-top:8px solid var(--signal);padding:22px 22px 24px}
 .f5card h3{font-size:17px;font-weight:900;margin-bottom:10px}
@@ -155,7 +152,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     <div class="mast">
       <div class="plate">
         <div class="eyebrow">Internal Training · Claude Code Pipeline</div>
-        <h1>Feature Factory<br>Software Assembly Line · <span style="color:var(--signal)">Fable 5 Edition</span></h1>
+        <h1>Feature Factory<br>Software Assembly Line</h1>
       </div>
       <div class="specbox" aria-label="Specs">
         <div><span>agents</span><b>8</b></div>
@@ -166,13 +163,13 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
     </div>
     <div class="thesis">
-      <p>An assembly line that machines an <em>idea</em> into <em>verified code</em>. One core belief: <strong>reliability comes from the system, not the model</strong> — sequence is driven by commands, scope is hard-blocked by hooks, loops have a stop-loss, and acceptance is judged by an independent validator. The Fable 5 upgrade teaches this line to remember and to converge on its own — without removing a single guardrail.</p>
+      <p>An assembly line that machines an <em>idea</em> into <em>verified code</em>. One core belief: <strong>reliability comes from the system, not the model</strong>: sequence is driven by commands, scope is hard-blocked by hooks, loops have a stop-loss, and acceptance is judged by an independent validator. Its advanced mechanisms teach the line to remember and to converge on its own, without removing a single guardrail.</p>
     </div>
   </div>
   <div class="belt" aria-hidden="true">
     <div class="belt-inner">
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
-      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span class="f5">/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span class="f5">/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span>/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span>/feat-distill → MEMORY.md</span>
+      <span>/feat-new</span><span>/feat-research</span><span>/feat-grill</span><span>/feat-story</span><span class="gate">⏸ human approval</span><span>/feat-spec</span><span class="gate">⏸ human approval</span><span>/feat-backend</span><span>/feat-frontend</span><span>/feat-ship</span><span>/feat-verify</span><span>/feat-validate</span><span>/feat-fix ↺</span><span>/feat-docs</span><span>/feat-distill → MEMORY.md</span>
     </div>
   </div>
   <div class="hazard"></div>
@@ -211,7 +208,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
 <!-- ==================== 02 Assembly line ==================== -->
 <section id="pipeline">
   <div class="sec-head"><span class="no">02</span><h2>The Assembly Line</h2><span class="en">The pipeline</span></div>
-  <p class="lead">A feature from intake to shipping. <span class="badge human">⏸ yellow gates</span> are human approvals — the line fully stops there. <span class="tag-f5">FABLE5</span> violet marks the stations added by this upgrade; everything else is the original line. Each station writes its output as a file under <code>&lt;artifactsDir&gt;/&lt;slug&gt;/</code>.</p>
+  <p class="lead">A feature from intake to shipping. <span class="badge human">⏸ yellow gates</span> are human approvals: the line fully stops there. Each station writes its output as a file under <code>&lt;artifactsDir&gt;/&lt;slug&gt;/</code>.</p>
 
   <div class="line">
     <div class="stage" data-n="00">
@@ -222,8 +219,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-new &lt;slug&gt; "description"</span><span class="out">→ idea.md + state.json</span></div>
       <p>Opens the feature's working folder and records the raw request.</p>
     </div>
-    <div class="stage f5" data-n="02">
-      <div class="row"><span class="cmdname">/feat-research</span><span class="tag-f5">FABLE5 enhanced</span><span class="out">→ research.md</span></div>
+    <div class="stage" data-n="02">
+      <div class="row"><span class="cmdname">/feat-research</span><span class="out">→ research.md</span></div>
       <p>First reads <code>MEMORY.md</code> and carries past lessons in as "Prior knowledge" (leads to verify, not facts to trust), then maps the codebase with the read-only Explore agent: relevant files, existing patterns, risks.</p>
     </div>
     <div class="stage" data-n="03">
@@ -246,8 +243,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-frontend</span><span class="out">→ UI + component tests</span></div>
       <p>The frontend-builder implements against the contract. Anything the contract is missing gets <b>reported as a gap</b> — never an invented endpoint.</p>
     </div>
-    <div class="stage f5" data-n="06">
-      <div class="row"><span class="cmdname">/feat-ship</span><span class="tag-f5">FABLE5 new</span><span class="badge opt">optional</span><span class="out">pairs with /goal</span></div>
+    <div class="stage" data-n="06">
+      <div class="row"><span class="cmdname">/feat-ship</span><span class="badge opt">optional</span><span class="out">pairs with /goal</span></div>
       <p>Hands the mechanical 07→09 loop to <code>/goal</code> for autonomous convergence: the command prints an exact goal condition for you to paste; an independent evaluator (default: Haiku) judges each turn. Prefer manual? Just run 07→09 yourself as before.</p>
     </div>
     <div class="stage" data-n="07">
@@ -270,8 +267,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <div class="row"><span class="cmdname">/feat-docs</span><span class="out">→ README + docs/ (EN → zh-TW)</span></div>
       <p>The doc-writer authors user-facing documentation from what was <em>actually built</em>: updates the README, writes usage/example guides under docsDir (with Mermaid diagrams), English first then <code>_zh-TW</code> translations, language-switch links atop both. Hooks confine it to docsDir and the root README files.</p>
     </div>
-    <div class="stage f5" data-n="11">
-      <div class="row"><span class="cmdname">/feat-distill</span><span class="tag-f5">FABLE5 new</span><span class="out">→ MEMORY.md updated</span></div>
+    <div class="stage" data-n="11">
+      <div class="row"><span class="cmdname">/feat-distill</span><span class="out">→ MEMORY.md updated</span></div>
       <p>The memory-distiller banks the lessons that <em>actually happened</em> in this feature into the cross-feature <code>MEMORY.md</code> (Verified facts / General rules / Watchlist). <b>Failures get distilled too</b>: a blocked feature's open findings go to the Watchlist so the next feature doesn't rediscover them. Zero new lessons is a legitimate result — padding is forbidden. For each fixed failure it asks what would have caught it earlier: a mechanical pattern comes back as a <b>proposed lint/hook check</b> for you to add (tracked as <code>check pending</code>), and only judgement calls become General rules. The validator checks later diffs against both the General rules and every <code>check pending</code> entry, so a lesson is guarded by review until its check lands.</p>
     </div>
   </div>
@@ -289,8 +286,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>Tools are permissions — the validator has no Edit/Bash, so it cannot modify code even if it wanted to.</td>
     </tr>
     <tr>
-      <td>Model routing <span class="tag-f5">FABLE5</span><span class="path">frontmatter · model: sonnet</span></td>
-      <td>The orchestrating session carries the expensive model (Fable 5); all workers are pinned to Sonnet. Switching a subagent's model does <b>not</b> re-read context — it starts from zero anyway.</td>
+      <td>Model routing<span class="path">frontmatter · model: sonnet</span></td>
+      <td>The orchestrating session runs the model you pick with <code>/model</code>; all workers are pinned to Sonnet. Switching a subagent's model does <b>not</b> re-read context: it starts from zero anyway.</td>
       <td>Same artifact reads, billed at Sonnet rates; the main session's prompt cache is untouched.</td>
     </tr>
     <tr>
@@ -304,7 +301,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>Generated by <code>/feat-init</code>; scripts you don't have yet (e.g. lint) stay blank and the quality gate skips them.</td>
     </tr>
     <tr>
-      <td>/goal convergence <span class="tag-f5">FABLE5</span><span class="path">Claude Code built-in · paired by /feat-ship</span></td>
+      <td>/goal convergence<span class="path">Claude Code built-in · paired by /feat-ship</span></td>
       <td>The user sets a goal condition; after each turn an independent evaluator (default: Haiku) judges pass/fail and, on fail, feeds the reason into the next turn.</td>
       <td>The evaluator sees only the conversation, never the filesystem — so every cycle must paste its evidence. /goal is part of the hooks system: <code>disableAllHooks</code> kills it AND scope enforcement — <b>never run the factory with hooks disabled</b>.</td>
     </tr>
@@ -319,24 +316,24 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       <td>Progressive disclosure keeps the always-loaded budget small: a prohibition or a rationale that fires on 1% of turns should not cost context on the other 99%. The installer verifies all six ship — a pointer whose target is missing fails silently.</td>
     </tr>
     <tr>
-      <td>Memory layer <span class="tag-f5">FABLE5</span><span class="path">.claude/factory/MEMORY.md</span></td>
+      <td>Memory layer<span class="path">.claude/factory/MEMORY.md</span></td>
       <td>Cross-feature long-term memory, written only by the memory-distiller, read by /feat-research at the start of every feature, and its General rules and <code>check pending</code> entries checked by the validator on every diff. Every entry must trace to something that actually happened; hard cap ~150 lines.</td>
       <td>Lives in the repo, under version control — <b>review memory diffs like code</b>: bad memory compounds exactly as fast as good memory.</td>
     </tr>
   </table>
 </section>
 
-<!-- ==================== 04 The upgrade ==================== -->
-<section id="fable5">
-  <div class="sec-head"><span class="no">04</span><h2>What Fable 5 Changed</h2><span class="en">The upgrade</span></div>
-  <p class="lead">Four things, all tagged <code>FABLE5</code> throughout the files — one <code>git diff</code> shows every change. The principle: <b>evolve, don't rebuild</b> — the two ⏸ gates, hook enforcement and the bounded loop are untouched.</p>
+<!-- ==================== 04 Advanced mechanisms ==================== -->
+<section id="advanced">
+  <div class="sec-head"><span class="no">04</span><h2>Advanced Mechanisms</h2><span class="en">Beyond the core line</span></div>
+  <p class="lead">Four mechanisms on top of the core line. The principle is <b>evolve, don't rebuild</b>: the two ⏸ gates, hook enforcement and the bounded loop are untouched.</p>
   <div class="f5grid">
     <div class="f5card">
       <h3>① Model routing</h3>
       <p>Orchestrator and workers are billed separately:</p>
       <table>
         <tr><th>Role</th><th>Model</th></tr>
-        <tr><td>Orchestrating session (yours)</td><td>Fable 5</td></tr>
+        <tr><td>Orchestrating session (yours)</td><td>the model you pick with <code>/model</code></td></tr>
         <tr><td>All 8 agents</td><td>sonnet (pinned in frontmatter)</td></tr>
         <tr><td>/goal evaluator</td><td>Haiku (built-in default)</td></tr>
         <tr><td>Security-sensitive work</td><td>switch that agent to <code>model: opus</code></td></tr>
@@ -344,7 +341,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="f5card">
       <h3>② Classifier refusal ≠ defect</h3>
-      <p>Fable 5 ships safety classifiers that can decline a request (API returns <code>stop_reason: "refusal"</code>). A loop that can't tell "the classifier said no" from "my code is wrong" burns its retry budget on rephrasing. Therefore:</p>
+      <p>Any model's safety classifiers can decline a request (API returns <code>stop_reason: "refusal"</code>); Claude Fable carries extra ones (biology, cybersecurity, LLM R&amp;D), so it refuses most often. A loop that can't tell "the classifier said no" from "my code is wrong" burns its retry budget on rephrasing. Therefore:</p>
       <ul>
         <li>Agents record refusals as <code>classifier-refusal</code> — working around them is forbidden</li>
         <li>The validator files them under a separate ⛔ heading (owner: human)</li>
@@ -365,8 +362,8 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </ul>
     </div>
   </div>
-  <div class="inert"><b>Inert-but-harmless by design</b>: these upgrades work — or idle safely — under any other model's session (Opus, Sonnet). The model field is plain routing (saves money), memory and /goal are model-agnostic, and the classifier path simply never triggers off Fable. So <b>the whole team maintains exactly one template</b> — pick the model with <code>/model</code>, not by swapping templates.</div>
-  <p style="margin-top:14px;font-size:13px;opacity:.75">References: this upgrade was inspired by <a href="https://x.com/0xCodez/status/2065089060104720776" style="text-decoration:underline">@0xCodez's self-improving-agent thread</a> (<a href="https://www.blocktempo.com/self-improving-agent-fable-5-2/" style="text-decoration:underline">BlockTempo zh-TW translation</a>). The thread is inspiration, not specification — every product-behavior claim was verified against Anthropic's official documentation before adoption.</p>
+  <div class="inert"><b>One template for the whole team</b>: pick the session's model with <code>/model</code>, not by swapping templates.</div>
+  <p style="margin-top:14px;font-size:13px;opacity:.75">References: these mechanisms were inspired by <a href="https://x.com/0xCodez/status/2065089060104720776" style="text-decoration:underline">@0xCodez's self-improving-agent thread</a> (<a href="https://www.blocktempo.com/self-improving-agent-fable-5-2/" style="text-decoration:underline">BlockTempo zh-TW translation</a>). The thread is inspiration, not specification: every product-behavior claim was verified against Anthropic's official documentation before adoption.</p>
 </section>
 
 <!-- ==================== 05 How to run it ==================== -->
@@ -375,7 +372,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
   <div class="how">
     <div class="howcol">
       <h3>Install (once per repo)</h3>
-      <div class="term"><span class="c"># 1. Copy from the upgraded template into your repo</span>
+      <div class="term"><span class="c"># 1. Copy the template into your repo</span>
 ./install.sh /path/to/your/repo
 <span class="c"># Windows: ./install.ps1 C:\path\to\repo (run Claude Code from Git Bash/WSL)</span>
 
@@ -408,7 +405,7 @@ jq --version
 <span class="y">/feat-verify</span> user-invite → <span class="y">/feat-validate</span> user-invite
 <span class="c">#   findings → /feat-fix, then back to verify/validate</span>
 
-<span class="c"># Path B (FABLE5): autonomous convergence</span>
+<span class="c"># Path B: autonomous convergence</span>
 <span class="v">/feat-ship</span> user-invite     <span class="c"># paste the /goal line it prints</span>
 
 <span class="c"># Wrap up: user docs → bank the lessons → review + commit yourself</span>
@@ -462,7 +459,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional C
   <div class="hazard"></div>
   <div class="wrap">
     <div class="foot">
-      <span>FEATURE FACTORY · FABLE 5 EDITION · 2026-09</span>
+      <span>FEATURE FACTORY · 2026-10</span>
       <span>Design rationale: .claude/factory/CLAUDE-rationale.md</span>
       <span>Behavioral contract: CLAUDE.md</span>
     </div>
