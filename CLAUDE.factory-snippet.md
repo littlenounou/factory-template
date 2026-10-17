@@ -17,25 +17,10 @@
 
 # CLAUDE.md
 
-> This file is the **behavioral contract** between this project and AI coding assistants
-> (Claude Code). All code modifications made through AI comply with this contract.
->
-> Each rule's design rationale lives in `.claude/factory/CLAUDE-rationale.md` — human
-> reading, not loaded by the agent. Read it before changing a rule.
-
 <!-- <<< FEATURE FACTORY: import the pipeline conventions + comment/doc/term policy >>> -->
 @.claude/factory/CONVENTIONS.md
 @.claude/factory/terminology-zh-tw.md
 <!-- <<< /FEATURE FACTORY >>> -->
-
----
-
-## How to Read This File
-
-- **Bold == action**: what to do
-- Rules are split into two tiers: **Always-On** (every context) + **Default Mode**
-  (standard development)
-- Exploratory work has its own **EXPLORE Mode**, activated explicitly by the user
 
 ---
 
@@ -68,28 +53,12 @@ to prevent.
 
 ---
 
-### Rule 2 — Read Before You Write
-
-Before modifying any file larger than 50 lines, first read:
-
-1. The file's exports / public API
-2. At least one direct caller
-3. Relevant shared utilities (if obviously imported)
-
-For small files (< 50 lines) or leaf modules (no callers), this rule is relaxed.
-
----
-
 ## Default Mode Rules (standard development, bug fixes, production-bound work)
 
 ### Rule 3 — Think Before Coding
 
-Before implementing:
-
-- **State your assumptions explicitly** (especially ambiguous parts)
-- **If multiple reasonable interpretations exist, list them and let the user choose**
-- **If a simpler alternative exists, propose it**
-- **If confused, stop and ask**
+When a request has more than one reasonable reading, **list the readings and let the user
+choose** before implementing.
 
 ---
 
@@ -121,21 +90,7 @@ and formatting stay exactly as you found them, including pre-existing dead code.
 
 ### Rule 6 — Goal-Driven Execution
 
-Transform tasks into **verifiable concrete goals**:
-
-| Weak instruction | Strong instruction |
-|------------------|---------------------|
-| "Add validation" | "Write tests for invalid inputs, then make them pass" |
-| "Fix this bug" | "Write a test that reproduces the bug, then make it pass" |
-| "Refactor X" | "All tests pass before and after the refactor" |
-
-For multi-step tasks, state the plan first:
-
-```
-1. [step] → verify: [check]
-2. [step] → verify: [check]
-3. [step] → verify: [check]
-```
+To fix a bug, **first write a test that reproduces it and fails**, then make it pass.
 
 ---
 
@@ -157,16 +112,9 @@ Every test answers **WHY** the behavior matters, not just **WHAT** it does.
 
 ### Rule 8 — Match Conventions, Surface Anti-Patterns
 
-**Default:** follow the codebase's existing conventions for naming, architecture, and
-error handling.
-- Existing code uses snake_case → use snake_case
-- Existing code uses class components → stay with class components
-- Existing code uses a particular error-handling pattern → match it
-
-**Exception:** when the existing convention is a widely-recognized anti-pattern (global
-mutable state, empty catch, callback hell, God Object, SQL-injection-prone patterns):
-- **Surface it in your response and let the human decide**
-- Whether to refactor is a separate conversation
+When an existing convention is a widely-recognized anti-pattern (global mutable state,
+empty catch, callback hell, God Object, SQL-injection-prone patterns), **surface it in your
+response and let the human decide**. Whether to refactor is a separate conversation.
 
 **Test: "Is this a deliberate team choice, or accumulated team debt?"** Follow the former;
 surface the latter.
@@ -186,19 +134,6 @@ text, naming suggestions, code review feedback, documentation generation.
 
 AI is stochastic; production behaviour that must be reproducible and debuggable belongs in
 code you can read.
-
----
-
-### Rule 10 — Checkpoint After Every Significant Step
-
-In multi-step tasks, after **each completed step**, report:
-
-- ✅ **Done**: [what was completed]
-- ✅ **Verified**: [how it was verified]
-- ⏳ **Remaining**: [what's left]
-
-Each step begins by restating where you are. If you cannot restate it, stop and re-read
-before going further.
 
 ---
 
@@ -226,7 +161,7 @@ Surface these signals the moment you observe them, then keep working:
 
 `explore mode` / `prototype` / `spike` / `let's do a POC` / `let's try it out` → read
 `.claude/factory/EXPLORE-MODE.md` and follow it until the user says `let's commit to this
-direction` / `let's do this properly`. Rules 0, 1, 2 and 9 stay on there too. Every other
+direction` / `let's do this properly`. Rules 0, 1 and 9 stay on there too. Every other
 situation is Default Mode.
 
 ---
@@ -263,10 +198,9 @@ situation is Default Mode.
 
 - [If the project has specific business terminology, abbreviations, or domain models, list them here]
 
----
-
-*This file is a contract between the team and AI, not a unilateral instruction from AI. If
-team members find a rule failing in practice or causing harm, open a PR to modify this file
-— **rules are tools, not scripture**. The rationale for each rule lives in
-`.claude/factory/CLAUDE-rationale.md`; the rules' change history lives in the factory
-template repo's `CHANGES.md`, which is not installed into this repo.*
+<!-- This file is a contract between the team and AI, not a unilateral instruction from AI.
+     If a rule fails in practice or causes harm, open a PR to modify this file: rules are
+     tools, not scripture. Read the rule's entry in .claude/factory/CLAUDE-rationale.md
+     first and update both in the same PR. The rules' change history lives in the factory
+     template repo's CHANGES.md, which is not installed into this repo.
+     Rule numbers 2 and 10 are retired; numbers are never reused. -->

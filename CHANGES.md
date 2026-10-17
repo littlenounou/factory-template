@@ -1,3 +1,55 @@
+# CLAUDE.md snippet: no-op rules pruned (2026-10-17)
+
+Issue #40 · PR #__
+
+The snippet still carried rules that restate what Claude Code and current (5.x) models do
+by default. Under `WRITING-FOR-AGENTS.md` (No-ops) such a sentence is deleted whole, and the
+saving repeats: the main session and every factory agent reload `CLAUDE.md` on every run.
+
+## Decisions (grilled with the maintainer)
+- **Rule 2 (Read Before You Write) retired.** The Edit tool already refuses a file not
+  read in the session; reading a caller before changing an interface is default behaviour.
+- **Rule 10 (Checkpoint) retired.** The task list shows done and remaining work, Rule 0
+  reports what was verified, and inside the factory each `/feat-*` step is the checkpoint.
+- **Rule 3 trimmed to one line**: with several reasonable readings, list them and let the
+  user choose. This is stricter than the default, which decides low-stakes ambiguity alone.
+- **Rule 6 trimmed to one line**: reproduce a bug with a failing test, then fix it. The
+  plan template and the weak/strong instruction table are gone.
+- **Rule 8 keeps its heading, with the anti-pattern exception only.** Following existing
+  conventions is default behaviour.
+- **No renumbering.** Retired numbers are never reused; Rules 5, 7 and 9 are cited by
+  number in `CONVENTIONS.md`, agents and the cheatsheets.
+
+## Modified
+- **CLAUDE.factory-snippet.md**: "How to Read This File" and the opening blockquote
+  removed; the closing paragraph is now an HTML comment (human-facing, stripped before
+  loading), which also notes the retired numbers; EXPLORE line reads "Rules 0, 1 and 9".
+- **.claude/factory/EXPLORE-MODE.md**: Rule 10 row and Rule 2 "still on" line removed;
+  the Rule 6 row now reads "Disabled: a fix may skip the reproduction test".
+- **.claude/factory/CLAUDE-rationale.md**: Rule 2 and Rule 10 entries replaced by a
+  "Retired: Rules 2 and 10" entry; Rules 3, 6 and 8 say what was trimmed and why; "Rules 0,
+  1 and 9" in the EXPLORE entry. Its "no pointer reaches it" line is now true: both
+  snippet paragraphs that pointed at it were agent-loaded text and are gone.
+
+## Kept, deliberately
+Rules 0, 1, 4, 5, 7 and 9, Context Health, the EXPLORE pointer and Project-Specific Rules.
+Rule 4 stays because over-engineering was a documented tendency of the 4.5 generation and
+there is no evidence yet that 5.x outgrew it. *Tech Stack* is read by `/feat-init` on a
+greenfield repo.
+
+## Compatibility
+A repo whose `CLAUDE.md` came from an older snippet keeps Rules 2 and 10 until someone
+edits it; a reinstall only refreshes `.claude/factory/`. After one, that repo's Rule 10 has
+no EXPLORE weakening row and applies at full strength in EXPLORE Mode. Harmless; delete the
+two rules from the repo's `CLAUDE.md` to match.
+
+## Follow-ups (not in this pass)
+- The no-op test is model-relative: watch the next few features for a behaviour that
+  regressed after its rule went, and restore it as a paired guardrail if one did.
+- *Test and Build Commands* may duplicate `project.json` (Cache test). Decide separately.
+
+---
+
 # v1.0.0 (2026-10-17)
 
 First release. `main` had never been tagged; v1.0.0 is `develop` as of PR #36, merged to
