@@ -33,6 +33,16 @@ already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
 snippet is copied as a starter. Expected counts after install: 8 agents, 19 commands, 3 hooks.
 
+Re-running the installer (to upgrade) refreshes the template's files and keeps the repo's own:
+- `.claude/factory/MEMORY.md` is installed only when the repo has none, and never overwritten.
+  If `artifactsDir` is not the default, it is not installed at all: memory lives in
+  `<artifactsDir>/MEMORY.md`.
+- `.claude/settings.json` is merged (`install.sh` uses `jq`): `hooks` comes from the
+  template, every other key (`permissions`, `env`, …) is kept. If your `hooks` differed, the
+  old file is saved as `.claude/settings.json.bak`; re-add any hooks of your own from it. If it
+  cannot be merged (`jq` missing for `install.sh`, or the file is not valid JSON), it is backed
+  up to the same `.bak` and replaced, with a warning.
+
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md`: add its two `@import` lines near
    the top (`CONVENTIONS.md` and `terminology-zh-tw.md`). That is the whole merge. Skip if you
