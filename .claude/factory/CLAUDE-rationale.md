@@ -249,3 +249,10 @@ baseline and deletion test, and the prompt-style rules.
   no-ops, information access) plus "a configured check that is broken or unwired";
   the validator's Merge danger takes `pr`'s door and blast-radius call. Still not
   adopted: `implement-spec`, and a factory-written PR body.
+- `implement-spec` applied to `/feat-epic`'s hand-off (2026-10-18), building the features
+  with no `after:` in parallel worktrees: not adopted. Only build through fix would run
+  in parallel, since grill and the ⏸ story/spec gates stay sequential and human, so little
+  time is saved. It would add worktree handling, conflicts between feature PRs, and one
+  MEMORY.md per worktree, which breaks its single writer. Sequential order also lets each
+  feature's research read the previous feature's merged code and lessons. Revisit when an
+  epic has many independent features and build time is the measured bottleneck.

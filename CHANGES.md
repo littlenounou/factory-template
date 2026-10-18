@@ -1,3 +1,18 @@
+# Decision recorded: no parallel builds for /feat-epic features (2026-10-18)
+
+Issue #46 · PR #47
+
+Evaluated applying `implement-spec`'s frontier to the `/feat-new` lines a cleared
+`/feat-epic` hands off. Not adopted; the reasons are in `CLAUDE-rationale.md` so the next
+upstream sync does not reopen it.
+
+## Modified
+- **CLAUDE-rationale.md**: Pocock provenance gains the decision and when to revisit it.
+
+No behaviour change: agent, command and hook files are untouched.
+
+---
+
 # Pocock v1.3 retro/pr re-read: /feat-retro and Merge danger (2026-10-18)
 
 Issue #44 · PR #45
