@@ -64,6 +64,7 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 ```
 /feat-recomment [path]         → 把舊的交錯式雙語註解轉成區塊形式
 /feat-sweep [path]             → 唯讀掃描淺模組 → sweep-report.md
+/feat-retro [session|slug]     → 唯讀回顧 session 的工作環境 → retro-report.md
 ```
 
 `/feat-recomment`:沒有 slug、沒有 `state.json`。先確認 git working tree 乾淨、先跑 dry run,再驅動
@@ -78,16 +79,23 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 它絕不改程式碼、也不建立 feature——哪個候選要進產線由你決定。執行節奏自己定,
 例如每出貨幾個 feature 或每季一次;報告請 commit,趨勢看 git 歷史。
 
+`/feat-retro` 也是唯讀的:它讀取 session 的對話記錄(預設為此 repo 最近一次 session;也可指定
+session id 或某個 slug 的 sessions),檢視的是 agent 的工作環境而不是程式碼:反覆搜尋才找到的檔案
+(缺少路徑指引)、過大的工具輸出、每次都載入卻沒改變行為的指令、拿不到的資訊,以及有設定但壞掉
+或沒接進 CI 的 lint/test 指令。它覆寫 `retro-report.md`,最多 7 項依嚴重度排序的提案,採用哪些由你決定。
+程式碼本身的錯誤仍由 `/feat-distill` 負責。覺得某次 session 特別慢或特別耗 token 時再跑,不要定時自動跑。
+
 ## 卡住時看這裡
 
 | 狀態 | 意思 / 處置 |
 |---|---|
-| validate 乾淨 | 跑 `/feat-docs` 產出使用者文件,收尾 `/feat-distill`,然後自己 review + commit |
+| validate 乾淨 | 跑 `/feat-docs` 產出使用者文件,收尾 `/feat-distill`,然後自己 review + commit。若 Merge danger 寫 `one-way`,合併前請放慢審查 |
 | `blocked` | fix 迴圈觸頂(3 次),交人工。流程:`/feat-distill`(開放問題入 Watchlist)→ 人工修/回 ⏸ 閘門改規格/接受風險 → `/feat-unblock`(重置 retries,回到 verify)。`state.json` 由該指令改,不手改 |
 | `blocked-classifier` | 安全分類器拒絕,**不是程式碼壞了**。該 agent 改 `model: opus` 重跑或人工處理,之後用 `/feat-unblock` 回產線 |
 | 同一 feature 第 2 次 blocked | 問題在上游——回 ⏸ 閘門改 story/spec 或拆 slug(`/feat-unblock` 會警告) |
 | 寫入被 hook 擋下 | 設計如此,不要繞過。真有需要:`rm .claude/factory/.active` 離開產線模式 |
 | context 感覺臃腫 / 自己在重複發問 | 你在階段中途——先做完。到下一個邊界時照 `PHASE-BOUNDARIES.md` 的階梯走:continue → `/clear` → 交接 → 子代理 → `/compact` 墊底。預設是 `/clear`:磁碟上的 artifacts 會把 context 重建起來 |
+| 某次 session 特別慢或特別耗 token | 跑 `/feat-retro`(唯讀):找出反覆搜尋、過大的工具輸出、無效指令,並在 `retro-report.md` 提出環境改善建議 |
 | `jq not found` | 強制其實沒開。裝 jq 再繼續 |
 | `… hook error` … `failed; blocking because onFailure is "block"` | hook 無法執行(script 不見、找不到 `bash`),所以刻意擋下這次工具呼叫,而不是讓它未經檢查就放行。若不見的是 `protect-secrets.sh`,Bash **與** Edit/Write 會全部被擋,Claude 無法自行修復——請你在 repo 根目錄的終端機自己還原:`git checkout -- .claude/`(或重跑安裝程式)。絕不改用 `disableAllHooks` 繞過 |
 | `… hook error` `Failed with non-blocking status code` … `沒有此一檔案或目錄` | 該 hook 根本沒執行、指令照樣放行:那道防護等於關閉。`settings.json` 是 2026-10-17 之前的版本(用相對 cwd 的路徑呼叫 hook,一 `cd` 就找不到)。複製最新的 `.claude/settings.json` 與 `.claude/hooks/`,確認 `claude --version` 為 2.1.295 以上,再重開 session |

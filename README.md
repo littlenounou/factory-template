@@ -31,7 +31,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 19 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 20 commands, 3 hooks.
 
 Re-running the installer (to upgrade) refreshes the template's files and keeps the repo's own:
 - `.claude/factory/MEMORY.md` is installed only when the repo has none, and never overwritten.
@@ -80,6 +80,7 @@ Re-running the installer (to upgrade) refreshes the template's files and keeps t
 # Maintenance (outside the line — no slug, no state.json)
 /feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
 /feat-sweep [path]      # read-only sweep for shallow modules -> sweep-report.md
+/feat-retro [session|slug]  # read-only retro on a session's environment -> retro-report.md
 ```
 The design and the reason behind each mechanism (model routing, classifier-refusal
 handling, memory layer, convergence loop included) are in `.claude/factory/CLAUDE-rationale.md`.
@@ -126,4 +127,6 @@ artifacts — they stay in place as the pipeline's record.
 This template does not auto-commit or open PRs by design. For the PR body, the `pr` skill
 from [mattpocock/skills](https://github.com/mattpocock/skills) (Claude Code plugin
 `mattpocock-skills`) works beside the line: a summary visual, before/after evidence, and a
-merge-danger call. It is not part of the factory and needs no factory changes.
+merge-danger call. It is not part of the factory and needs no factory changes. The
+validator already writes a **Merge danger** section (one-way or two-way door, blast
+radius) at the end of `validation.md`, ready to carry into that PR body.

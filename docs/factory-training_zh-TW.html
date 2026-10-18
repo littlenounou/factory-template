@@ -157,7 +157,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="規格">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>19</b></div>
+        <div><span>commands</span><b>20</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
         <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
@@ -254,7 +254,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage" data-n="08">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
-      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。乾淨 → 解除 <code>.active</code>，下一站 <code>/feat-docs</code> 產出使用者文件。</p>
+      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。結尾另有 <b>Merge danger</b> 段落（one-way 或 two-way door、影響範圍），不列入上述分級、不會觸發修正；若是 one-way door 會再提醒你，合併前請放慢審查。乾淨 → 解除 <code>.active</code>，下一站 <code>/feat-docs</code> 產出使用者文件。</p>
     </div>
     <div class="stage loop" data-n="09">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">有界迴圈</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
@@ -422,17 +422,23 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
 <span class="c"># 定期：唯讀掃描淺模組（刪除測試）</span>
 <span class="y">/feat-sweep</span>                <span class="c"># 沒有 slug；feature 進行中也可執行；寫出 sweep-report.md</span>
 <span class="c"># 最多 7 個排序過的候選，每個附一行可直接貼上的 /feat-new。</span>
-<span class="c"># 它絕不改程式碼、也不建立 feature——哪個候選進產線由你決定。</span></div>
+<span class="c"># 它絕不改程式碼、也不建立 feature——哪個候選進產線由你決定。</span>
+
+<span class="c"># 覺得某次 session 特別慢時：唯讀回顧 agent 的工作環境</span>
+<span class="y">/feat-retro</span>                <span class="c"># 預設讀最近一次 session；寫出 retro-report.md</span>
+<span class="c"># 檢查路徑指引、工具用量、無效指令、資訊取得、檢查是否接上。</span>
+<span class="c"># 最多 7 項依嚴重度排序的提案，採用哪些由你決定。</span></div>
     </div>
     <div class="howcol">
       <h3>狀態對照：卡住時看這裡</h3>
       <table class="states">
         <tr><th>你看到的</th><th>意思／怎麼辦</th></tr>
-        <tr><td><span class="dot" style="background:var(--ok)"></span>validate 乾淨</td><td>跑 <code>/feat-docs</code> 產出使用者文件，收尾 <code>/feat-distill</code>，然後自己 review、自己 commit。</td></tr>
+        <tr><td><span class="dot" style="background:var(--ok)"></span>validate 乾淨</td><td>跑 <code>/feat-docs</code> 產出使用者文件，收尾 <code>/feat-distill</code>，然後自己 review、自己 commit。若 Merge danger 寫 <code>one-way</code>，合併前請放慢審查。</td></tr>
         <tr><td><span class="dot" style="background:var(--stop)"></span>blocked</td><td>fix 迴圈達 3 次上限，需要人的判斷。流程：先 <code>/feat-distill</code>（開放問題入 Watchlist）→ 人工修／回 ⏸ 閘門改 story-spec／接受風險 → <code>/feat-unblock</code>（重置 retries，回到 verify）。<code>state.json</code> 由該指令改，不手改。</td></tr>
         <tr><td><span class="dot" style="background:var(--signal)"></span>blocked-classifier</td><td>被安全分類器拒絕，<b>不是程式碼壞了</b>。把該步驟的 agent 換 <code>model: opus</code> 重跑，或改人工處理；之後用 <code>/feat-unblock</code> 回產線。同一 feature 第二次 blocked 代表問題在上游——改 story/spec 或拆 slug。</td></tr>
         <tr><td><span class="dot" style="background:#8a6d00"></span>寫入被 hook 擋下</td><td>設計如此——當前 track 不准碰那個路徑。不要繞過；真有需要，<code>rm .claude/factory/.active</code> 解除（等於離開產線模式）。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>context 感覺臃腫／自己在重複發問</td><td>你正在階段中途——先把它做完。到下一個 <code>/feat-*</code> 步驟之間的邊界時，照 <code>.claude/factory/PHASE-BOUNDARIES.md</code> 的階梯走：continue → <code>/clear</code> → 交接 → 子代理 → <code>/compact</code> 墊底。這裡的預設是 <code>/clear</code>：磁碟上的 artifacts 會把 context 重建起來。</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>某次 session 特別慢或特別耗 token</td><td>跑 <code>/feat-retro</code>（唯讀）：找出反覆搜尋、過大的工具輸出、無效指令，並在 <code>retro-report.md</code> 提出環境改善建議。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>「jq not found」</td><td>強制機制其實沒開（fail-safe 放行）。裝好 jq 再繼續。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>quality-gate 顯示 (none configured, skipped)</td><td>manifest 裡該指令留空。專案補上 test/lint script 後回填 project.json。</td></tr>
       </table>

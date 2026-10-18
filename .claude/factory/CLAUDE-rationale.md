@@ -200,6 +200,17 @@ was dropped.
   mechanical and reviewable, and it refuses a dirty tree so the change lands as one commit.
 - `/feat-sweep` reports shallow modules only; the smells baseline stays with the
   validator, on per-feature diffs. Cadence is the human's; no step prompts for it.
+- `/feat-retro` reads session transcripts, which no feature artifact records: a file the
+  agent searched for fourteen times leaves no trace in `verification.md`, so `/feat-distill`
+  cannot see it. It is user-invoked and report-only because an agent that reflects on its
+  own runs unprompted tends to nitpick and drift; the human picks what to apply. It
+  keeps no Watchlist entries, so MEMORY.md keeps its single writer; the committed
+  report's git history is the trend. It reads the session's gate output instead of
+  re-running checks, so it stays read-only.
+- The validator's **Merge danger** section sits outside the 🔴/🟠/⚪ scale on purpose: an
+  open 🟠 sends `/feat-validate` to `/feat-fix`, fails the `/feat-ship` goal and stops
+  `/feat-distill`, while a one-way door (a migration, say) is a property of the change,
+  not a defect to fix. It is surfaced to the human instead.
 
 ## Pocock provenance
 Adapted from mattpocock/skills (MIT), verified against the repo and the author's own posts
@@ -233,3 +244,8 @@ baseline and deletion test, and the prompt-style rules.
   `/feat-epic` already splits large work into features), `pr` as a factory step (the
   upstream skill runs beside the line, see README), and the repo-wide em-dash sweep (new
   English lines follow the punctuation rule instead).
+- v1.3 `retro` and `pr` re-read (2026-10-18): `/feat-retro` takes `retro`'s environment
+  categories that the distill prevention pass does not cover (navigation, tool economy,
+  no-ops, information access) plus "a configured check that is broken or unwired";
+  the validator's Merge danger takes `pr`'s door and blast-radius call. Still not
+  adopted: `implement-spec`, and a factory-written PR body.
