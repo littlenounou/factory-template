@@ -1,6 +1,6 @@
 # Pocock v1.3 retro/pr re-read: /feat-retro and Merge danger (2026-10-18)
 
-Issue #44
+Issue #44 · PR #45
 
 A second read of upstream `retro` and `pr` (both still in `in-progress/`). The 2026-10-07
 sync took `retro`'s mechanical/judgement split into `/feat-distill`; distill reads feature
