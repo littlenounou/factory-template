@@ -157,7 +157,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
       </div>
       <div class="specbox" aria-label="規格">
         <div><span>agents</span><b>8</b></div>
-        <div><span>commands</span><b>19</b></div>
+        <div><span>commands</span><b>20</b></div>
         <div><span>hooks</span><b>3</b></div>
         <div><span>人工檢查點</span><b>2（⏸ story / spec）</b></div>
         <div><span>fix 迴圈上限</span><b>loopMaxRetries = 3</b></div>
@@ -422,7 +422,12 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
 <span class="c"># 定期：唯讀掃描淺模組（刪除測試）</span>
 <span class="y">/feat-sweep</span>                <span class="c"># 沒有 slug；feature 進行中也可執行；寫出 sweep-report.md</span>
 <span class="c"># 最多 7 個排序過的候選，每個附一行可直接貼上的 /feat-new。</span>
-<span class="c"># 它絕不改程式碼、也不建立 feature——哪個候選進產線由你決定。</span></div>
+<span class="c"># 它絕不改程式碼、也不建立 feature——哪個候選進產線由你決定。</span>
+
+<span class="c"># 覺得某次 session 特別慢時：唯讀回顧 agent 的工作環境</span>
+<span class="y">/feat-retro</span>                <span class="c"># 預設讀最近一次 session；寫出 retro-report.md</span>
+<span class="c"># 檢查路徑指引、工具用量、無效指令、資訊取得、檢查是否接上。</span>
+<span class="c"># 最多 7 項依嚴重度排序的提案，採用哪些由你決定。</span></div>
     </div>
     <div class="howcol">
       <h3>狀態對照：卡住時看這裡</h3>

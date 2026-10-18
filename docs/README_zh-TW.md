@@ -28,7 +28,7 @@
 ```
 安裝程式會把 `.claude/` 複製進 repo，並讓 hooks 具備執行權限。若 repo 已有 `CLAUDE.md`，
 它**不會**被修改——安裝程式會把 `CLAUDE.factory-snippet.md` 放在旁邊供你自行合併。若沒有
-`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、19 個 commands、
+`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、20 個 commands、
 3 個 hooks。
 
 重新執行安裝程式（升級）會更新模板的檔案，並保留 repo 自己的檔案：
@@ -75,6 +75,7 @@
 # 維護指令（產線之外——無 slug、無 state.json）
 /feat-recomment [path]  # 把舊的交錯式雙語註解轉成區塊形式
 /feat-sweep [path]      # 唯讀掃描淺模組 -> sweep-report.md
+/feat-retro [session|slug]  # 唯讀回顧 session 的工作環境 -> retro-report.md
 ```
 整體設計與每個機制背後的理由（包括模型路由、classifier 拒絕處理、記憶層、收斂迴圈），
 請見 `.claude/factory/CLAUDE-rationale.md`。
@@ -120,4 +121,5 @@ PR 內一併更新它。
 本模板刻意不自動 commit，也不自動開 PR。PR 描述可搭配
 [mattpocock/skills](https://github.com/mattpocock/skills) 的 `pr` skill（Claude Code
 plugin `mattpocock-skills`），它在產線之外運作：摘要圖示、修改前後的證據，以及合併風險判斷。
-它不屬於工廠產線，也不需要修改任何工廠設定。
+它不屬於工廠產線，也不需要修改任何工廠設定。validator 已在 `validation.md` 結尾寫出
+**Merge danger** 段落（one-way 或 two-way door、影響範圍），可直接帶進 PR 描述。

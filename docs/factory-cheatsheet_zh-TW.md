@@ -64,6 +64,7 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 ```
 /feat-recomment [path]         → 把舊的交錯式雙語註解轉成區塊形式
 /feat-sweep [path]             → 唯讀掃描淺模組 → sweep-report.md
+/feat-retro [session|slug]     → 唯讀回顧 session 的工作環境 → retro-report.md
 ```
 
 `/feat-recomment`:沒有 slug、沒有 `state.json`。先確認 git working tree 乾淨、先跑 dry run,再驅動
@@ -77,6 +78,12 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 最多 7 個排序過的候選,每個結尾附一行可直接貼上的 `/feat-new`。
 它絕不改程式碼、也不建立 feature——哪個候選要進產線由你決定。執行節奏自己定,
 例如每出貨幾個 feature 或每季一次;報告請 commit,趨勢看 git 歷史。
+
+`/feat-retro` 也是唯讀的:它讀取 session 的對話記錄(預設為此 repo 最近一次 session;也可指定
+session id 或某個 slug 的 sessions),檢視的是 agent 的工作環境而不是程式碼:反覆搜尋才找到的檔案
+(缺少路徑指引)、過大的工具輸出、每次都載入卻沒改變行為的指令、拿不到的資訊,以及有設定但壞掉
+或沒接進 CI 的 lint/test 指令。它覆寫 `retro-report.md`,最多 7 項依嚴重度排序的提案,採用哪些由你決定。
+程式碼本身的錯誤仍由 `/feat-distill` 負責。覺得某次 session 特別慢或特別耗 token 時再跑,不要定時自動跑。
 
 ## 卡住時看這裡
 

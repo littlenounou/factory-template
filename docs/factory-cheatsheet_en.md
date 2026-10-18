@@ -65,6 +65,7 @@ The line never commits or opens PRs for you — review and commit yourself at th
 ```
 /feat-recomment [path]          → migrate legacy interleaved bilingual comments to block form
 /feat-sweep [path]              → read-only sweep for shallow modules → sweep-report.md
+/feat-retro [session|slug]      → read-only retro on a session's environment → retro-report.md
 ```
 
 `/feat-recomment`: no slug, no `state.json`. Guards on a clean git tree, dry-runs first, then drives
@@ -78,6 +79,14 @@ deletion test across the repo (recently changed code first) and overwrites `swee
 with up to 7 ranked candidates, each ending in a paste-ready `/feat-new` line. It never edits
 code or creates a feature — you pick what enters the line. Run it on your own cadence, e.g.
 every few shipped features or once a quarter; commit the report so git history shows the trend.
+
+`/feat-retro` is read-only too: it reads a session's transcript (default: the most recent one
+in this repo; or a session id, or a slug's sessions) and looks at the agent's environment, not
+its code: files it searched for repeatedly (a missing navigation pointer), oversized tool
+output, always-loaded lines that changed nothing, information it could not reach, and lint/test
+commands that are configured but broken or never run in CI. It overwrites `retro-report.md` with
+up to 7 ranked proposals; you apply the ones you choose. Code mistakes stay `/feat-distill`'s job.
+Run it when a session felt slow or expensive, not on a timer.
 
 ## When you're stuck
 

@@ -1,3 +1,58 @@
+# Pocock v1.3 retro/pr re-read: /feat-retro and Merge danger (2026-10-18)
+
+Issue #44
+
+A second read of upstream `retro` and `pr` (both still in `in-progress/`). The 2026-10-07
+sync took `retro`'s mechanical/judgement split into `/feat-distill`; distill reads feature
+artifacts only, so `retro`'s environment categories, which need the session transcript,
+were still uncovered.
+
+## Decisions (grilled with the maintainer)
+- **New maintenance command `/feat-retro [session|slug]`**, shaped like `/feat-sweep`:
+  user-invoked, read-only, one overwritten `retro-report.md`, at most 7 candidates by
+  severity, each with evidence, the target file and how it loads, and the effect.
+- **Categories**: navigation, tool economy, no-ops, information access, and guardrail
+  wiring (a configured lint/test command that is broken or that no CI job or pre-commit
+  hook runs). Code mistakes are routed to `/feat-distill`, and a blank command stays
+  distill's `no guardrail` entry.
+- **Default source**: the most recent session in the repo; a session id or a slug narrows it.
+- **No Watchlist entries**: MEMORY.md keeps its single writer; the committed report's git
+  history is the trend.
+- **Reads, never re-runs**: guardrail wiring is judged from the session's
+  `quality-gate.sh` output and the CI/pre-commit config.
+- **Validator Merge danger**: door (one-way/two-way) and blast radius, from `pr`.
+- Not taken: a factory-written PR body (the upstream `pr` skill plus Merge danger is
+  enough for now) and plain-language PR/retro variants (reviewers are engineers;
+  pipeline artifacts stay English).
+
+## Changed during implementation
+The plan put a one-way door at 🟠 by default. An open 🟠 sends `/feat-validate` to
+`/feat-fix`, fails the `/feat-ship` goal and stops `/feat-distill`, so every migration
+would block a clean feature. Merge danger is therefore a section outside the 🔴/🟠/⚪
+scale, and `/feat-validate` repeats a one-way verdict to the user.
+
+## Added
+- **.claude/commands/feat-retro.md**.
+
+## Modified
+- **validator.md**: closing **Merge danger** section.
+- **feat-validate.md**: step 4 repeats a one-way door to the user.
+- **CONVENTIONS.md**: `/feat-retro` in the pipeline block's maintenance line.
+- **CLAUDE-rationale.md**: Maintenance commands entry for `/feat-retro`, the reason Merge
+  danger sits outside the scale, and a Pocock provenance line.
+- **install.sh / install.ps1**: expected commands 19 → 20.
+- **README.md / docs/README_zh-TW.md**: command count, maintenance list, Merge danger note
+  beside the `pr` pointer.
+- **factory-cheatsheet_{en,zh-TW}.md**: maintenance list and a `/feat-retro` paragraph.
+- **factory-training_{en,zh-TW}.html**: commands spec 19 → 20 and a `/feat-retro` block in
+  Maintenance. Stations, house rules and table rows unchanged.
+
+## Unchanged, checked
+`feat-distill.md`, `memory-distiller.md`, `MEMORY.md` (single writer holds), hooks,
+`feat-ship.md` (its goal counts only 🔴/🟠, which Merge danger is not), `feat-status.md`.
+
+---
+
 # Training guides published with GitHub Pages (2026-10-17)
 
 Issue #42 · PR #43
@@ -1144,3 +1199,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-08-14 | (fill in) | writing-for-agents pass: prohibitions rephrased positively, rationale/EXPLORE Mode/phase-boundary ladder disclosed to companion files, changelog moved here |
 | 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
 | 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules and `check pending`, grill round separator, commands hand off to the human |
+| 2026-10-18 | (fill in) | Pocock v1.3 retro/pr re-read: `/feat-retro` maintenance command, validator Merge danger section |
