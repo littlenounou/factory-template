@@ -43,10 +43,12 @@ scale, and `/feat-validate` repeats a one-way verdict to the user.
 - **install.sh / install.ps1**: expected commands 19 → 20.
 - **README.md / docs/README_zh-TW.md**: command count, maintenance list, Merge danger note
   beside the `pr` pointer.
-- **factory-cheatsheet_{en,zh-TW}.md**: maintenance list and a `/feat-retro` paragraph.
+- **factory-cheatsheet_{en,zh-TW}.md**: maintenance list, a `/feat-retro` paragraph, and the
+  stuck table: the validate-clean row mentions a one-way door, plus a new row pointing a
+  slow or token-heavy session to `/feat-retro`.
 - **factory-training_{en,zh-TW}.html**: commands spec 19 → 20, a `/feat-retro` block in
-  Maintenance, and the `/feat-validate` station describes Merge danger. Station count,
-  house rules and table rows unchanged.
+  Maintenance, the `/feat-validate` station describes Merge danger, and the stuck table
+  gets the same two changes as the cheatsheets. Station count and house rules unchanged.
 
 ## Unchanged, checked
 `feat-distill.md`, `memory-distiller.md`, `MEMORY.md` (single writer holds), hooks,

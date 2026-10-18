@@ -92,12 +92,13 @@ Run it when a session felt slow or expensive, not on a timer.
 
 | State | Meaning / what to do |
 |---|---|
-| validate clean | Run `/feat-docs` for user docs, close with `/feat-distill`, then review + commit yourself |
+| validate clean | Run `/feat-docs` for user docs, close with `/feat-distill`, then review + commit yourself. If Merge danger says `one-way`, give the merge a slower review |
 | `blocked` | Fix loop hit the 3-retry cap; needs a human. Flow: `/feat-distill` (findings → Watchlist) → fix manually / revise story-spec / accept risk → `/feat-unblock` (resets retries, re-enters at verify). `state.json` is changed by that command, not by hand |
 | `blocked-classifier` | Safety classifier declined — **the code is not broken**. Switch that agent to `model: opus` and re-run, or handle manually; then `/feat-unblock` to re-enter the line |
 | blocks a 2nd time | The problem is upstream — revise story/spec at the ⏸ gates or split the slug (`/feat-unblock` warns you) |
 | Write blocked by a hook | By design — don't work around it. If truly needed: `rm .claude/factory/.active` (= leaving factory mode) |
 | context feels bloated / you're repeating yourself | You're mid-phase — finish it. At the next boundary walk the ladder in `PHASE-BOUNDARIES.md`: continue → `/clear` → hand off → subagent → `/compact` last. `/clear` is the default: artifacts on disk rebuild the context |
+| a session felt slow or burned tokens | Run `/feat-retro` (read-only): it finds repeated searches, oversized tool output and no-op instructions, and proposes environment fixes in `retro-report.md` |
 | `jq not found` | Enforcement is actually OFF. Install jq, then continue |
 | `… hook error` … `failed; blocking because onFailure is "block"` | A hook could not run (script missing, `bash` not found), so the tool call was blocked on purpose rather than let through unchecked. If `protect-secrets.sh` is the missing one, Bash **and** Edit/Write are all blocked and Claude cannot repair it. Restore it yourself from a terminal at the repo root: `git checkout -- .claude/` (or re-run the installer). Never fall back to `disableAllHooks` |
 | `… hook error` `Failed with non-blocking status code` … `No such file or directory` | The hook never ran and the call went through: that protection is OFF. `settings.json` predates 2026-10-17 (cwd-relative hook paths that break after a `cd`). Copy the current `.claude/settings.json` + `.claude/hooks/`, confirm `claude --version` is 2.1.295+, restart the session |
