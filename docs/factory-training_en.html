@@ -253,7 +253,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage" data-n="08">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
-      <p>The validator reviews read-only: acceptance, security, scope, conventions. Findings are graded 🔴 Critical / 🟠 Important / ⚪ Minor, each with <code>path:line</code>. Clean → <code>.active</code> is removed; next stop is <code>/feat-docs</code> for user-facing documentation.</p>
+      <p>The validator reviews read-only: acceptance, security, scope, conventions. Findings are graded 🔴 Critical / 🟠 Important / ⚪ Minor, each with <code>path:line</code>. A closing <b>Merge danger</b> note (one-way or two-way door, blast radius) sits outside that scale: it never triggers a fix, and a one-way door is repeated to you so the merge gets a slower review. Clean → <code>.active</code> is removed; next stop is <code>/feat-docs</code> for user-facing documentation.</p>
     </div>
     <div class="stage loop" data-n="09">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">bounded loop</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>

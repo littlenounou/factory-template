@@ -44,8 +44,9 @@ scale, and `/feat-validate` repeats a one-way verdict to the user.
 - **README.md / docs/README_zh-TW.md**: command count, maintenance list, Merge danger note
   beside the `pr` pointer.
 - **factory-cheatsheet_{en,zh-TW}.md**: maintenance list and a `/feat-retro` paragraph.
-- **factory-training_{en,zh-TW}.html**: commands spec 19 → 20 and a `/feat-retro` block in
-  Maintenance. Stations, house rules and table rows unchanged.
+- **factory-training_{en,zh-TW}.html**: commands spec 19 → 20, a `/feat-retro` block in
+  Maintenance, and the `/feat-validate` station describes Merge danger. Station count,
+  house rules and table rows unchanged.
 
 ## Unchanged, checked
 `feat-distill.md`, `memory-distiller.md`, `MEMORY.md` (single writer holds), hooks,

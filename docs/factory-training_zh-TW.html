@@ -254,7 +254,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage" data-n="08">
       <div class="row"><span class="cmdname">/feat-validate</span><span class="out">→ validation.md</span></div>
-      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。乾淨 → 解除 <code>.active</code>，下一站 <code>/feat-docs</code> 產出使用者文件。</p>
+      <p>validator 唯讀審查：驗收、安全、範圍、慣例。發現分級 🔴 Critical／🟠 Important／⚪ Minor，每條附 <code>path:line</code>。結尾另有 <b>Merge danger</b> 段落（one-way 或 two-way door、影響範圍），不列入上述分級、不會觸發修正；若是 one-way door 會再提醒你，合併前請放慢審查。乾淨 → 解除 <code>.active</code>，下一站 <code>/feat-docs</code> 產出使用者文件。</p>
     </div>
     <div class="stage loop" data-n="09">
       <div class="row"><span class="cmdname">/feat-fix</span><span class="badge red">有界迴圈</span><span class="out">retries ≤ loopMaxRetries(3)</span></div>
