@@ -1,6 +1,6 @@
 # Fix: comment-migrate.py verifies before writing that no code changed (2026-10-20)
 
-Issue #50
+Issue #50 · PR #51
 
 `README.md` promised a pre-write check that `comment-migrate.py` never had, and the script
 could change code: `--` lines in a Python SQL string and `//` lines in a TS template literal
