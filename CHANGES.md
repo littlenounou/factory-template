@@ -1,6 +1,6 @@
 # Fix: /feat-recomment splits a mixed-language line onto its own line (2026-10-20)
 
-PR #48
+Issue #49 · PR #48
 
 A comment line holding both languages (a Chinese sentence followed by the start of the next
 English sentence) was refused by `comment-migrate.py` and left for a hand fix. With no rule
