@@ -161,6 +161,7 @@ class Finding:
     kind: str          # 'migrated' | 'reordered' | 'review'
     reason: str = ""
     sample: list[str] = field(default_factory=list)
+    whole_file: bool = False   # the whole file was left unwritten (verification, line endings)
 
 
 @dataclass
@@ -170,6 +171,8 @@ class Stats:
     migrated: int = 0
     reordered: int = 0
     review: int = 0
+    files_skipped: int = 0     # would have changed, but failed verification
+    layer1_only: list[str] = field(default_factory=list)  # changed, no parser check for the language
 
 
 # ---------------------------------------------------------------------------
@@ -300,7 +303,7 @@ def reject(findings: list[Finding], first: int, path: str, reason: str) -> None:
     line = findings[first].line if len(findings) > first else 1
     sample = [s for f in findings[first:] for s in f.sample][:20]
     del findings[first:]
-    findings.append(Finding(path, line, "review", reason, sample))
+    findings.append(Finding(path, line, "review", reason, sample, whole_file=True))
 
 
 def _split_prefix(line: str, token: str) -> tuple[str, str]:
@@ -364,6 +367,306 @@ def verify_lines(old: list[str], new: list[str], regions: list[Region]) -> str |
             if ln.rstrip() != r.separator.rstrip():
                 return f"an unexpected comment line appeared: {ln.strip()[:60]!r}"
     return None
+
+# ---------------------------------------------------------------------------
+# Verification, layer 2: the language's own view of the file. Comments may move;
+# code and string literals (except Python docstrings) must not change. This also
+# catches text the scanner mistook for comments, such as `--` lines in a SQL
+# string or `//` lines in a template literal.
+# ---------------------------------------------------------------------------
+class LexError(Exception):
+    pass
+
+
+def _python_tokens(text: str) -> list[tuple]:
+    import ast
+    import io
+    import tokenize
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError as exc:
+        raise LexError(f"Python does not parse: {exc.msg} (line {exc.lineno})") from None
+    src_lines = text.split("\n")
+    docstrings: set[tuple[int, int]] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) \
+                and node.body and isinstance(node.body[0], ast.Expr) \
+                and isinstance(node.body[0].value, ast.Constant) \
+                and isinstance(node.body[0].value.value, str):
+            value = node.body[0].value
+            # col_offset counts UTF-8 bytes; tokenize counts characters.
+            line = src_lines[value.lineno - 1].encode("utf-8")
+            docstrings.add((value.lineno, len(line[: value.col_offset].decode("utf-8"))))
+    skip = {tokenize.COMMENT, tokenize.NL, tokenize.ENCODING}
+    tokens: list[tuple] = []
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(text).readline):
+            if tok.type in skip:
+                continue
+            if tok.type == tokenize.STRING and tok.start in docstrings:
+                tokens.append(("docstring",))
+            else:
+                tokens.append((tokenize.tok_name[tok.type], tok.string))
+    except (tokenize.TokenError, SyntaxError) as exc:
+        raise LexError(f"Python does not tokenize: {exc}") from None
+    return tokens
+
+
+_CS_STRING = re.compile(r'(\$*)(@?)(\$*)("{3,}|")')
+_JS_REGEX_KEYWORDS = {
+    "return", "typeof", "instanceof", "in", "of", "new", "delete", "void", "throw",
+    "case", "do", "else", "yield", "await",
+}
+
+
+class _CLikeLexer:
+    """
+    Splits C#, Java and JS/TS source into code and literals, dropping comments.
+    Not a parser: it only needs to know where comments, strings, template
+    literals and regex literals start and end. Anything it cannot follow to the
+    end raises LexError, and the file goes to human review.
+    """
+
+    def __init__(self, text: str, lang: str) -> None:
+        self.t = text
+        self.n = len(text)
+        self.lang = lang
+        self.tokens: list[str] = []
+
+    def run(self) -> list[str]:
+        self.code(0, 0)
+        return self.tokens
+
+    def code(self, i: int, hole_braces: int) -> int:
+        """Top level when hole_braces == 0; else an interpolation hole closed by that many '}'."""
+        t, n = self.t, self.n
+        top = hole_braces == 0
+        buf: list[str] = []
+        depth = 0
+        after_literal = False
+
+        def flush() -> None:
+            text = " ".join("".join(buf).split())
+            if top and text:
+                self.tokens.append("code: " + text)
+            buf.clear()
+
+        while i < n:
+            if t.startswith("//", i):
+                j = t.find("\n", i)
+                i = n if j < 0 else j
+                buf.append(" ")
+                continue
+            if t.startswith("/*", i):
+                j = t.find("*/", i + 2)
+                if j < 0:
+                    raise LexError("unterminated /* comment")
+                i = j + 2
+                buf.append(" ")
+                continue
+            end = self.literal(i)
+            if end is None and t[i] == "/" and self.lang == "js" and self.regex_allowed(buf, after_literal):
+                end = self.regex(i)
+            if end is not None:
+                flush()
+                if top:
+                    self.tokens.append("literal: " + t[i:end])
+                after_literal = True
+                i = end
+                continue
+            c = t[i]
+            if not top:
+                if c == "{":
+                    depth += 1
+                elif c == "}":
+                    if depth == 0:
+                        if not t.startswith("}" * hole_braces, i):
+                            raise LexError("unbalanced braces in an interpolation hole")
+                        return i + hole_braces
+                    depth -= 1
+            buf.append(c)
+            if not c.isspace():
+                after_literal = False
+            i += 1
+        if not top:
+            raise LexError("unterminated interpolation hole")
+        flush()
+        return n
+
+    def regex_allowed(self, buf: list[str], after_literal: bool) -> bool:
+        before = "".join(buf).rstrip()
+        if not before:
+            return not after_literal
+        last = before[-1]
+        if last.isalnum() or last in "_$":
+            word = re.search(r"[\w$]+$", before)
+            return word is not None and word.group() in _JS_REGEX_KEYWORDS
+        if last in ")]":
+            return False
+        if last == "!" and len(before) > 1 and (before[-2].isalnum() or before[-2] in "_$)]"):
+            return False  # TS non-null `x! / y`
+        if last == "}":
+            raise LexError("a '/' after '}' could be a regex or a division")
+        return True
+
+    def literal(self, i: int) -> int | None:
+        t, c = self.t, self.t[i]
+        if self.lang == "cs":
+            if c in '$@"':
+                m = _CS_STRING.match(t, i)
+                if m is None:
+                    return None
+                dollars = len(m.group(1)) + len(m.group(3))
+                quotes = m.group(4)
+                if m.group(2):
+                    # Verbatim opens with ONE quote; `@"""a"` starts with an escaped quote.
+                    return self.cs_verbatim(m.start(4) + 1, dollars > 0)
+                if len(quotes) >= 3:
+                    return self.cs_raw(m.end(), len(quotes), dollars)
+                return self.quoted(m.end(), '"', dollars > 0)
+            if c == "'":
+                return self.quoted(i + 1, "'", False)
+            return None
+        if self.lang == "java":
+            if t.startswith('"""', i):
+                return self.text_block(i + 3)
+            if c in "\"'":
+                return self.quoted(i + 1, c, False)
+            return None
+        if c in "\"'":
+            return self.quoted(i + 1, c, False)
+        if c == "`":
+            return self.template(i + 1)
+        return None
+
+    def quoted(self, j: int, quote: str, holes: bool) -> int:
+        t, n = self.t, self.n
+        while j < n:
+            ch = t[j]
+            if ch == "\\":
+                j += 2
+            elif ch == quote:
+                return j + 1
+            elif ch == "\n":
+                break
+            elif holes and t.startswith("{{", j) or holes and t.startswith("}}", j):
+                j += 2
+            elif holes and ch == "{":
+                j = self.code(j + 1, 1)
+            else:
+                j += 1
+        raise LexError("unterminated string literal")
+
+    def cs_verbatim(self, j: int, holes: bool) -> int:
+        t, n = self.t, self.n
+        while j < n:
+            if t.startswith('""', j):
+                j += 2
+            elif t[j] == '"':
+                return j + 1
+            elif holes and (t.startswith("{{", j) or t.startswith("}}", j)):
+                j += 2
+            elif holes and t[j] == "{":
+                j = self.code(j + 1, 1)
+            else:
+                j += 1
+        raise LexError("unterminated verbatim string")
+
+    def cs_raw(self, j: int, quotes: int, dollars: int) -> int:
+        t, n = self.t, self.n
+        close = '"' * quotes
+        while j < n:
+            if t.startswith(close, j):
+                return j + quotes
+            if dollars and t[j] == "{":
+                k = 0
+                while j + k < n and t[j + k] == "{":
+                    k += 1
+                j += k
+                if k >= dollars:
+                    j = self.code(j, dollars)
+                continue
+            j += 1
+        raise LexError("unterminated raw string literal")
+
+    def text_block(self, j: int) -> int:
+        t, n = self.t, self.n
+        while j < n:
+            if t[j] == "\\":
+                j += 2
+            elif t.startswith('"""', j):
+                return j + 3
+            else:
+                j += 1
+        raise LexError("unterminated text block")
+
+    def template(self, j: int) -> int:
+        t, n = self.t, self.n
+        while j < n:
+            if t[j] == "\\":
+                j += 2
+            elif t[j] == "`":
+                return j + 1
+            elif t.startswith("${", j):
+                j = self.code(j + 2, 1)
+            else:
+                j += 1
+        raise LexError("unterminated template literal")
+
+    def regex(self, i: int) -> int:
+        t, n = self.t, self.n
+        j = i + 1
+        in_class = False
+        while j < n:
+            ch = t[j]
+            if ch == "\\":
+                j += 2
+                continue
+            if ch == "\n":
+                break
+            if ch == "[":
+                in_class = True
+            elif ch == "]":
+                in_class = False
+            elif ch == "/" and not in_class:
+                j += 1
+                while j < n and (t[j].isalnum() or t[j] in "_$"):
+                    j += 1
+                return j
+            j += 1
+        raise LexError("unterminated regex literal")
+
+
+# JSX/TSX are left out: JSX text and closing tags (`</div>`, `Don't`) are not
+# lexable without a JSX-aware lexer, so they get layer 1 only.
+LEXER_LANG = {".cs": "cs", ".java": "java", ".js": "js", ".mjs": "js", ".cjs": "js", ".ts": "js"}
+
+
+def verify_syntax(suffix: str, old: str, new: str) -> tuple[bool, str | None]:
+    """(parser_checked, problem). parser_checked is False for layer-1-only languages."""
+    if suffix == ".py":
+        tokenize_file = _python_tokens
+    elif suffix in LEXER_LANG:
+        def tokenize_file(text: str) -> list:
+            return _CLikeLexer(text, LEXER_LANG[suffix]).run()
+    else:
+        return False, None
+    try:
+        before = tokenize_file(old)
+    except LexError as exc:
+        return True, f"the original file: {exc}"
+    try:
+        after = tokenize_file(new)
+    except LexError as exc:
+        return True, f"the rewritten file: {exc}"
+    if before == after:
+        return True, None
+    for a, b in zip(before, after):
+        if a != b:
+            shown = a if isinstance(a, str) else " ".join(map(str, a))
+            return True, f"code or a string literal changed near {shown[:60]!r}"
+    return True, "the number of code tokens changed"
 
 
 DOCSTRING_OPEN = re.compile(r'^(\s*)(?:[rRbBuUfF]{0,2})("""|\'\'\')\s*$')
@@ -486,7 +789,11 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
         reject(findings, first_finding, str(path), f"verification failed (lines): {problem}")
         return None
     new_text = eol.join(out) + (eol if trailing else "")
-    return new_text, True
+    checked, problem = verify_syntax(path.suffix, text, new_text)
+    if problem is not None:
+        reject(findings, first_finding, str(path), f"verification failed (parser): {problem}")
+        return None
+    return new_text, checked
 
 
 # ---------------------------------------------------------------------------
@@ -574,7 +881,12 @@ def write_report(path: Path, stats: Stats, findings: list[Finding], applied: boo
     L.append(f"| Blocks regrouped (interleaved → block) | {stats.migrated} |")
     L.append(f"| Pairs reordered (Chinese was first) | {stats.reordered} |")
     L.append(f"| Blocks needing human review | {stats.review} |")
+    L.append(f"| Files left unwritten (failed verification) | {stats.files_skipped} |")
+    L.append(f"| Changed files verified by line check only | {len(stats.layer1_only)} |")
     L.append("")
+    L += ["Every changed file passed the line check (only comment lines moved). Python, C#,",
+          "Java, JS and TS files also passed a parser check (code and string literals",
+          "unchanged); files in other languages, JSX and TSX had the line check only.", ""]
 
     changed = [f for f in findings if f.kind in ("migrated", "reordered")]
     if changed:
@@ -585,6 +897,13 @@ def write_report(path: Path, stats: Stats, findings: list[Finding], applied: boo
         for fp, items in sorted(by_file.items()):
             locs = ", ".join(f"L{i.line}" for i in items)
             L.append(f"- `{fp}` — {len(items)} block(s): {locs}")
+        L.append("")
+
+    if stats.layer1_only:
+        L += ["## Verified by line check only", "",
+              "No parser check exists for these languages. Review their diff with care:",
+              "a comment-like line inside a string or heredoc would not be caught.", ""]
+        L += [f"- `{fp}`" for fp in stats.layer1_only]
         L.append("")
 
     review = [f for f in findings if f.kind == "review"]
@@ -654,9 +973,12 @@ def main() -> int:
         stats.migrated += sum(1 for f in new_findings if f.kind == "migrated")
         stats.reordered += sum(1 for f in new_findings if f.kind == "reordered")
         stats.review += sum(1 for f in new_findings if f.kind == "review")
+        stats.files_skipped += sum(1 for f in new_findings if f.whole_file)
         if result is not None:
             stats.files_changed += 1
-            new_text, _ = result
+            new_text, parser_checked = result
+            if not parser_checked:
+                stats.layer1_only.append(str(p))
             if args.apply:
                 # Bytes, not text mode: text mode on Windows turns every "\n" into
                 # "\r\n", so CRLF files would gain "\r\r\n" and LF files become CRLF.
@@ -669,7 +991,11 @@ def main() -> int:
     print(f"Scanned {stats.files_scanned} file(s).")
     print(f"{verb} {stats.files_changed} file(s): "
           f"{stats.migrated} block(s) regrouped, {stats.reordered} pair(s) reordered.")
-    print(f"{stats.review} block(s) need human review.")
+    print(f"{stats.review} block(s) need human review"
+          f" ({stats.files_skipped} whole file(s) left unwritten after failed verification).")
+    if stats.layer1_only:
+        print(f"{len(stats.layer1_only)} changed file(s) verified by line check only (no parser"
+              " for the language); see the report.")
     print(f"Report: {report}")
     if not args.apply and stats.files_changed:
         print("Dry run — nothing was written. Re-run with --apply to commit the change.")
