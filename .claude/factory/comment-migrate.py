@@ -565,7 +565,9 @@ def main() -> int:
             stats.files_changed += 1
             new_text, _ = result
             if args.apply:
-                p.write_text(new_text, encoding="utf-8")
+                # Bytes, not text mode: text mode on Windows turns every "\n" into
+                # "\r\n", so CRLF files would gain "\r\r\n" and LF files become CRLF.
+                p.write_bytes(new_text.encode("utf-8"))
 
     report.parent.mkdir(parents=True, exist_ok=True)
     write_report(report, stats, findings, args.apply)
