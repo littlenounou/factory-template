@@ -109,6 +109,48 @@ def looks_like_code(text: str) -> bool:
     return bool(CODE_RE.search(text.strip()))
 
 
+def is_mixed(text: str) -> bool:
+    """One line holding substantial English AND Chinese (a short identifier does not count)."""
+    return bool(CJK_RE.search(text)) and len(LATIN_RE.findall(text)) > 25
+
+
+# A Chinese sentence ending in full-width punctuation, then an English-only tail.
+ZH_THEN_EN_RE = re.compile(r"^(.*[。！？；])\s*([`A-Za-z][^㐀-鿿豈-﫿]*)$")
+# An English-only head ending a sentence, then a tail that opens with Chinese
+# (directly, or after one `identifier`).
+EN_THEN_ZH_RE = re.compile(
+    r"^([^㐀-鿿豈-﫿]*[.!?:;])\s+((?:`[^`]+`\s*)?[㐀-鿿豈-﫿].*)$"
+)
+
+
+def split_mixed(line: str, content: str) -> list[tuple[str, str]] | None:
+    """
+    Split one mixed-language comment line at its single sentence boundary into two
+    lines that share the original prefix (indent, comment token, leading space).
+    The tail starts its OWN new line: it is never joined onto a neighbouring line,
+    and no other line is re-wrapped. Text is kept word for word; only a line break
+    is inserted. Returns [(line, content), (line, content)] or None if the boundary
+    is not unambiguous (the caller then sends the block to human review).
+    """
+    body = line.rstrip()
+    core = content.rstrip()
+    if not body.endswith(core):
+        return None
+    prefix = body[: len(body) - len(core)]
+    lead = core[: len(core) - len(core.lstrip())]
+    text = core.lstrip()
+    m = ZH_THEN_EN_RE.match(text) or EN_THEN_ZH_RE.match(text)
+    if not m:
+        return None
+    head, tail = m.group(1).rstrip(), m.group(2).strip()
+    parts = [lead + head, lead + tail]
+    if {classify(parts[0]), classify(parts[1])} != {"zh", "en"}:
+        return None
+    if any(is_mixed(p) for p in parts):
+        return None
+    return [(prefix + p, p) for p in parts]
+
+
 # ---------------------------------------------------------------------------
 # Findings
 # ---------------------------------------------------------------------------
@@ -141,6 +183,16 @@ def regroup(lines: list[str], contents: list[str]) -> tuple[list[str] | None, st
     Returns (new_lines_or_None, kind, reason).
     kind is 'migrated' | 'reordered' | 'review' | 'clean'.
     """
+    # A mixed line that splits cleanly at one sentence boundary becomes two lines first;
+    # one that does not is left as-is and trips the mixed-line review below.
+    expanded: list[tuple[str, str]] = []
+    for ln, c in zip(lines, contents):
+        halves = split_mixed(ln, c) if is_mixed(c) else None
+        expanded.extend(halves or [(ln, c)])
+    was_split = len(expanded) != len(lines)
+    lines = [ln for ln, _ in expanded]
+    contents = [c for _, c in expanded]
+
     kinds = [classify(c) for c in contents]
     if "zh" not in kinds or "en" not in kinds:
         return None, "clean", ""
@@ -150,17 +202,18 @@ def regroup(lines: list[str], contents: list[str]) -> tuple[list[str] | None, st
     if switches < 1:
         return None, "clean", ""
 
-    # A two-line EN→ZH pair is already the compliant degenerate case.
+    # A two-line EN→ZH pair is already the compliant degenerate case
+    # (once split, it still needs writing back as two lines).
     if switches == 1 and kinds[0] == "en":
-        return None, "clean", ""
+        return (lines, "migrated", "") if was_split else (None, "clean", "")
 
     if any(looks_like_code(c) for c in contents):
         return None, "review", "contains commented-out code — reordering could break it"
 
-    # Mixed-language lines (one line holding both languages) mean the split point
-    # is ambiguous; a human should look.
+    # A mixed line still here had no single clean sentence boundary, so the split
+    # point is ambiguous; a human should look.
     for c in contents:
-        if CJK_RE.search(c) and len(LATIN_RE.findall(c)) > 25:
+        if is_mixed(c):
             return None, "review", "a line mixes substantial English and Chinese"
 
     en = [ln for ln, k in zip(lines, kinds) if k == "en"]
@@ -197,8 +250,9 @@ def process_run(
         contents = [p[2] for p in para]
         new, kind, reason = regroup(lines, contents)
         if kind == "review":
+            # The whole paragraph (capped), so the human sees both languages.
             findings.append(Finding(path, para[0][0], "review", reason,
-                                    lines[:6]))
+                                    lines[:20]))
             out.extend(lines)
         elif new is not None:
             findings.append(Finding(path, para[0][0], kind))
