@@ -299,9 +299,16 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
     if not CJK_RE.search(text):
         return None  # nothing bilingual here
 
+    # Split on the file's own line ending only. str.splitlines() would also split on
+    # U+2028, \f and other characters that can sit inside a string literal, and
+    # writing those lines back would break the code line in two.
     eol = "\r\n" if "\r\n" in text else "\n"
-    trailing = text.endswith(("\n", "\r"))
-    lines = text.splitlines()
+    leftover = text.replace("\r\n", "")
+    mixed_eol = "\r" in leftover or (eol == "\r\n" and "\n" in leftover)
+    trailing = text.endswith(eol)
+    body = text[: -len(eol)] if trailing else text
+    lines = body.split(eol) if body else []
+    first_finding = len(findings)
 
     out: list[str] = []
     changed = False
@@ -376,6 +383,14 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
         i += 1
 
     if not changed:
+        return None
+    if mixed_eol:
+        # One line ending cannot be chosen for the rewritten lines without changing
+        # some line's ending, so the file is left for a human.
+        first_line = findings[first_finding].line
+        del findings[first_finding:]
+        findings.append(Finding(str(path), first_line, "review",
+                                "mixed line endings — rewriting would change some of them"))
         return None
     new_text = eol.join(out) + (eol if trailing else "")
     return new_text, True
