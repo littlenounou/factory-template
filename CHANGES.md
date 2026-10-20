@@ -1,3 +1,24 @@
+# Fix: /feat-recomment splits a mixed-language line onto its own line (2026-10-20)
+
+Issue #49 · PR #48
+
+A comment line holding both languages (a Chinese sentence followed by the start of the next
+English sentence) was refused by `comment-migrate.py` and left for a hand fix. With no rule
+for splitting a line, the hand fix glued the English tail onto the end of the previous
+English line and re-wrapped the lines after it.
+
+## Modified
+- **comment-migrate.py**: a mixed line with ONE clean sentence boundary (full-width
+  `。！？；` then English, or `. ! ? : ;` then Chinese) is split into two lines that share
+  the original prefix; the tail starts its own line, nothing is re-wrapped, text is kept
+  word for word. Lines without such a boundary still go to human review, and the review
+  sample now shows the whole paragraph (up to 20 lines, was 6) so both languages are visible.
+- **feat-recomment.md** (step 4): the same rule for hand fixes: split at the language
+  boundary, the moved part starts its own new line, never join or re-wrap.
+- **README.md / docs/README_zh-TW.md**: describe the line split.
+
+---
+
 # Decision recorded: no parallel builds for /feat-epic features (2026-10-18)
 
 Issue #46 · PR #47

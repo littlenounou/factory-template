@@ -115,7 +115,8 @@ changing one; edit it in the same PR when you do.
 
 Code written before the block rule can be migrated in place with
 `/feat-recomment [path]`, which drives `.claude/factory/comment-migrate.py` — a deterministic
-script that only REORDERS existing comment lines (it never translates or rewords) and leaves
+script that only REORDERS existing comment lines, splitting a line that holds both languages
+at its sentence boundary into two (it never translates or rewords), and leaves
 anything ambiguous for a human, listed in `comment-migration-report.md`. It never changes code:
 before writing a file it verifies that only comment / docstring line order changed. Dry-run by default;
 `--check` exits non-zero when interleaved comments remain, for use as a CI guard.

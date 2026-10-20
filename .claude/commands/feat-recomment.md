@@ -30,6 +30,10 @@ script does the reordering; your hands touch only the leftovers it refuses.
    - Keep commented-out code as its own separate comment block, adjacent to nothing else.
    - Move lines only: every comment keeps its text word for word (hard guardrail). A
      comment that is wrong or missing its translation goes in your report.
+   - A line holding both languages is the one exception: split it at the language
+     boundary into separate lines, each with the line's own prefix (indent, comment
+     token, leading space). The moved part starts its OWN new line. Never join it onto
+     the end of a neighbouring line, and never re-wrap the lines around it.
    If a block is genuinely ambiguous, leave it and list it for the human.
 
 5. Tell the user to review and commit this as a standalone comment-style commit, and that
