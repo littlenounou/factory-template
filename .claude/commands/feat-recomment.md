@@ -16,8 +16,9 @@ script does the reordering; your hands touch only the leftovers it refuses.
 
 2. DRY RUN — `python3 .claude/factory/comment-migrate.py $1`
    Report to the user: files scanned, files that would change, blocks regrouped, pairs
-   reordered (Chinese was first), and blocks needing human review. Then STOP and ask for
-   approval.
+   reordered (Chinese was first), blocks needing human review, files left unwritten after
+   failed verification, and changed files verified by line check only (named in the
+   report; their diff needs a closer look). Then STOP and ask for approval.
 
 3. APPLY (after approval) — `python3 .claude/factory/comment-migrate.py $1 --apply`
    Then show `git diff --stat`. Spot-check 2-3 of the changed blocks by reading them and
@@ -34,6 +35,10 @@ script does the reordering; your hands touch only the leftovers it refuses.
      boundary into separate lines, each with the line's own prefix (indent, comment
      token, leading space). The moved part starts its OWN new line. Never join it onto
      the end of a neighbouring line, and never re-wrap the lines around it.
+   - A whole file marked "verification failed" was not written: the script's rewrite
+     would have changed code or a string literal (usually a comment-like line inside a
+     string, heredoc or template literal). Fix only its real comments by hand, and
+     leave the lines inside the string exactly as they are.
    If a block is genuinely ambiguous, leave it and list it for the human.
 
 5. Tell the user to review and commit this as a standalone comment-style commit, and that

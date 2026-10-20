@@ -109,8 +109,10 @@ PR 內一併更新它。
 在區塊規則之前寫下的程式碼，可用 `/feat-recomment [path]` 就地遷移，該命令驅動
 `.claude/factory/comment-migrate.py` —— 一支確定性腳本，只**重新排序**既有的註解行，
 並把同時含兩種語言的單行在句子邊界拆成兩行（絕不翻譯或改寫），任何有疑義的部分都留給人處理，並列在
-`comment-migration-report.md` 內。它不會更動程式碼：寫入檔案前會先驗證，
-只有註解／docstring 行的順序改變。預設為 dry-run；`--check` 在仍有交錯註解時以非零狀態
+`comment-migration-report.md` 內。它不會更動程式碼：寫入檔案前，先檢查只有註解行移動
+（所有語言）；Python、C#、Java、JavaScript 與 TypeScript 再檢查程式碼與字串常值都沒有改變
+（Python docstring 除外）。任一項檢查失敗的檔案不會寫入，而是列在報告中交給人處理；
+其他語言、JSX 與 TSX 只做第一項檢查，並會列出，提醒仔細檢視其 diff。預設為 dry-run；`--check` 在仍有交錯註解時以非零狀態
 結束，可作為 CI 守門。
 
 `/feat-docs`（**doc-writer** agent）會用 **Mermaid** 圖表產出上述面向使用者的文件

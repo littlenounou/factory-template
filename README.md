@@ -118,7 +118,11 @@ Code written before the block rule can be migrated in place with
 script that only REORDERS existing comment lines, splitting a line that holds both languages
 at its sentence boundary into two (it never translates or rewords), and leaves
 anything ambiguous for a human, listed in `comment-migration-report.md`. It never changes code:
-before writing a file it verifies that only comment / docstring line order changed. Dry-run by default;
+before writing a file it checks that only comment lines moved (every language), then, for
+Python, C#, Java, JavaScript and TypeScript, that code and string literals are unchanged
+(Python docstrings excepted). A file that fails either check is not written and goes to the
+report for a human; files in other languages, JSX and TSX get the first check only and are
+listed so their diff gets a closer look. Dry-run by default;
 `--check` exits non-zero when interleaved comments remain, for use as a CI guard.
 
 `/feat-docs` (the **doc-writer** agent) produces those user-facing docs with **Mermaid** diagrams
