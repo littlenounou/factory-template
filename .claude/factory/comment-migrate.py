@@ -282,6 +282,90 @@ def token_of(stripped: str, style: str) -> str | None:
     return None
 
 
+# ---------------------------------------------------------------------------
+# Verification, layer 1: nothing outside the comment regions changed, and inside
+# them only whole lines moved (plus separators and mixed-line splits).
+# ---------------------------------------------------------------------------
+@dataclass
+class Region:
+    old_start: int   # [old_start, old_end) in the original lines
+    old_end: int
+    new_start: int   # [new_start, new_end) in the rewritten lines
+    new_end: int
+    separator: str   # the separator line this region may gain
+
+
+def reject(findings: list[Finding], first: int, path: str, reason: str) -> None:
+    """Replace a file's change findings with one review finding: the file is not written."""
+    line = findings[first].line if len(findings) > first else 1
+    sample = [s for f in findings[first:] for s in f.sample][:20]
+    del findings[first:]
+    findings.append(Finding(path, line, "review", reason, sample))
+
+
+def _split_prefix(line: str, token: str) -> tuple[str, str]:
+    """(prefix, text): the indent, comment token and spaces, then the stripped text."""
+    body = line.rstrip()
+    rest = body.lstrip()
+    if token and rest.startswith(token):
+        rest = rest[len(token):]
+    text = rest.strip()
+    return body[: len(body) - len(text)] if text else body, text
+
+
+def verify_lines(old: list[str], new: list[str], regions: list[Region]) -> str | None:
+    """Return None when the rewrite only moved comment lines, else what went wrong."""
+    old_code: list[str] = []
+    new_code: list[str] = []
+    o = n = 0
+    for r in regions:
+        old_code += old[o:r.old_start]
+        new_code += new[n:r.new_start]
+        o, n = r.old_end, r.new_end
+    old_code += old[o:]
+    new_code += new[n:]
+    if old_code != new_code:
+        for a, b in zip(old_code, new_code):
+            if a != b:
+                return f"a code line changed: {a.strip()[:60]!r}"
+        return "the number of code lines changed"
+
+    for r in regions:
+        token = r.separator.strip()
+        before = old[r.old_start:r.old_end]
+        after = new[r.new_start:r.new_end]
+        prefixes = {_split_prefix(ln, token)[0] for ln in before}
+        left_old = list(before)
+        left_new: list[str] = []
+        for ln in after:
+            if ln in left_old:
+                left_old.remove(ln)
+            else:
+                left_new.append(ln)
+        # Whatever was not moved as-is must be a mixed line split into two pieces.
+        for ln in left_old:
+            want = "".join(_split_prefix(ln, token)[1].split())
+            pair: tuple[int, int] | None = None
+            for ia, a in enumerate(left_new):
+                for ib, b in enumerate(left_new):
+                    if ia == ib:
+                        continue
+                    (pa, ta), (pb, tb) = _split_prefix(a, token), _split_prefix(b, token)
+                    if "".join((ta + tb).split()) == want and pa in prefixes and pb in prefixes:
+                        pair = (ia, ib)
+                        break
+                if pair:
+                    break
+            if pair is None:
+                return f"a comment line was lost or altered: {ln.strip()[:60]!r}"
+            for idx in sorted(pair, reverse=True):
+                del left_new[idx]
+        for ln in left_new:
+            if ln.rstrip() != r.separator.rstrip():
+                return f"an unexpected comment line appeared: {ln.strip()[:60]!r}"
+    return None
+
+
 DOCSTRING_OPEN = re.compile(r'^(\s*)(?:[rRbBuUfF]{0,2})("""|\'\'\')\s*$')
 
 
@@ -311,6 +395,7 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
     first_finding = len(findings)
 
     out: list[str] = []
+    regions: list[Region] = []
     changed = False
     i = 0
     n = len(lines)
@@ -331,8 +416,10 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
                 if j < n:  # found the closer
                     body = [(k + 1, lines[k], lines[k]) for k in range(i + 1, j)]
                     out.append(line)
+                    mark = len(out)
                     if process_run(out, body, "", str(path), findings):
                         changed = True
+                    regions.append(Region(i + 1, j, mark, len(out), ""))
                     out.append(lines[j])
                     i = j + 1
                     continue
@@ -354,8 +441,10 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
                 if ok and body:
                     star_indent = lines[i + 1][: len(lines[i + 1]) - len(lines[i + 1].lstrip())]
                     out.append(lines[i])
+                    mark = len(out)
                     if process_run(out, body, star_indent + "*", str(path), findings):
                         changed = True
+                    regions.append(Region(i + 1, j, mark, len(out), star_indent + "*"))
                     out.append(lines[j])
                     i = j + 1
                     continue
@@ -374,8 +463,10 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
                     break
                 run.append((j + 1, lines[j], s[len(t):]))
                 j += 1
+            mark = len(out)
             if process_run(out, run, indent + tok, str(path), findings):
                 changed = True
+            regions.append(Region(i, j, mark, len(out), indent + tok))
             i = j
             continue
 
@@ -387,10 +478,12 @@ def scan_file(path: Path, style: str, findings: list[Finding]) -> tuple[str, boo
     if mixed_eol:
         # One line ending cannot be chosen for the rewritten lines without changing
         # some line's ending, so the file is left for a human.
-        first_line = findings[first_finding].line
-        del findings[first_finding:]
-        findings.append(Finding(str(path), first_line, "review",
-                                "mixed line endings — rewriting would change some of them"))
+        reject(findings, first_finding, str(path),
+               "mixed line endings — rewriting would change some of them")
+        return None
+    problem = verify_lines(lines, out, regions)
+    if problem is not None:
+        reject(findings, first_finding, str(path), f"verification failed (lines): {problem}")
         return None
     new_text = eol.join(out) + (eol if trailing else "")
     return new_text, True
