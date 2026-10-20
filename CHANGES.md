@@ -1,3 +1,42 @@
+# Fix: comment-migrate.py verifies before writing that no code changed (2026-10-20)
+
+Issue #50
+
+`README.md` promised a pre-write check that `comment-migrate.py` never had, and the script
+could change code: `--` lines in a Python SQL string and `//` lines in a TS template literal
+were reordered as comments, U+2028 inside a string split a code line in two, and on Windows
+text-mode writes turned CRLF into `\r\r\n`.
+
+## Decisions (grilled with the maintainer)
+- **Two verification layers, run in dry run and `--apply` alike** so dry-run counts are what
+  apply writes. Layer 1 (every language): with comment regions taken out, every other line
+  is byte-identical; inside them lines only move, gain a separator, or are split (#48).
+  Layer 2: comments may move, code and string literals may not (Python docstrings excepted).
+- **Layer 2 languages**: Python via `tokenize` + `ast`; C#, Java, JS and TS via one built-in
+  lexer, no external tools (Roslyn and JavaParser would need SDKs and downloads). It follows
+  C# verbatim/interpolated/raw strings, Java text blocks, template literals with nested
+  `${}` and regex literals; anything it cannot follow to the end fails verification.
+- **Other languages** are written on layer 1 alone and listed in the report. JSX and TSX are
+  in this group: their text and closing tags are not lexable without a JSX-aware lexer.
+- **A failed file is not written**; it goes to "Needs human review" with the reason, the
+  rest of the run continues, and `--check` exits non-zero.
+- **The scanner was not made smarter**: strings it mistakes for comments are caught by
+  layer 2 instead.
+- A file with mixed line endings goes to review instead of being rewritten.
+- Regression tests were written, run and deleted (not committed); the PR lists the cases.
+
+## Modified
+- **comment-migrate.py**: lines split on the file's own line ending (not `splitlines()`),
+  files written as bytes, both verification layers, two new report metrics and a
+  "Verified by line check only" section.
+- **feat-recomment.md**: step 2 reports unwritten and line-check-only files; step 4 covers
+  a file that failed verification.
+- **README.md / docs/README_zh-TW.md**: describe the two checks.
+
+Out of scope, next issue: a single `中文。English… 又是中文` line is not detected by `--check`.
+
+---
+
 # Fix: /feat-recomment splits a mixed-language line onto its own line (2026-10-20)
 
 Issue #49 · PR #48
