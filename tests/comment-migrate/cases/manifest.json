@@ -1,0 +1,104 @@
+{
+  "01_docstring_closer_then_code.py": {
+    "why": "A1: a lone docstring closer opened a fake docstring that swallowed code; the # pair moved past the asserts",
+    "check": 0,
+    "review": 0
+  },
+  "02_docstring_zh_continuation.py": {
+    "why": "A3: Chinese continuation lines with only identifiers and full-width punctuation were classified as English",
+    "check": 0,
+    "review": 0
+  },
+  "03_comment_zh_continuation.py": {
+    "why": "A3: same, inside a # comment block",
+    "check": 0,
+    "review": 0
+  },
+  "04_comment_then_code.py": {
+    "why": "A5: the comment block ran on into real code and was flagged as commented-out code",
+    "check": 0,
+    "review": 0
+  },
+  "05_zh_with_identifier.py": {
+    "why": "A6: a Chinese sentence with an identifier is not a mixed-language line",
+    "check": 0,
+    "review": 0
+  },
+  "06_no_separator.py": {
+    "why": "B10: multi-line EN directly followed by multi-line ZH must be flagged, not fixed",
+    "check": 1,
+    "review": 1
+  },
+  "07_interleaved.py": {
+    "why": "legacy line-by-line interleave is migrated",
+    "expected": "07_interleaved.expected.py",
+    "check": 1
+  },
+  "08_mid_sentence_blank.py": {
+    "why": "A7: a blank line inside a sentence is reported, never removed",
+    "check": 1,
+    "review": 1,
+    "report_contains": "mid-sentence"
+  },
+  "09_paragraph_interleave.py": {
+    "why": "decision 2: paragraph runs EN,ZH,EN,ZH are reordered; the stray blank stays and is reported",
+    "expected": "09_paragraph_interleave.expected.py",
+    "check": 1,
+    "report_contains": "mid-sentence"
+  },
+  "10_paragraph_block_form.py": {
+    "why": "A4: the hand-fixed block form produces 0 changes",
+    "check": 0,
+    "review": 0
+  },
+  "11_one_plus_one.py": {
+    "why": "A2: one EN line + one ZH line is the allowed short form",
+    "check": 0,
+    "review": 0
+  },
+  "12_csharp_interleaved.cs": {
+    "why": "C# line comments are migrated and pass the lexer check",
+    "expected": "12_csharp_interleaved.expected.cs",
+    "check": 1
+  },
+  "13_ts_template_literal.ts": {
+    "why": "lines inside a template literal look like comments; the lexer check must stop the rewrite",
+    "check": 1,
+    "review": 1,
+    "report_contains": "lexer"
+  },
+  "14_mixed_line_split.py": {
+    "why": "PR #51: a line holding one EN and one ZH sentence is split at the boundary, text kept word for word",
+    "expected": "14_mixed_line_split.expected.py",
+    "check": 1
+  },
+  "15_crlf_interleaved.py": {
+    "why": "PR #50: CRLF line endings are kept exactly",
+    "expected": "15_crlf_interleaved.expected.py",
+    "check": 1
+  },
+  "16_rule_line_between_paragraphs.py": {
+    "why": "a rule line (+===+) between paragraphs is structure: never dropped by a paragraph reorder",
+    "check": 1,
+    "review": 1,
+    "report_contains": "rule line"
+  },
+  "17_split_paragraph.py": {
+    "why": "docstring #1 shape: a stray blank cut EN1, whose tail shares a paragraph with ZH1; the paragraph splits, the block reorders, the stray blank stays and is reported",
+    "expected": "17_split_paragraph.expected.py",
+    "check": 1,
+    "report_contains": "mid-sentence"
+  },
+  "18_module_docstring_pairs.py": {
+    "why": "docstring #3 shape: module docstring EN1/ZH1/EN2/ZH2 becomes the hand-fixed form exactly",
+    "expected": "18_module_docstring_pairs.expected.py",
+    "check": 1,
+    "review": 0
+  },
+  "19_class_docstring_pairs.py": {
+    "why": "docstring #4 shape: indented class docstring EN1/ZH1/EN2/ZH2",
+    "expected": "19_class_docstring_pairs.expected.py",
+    "check": 1,
+    "review": 0
+  }
+}
