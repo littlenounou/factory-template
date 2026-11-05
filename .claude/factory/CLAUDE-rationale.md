@@ -158,25 +158,21 @@ was dropped.
   test-verifier writes real tests, so it is an author, not a Haiku-grade grader.
   Security-sensitive work (an Off-Limits area) is the most classifier-prone: switch that
   builder to `model: opus` for the feature, or keep the work outside the factory.
-  Known issues, for whoever troubleshoots routing (no agent needs these on a run):
-  - Resolution order since Claude Code v2.1.251: the per-call `model` parameter of the
-    Agent tool, then the agent's frontmatter `model:`, then `CLAUDE_CODE_SUBAGENT_MODEL`,
-    then the main session's model. The team baseline (2.1.295+, set by the hooks) covers
-    it. Before v2.1.251 the env variable came first and overrode the frontmatter; a
-    project env pin (5befcc3, 2026-07) guarded against a user-level `haiku` doing that.
-    The pin was lost in cd510f7 and is deliberately not restored: under the current order
-    it would reach no factory agent.
-  - `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (v2.1.257+), set in the shell or in `env` at any
-    settings scope, makes Claude Code ignore the frontmatter and the per-call parameter:
-    every agent runs on `CLAUDE_CODE_SUBAGENT_MODEL`, or on the main model if that is unset.
-  - The orchestrating session can pass `model` on an Agent call, and that outranks the
-    frontmatter. No command asks it to; the gotcha is recorded, not guarded.
-  - `sonnet` is an alias, so there is no version to bump. It resolves to the latest Sonnet
-    on the Anthropic API and Claude plans; some cloud providers map it to an older Sonnet,
-    and `ANTHROPIC_DEFAULT_SONNET_MODEL` redirects it.
-  - Symptom of broken routing: `/usage` shows no Sonnet, or a model the routing above
-    does not explain. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and the `env` key of
-    `~/.claude/settings.json`, `.claude/settings.json` and `.claude/settings.local.json`.
+  **Routing overrides**, for troubleshooting:
+  - Order since Claude Code v2.1.251 (inside the 2.1.295 floor the hooks need): the Agent
+    call's `model` parameter, then frontmatter `model:`, then `CLAUDE_CODE_SUBAGENT_MODEL`,
+    then the main session's model. The env variable reaches no factory agent, so the
+    template sets no env pin.
+  - Two overrides beat the frontmatter. `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (v2.1.257+,
+    in the shell or in `env` at any settings scope) puts every agent on
+    `CLAUDE_CODE_SUBAGENT_MODEL`, or on the main model when that is unset. A `model` the
+    orchestrating session passes on an Agent call wins too; no command passes one, and it
+    stays unguarded until a run shows it.
+  - `sonnet` is an alias, so no version needs bumping. A cloud provider may map it to an
+    older Sonnet; `ANTHROPIC_DEFAULT_SONNET_MODEL` redirects it.
+  - Symptom: `/usage` shows no Sonnet, or a model the order above does not explain. Check
+    `echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and the `env` key of `~/.claude/settings.json`,
+    `.claude/settings.json` and `.claude/settings.local.json`.
 - **Classifier refusals.** A loop that cannot tell "the classifier said no" from "my code
   is wrong" burns its retry budget rephrasing a refusal — hence the separate token, the ⛔
   heading, and `blocked-classifier` outside the retry count. The API's fallback to another
