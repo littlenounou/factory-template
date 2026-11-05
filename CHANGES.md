@@ -1,3 +1,70 @@
+# Fix: comment-migrate.py regression restored and locked by fixtures (2026-11-05)
+
+A field report from `/feat-recomment` on a Python repo found 9 bad changes and 37 false
+alarms: the same failures the 2026-09-16 fixes (55f2256) had removed. Cause: cd510f7
+("Redact secrets in pasted evidence", 2026-09-19) restored `comment-migrate.py` and
+`feat-recomment.md` byte for byte to their 2026-08 versions, and nothing re-ran the cases,
+so PR #51 was built on the regressed script. The Watchlist entry recording the bug in that
+repo had also been pruned, so no reminder was left.
+
+## Decisions (grilled with the maintainer)
+- **Restore 55f2256, keep #50/#51.** The restored logic is the base; line-ending handling,
+  byte writes, mixed-line splitting and the C#/Java/JS/TS lexer check are carried over.
+- **Permanent regression fixtures** in `tests/comment-migrate/` (not installed by
+  install.sh). Anonymized: they reproduce the field-report shapes without the repo's code.
+- **A blank line inside a sentence is reported, never removed.** Moving whole lines is
+  safe; deleting a blank line merges two paragraphs when the guess is wrong.
+- **Paragraph-level reorder only for single-language paragraphs that alternate in pairs**
+  (EN, ZH, EN, ZH). Anything else goes to review.
+- **No temporary `--apply` gate.** The fix and its fixtures land together; the command
+  now always shows the full diff and waits for the human to read it.
+
+## Fixed (comment-migrate.py)
+- Restored from 55f2256: tokenize/ast scanning for Python (a lone closing `"""` no longer
+  opens a fake docstring that swallows code: 5 of the 9 bad changes and most false
+  alarms); continuation-aware classification with CJK punctuation counted as Chinese (the
+  other 4); multi-line English followed directly by Chinese is flagged, so `--check`
+  reports it again.
+- The safety check now pins each comment to the code below it: a comment cannot move past
+  an `assert` unnoticed (the old check compared comment multisets only).
+- Commented-out-code and mixed-language checks ignore identifiers, `code spans` and quoted
+  messages; in Python a line must also parse as code and not read as prose.
+- The script never scans itself (its docstring shows interleaved comments on purpose,
+  which kept `--check` red in every installed repo).
+
+## Added
+- Paragraph-level reorder: EN₁ / ZH₁ / EN₂ / ZH₂ becomes EN₁ / EN₂ / separator / ZH₁ / ZH₂;
+  line order inside one language never changes.
+- Mid-sentence blank line detection (report only).
+- `--diff FILE`: the exact patch, in `git apply` form, for review before `--apply`.
+- `tests/comment-migrate/run.py`: 15 cases plus 5 direct checks of the safety net. Each
+  case checks the rewrite, idempotence, the `--check` exit code, the review count and the
+  report. Run it before merging any change to `comment-migrate.py`.
+
+## Modified
+- **feat-recomment.md**: dry run writes the diff; a REVIEW step shows the whole diff and
+  checks each hunk; apply is done when `git apply -R --check` passes on the reviewed diff;
+  the full list of review reasons (lost in cd510f7) is back, plus the two new ones.
+- **README.md / README_zh-TW.md / cheatsheets / training pages**: diff review, new
+  guarantees and refusal reasons.
+
+## Verified
+- Fixtures: 20/20 (develop at bd2c338: 6/16; 55f2256: 12/18).
+- On the 8 real files from the report (kept out of the repo): the 9 bad changes are gone,
+  false alarms drop from 15 to 0, one missed EN/ZH/EN/ZH module docstring is migrated, and
+  69 mid-sentence blank lines are reported. Docstring #2 (`_core.py`) before becomes the
+  hand-fixed after (with its stray blank kept and reported); the after produces 0 changes.
+- The documented workflow end to end in a scratch repo (LF, CRLF, no trailing newline):
+  `git apply -R --check` on the reviewed diff passes after `--apply`.
+
+## Follow-ups
+- In the affected repo: restore the Watchlist entry as `check pending` until it re-runs
+  `/feat-recomment` with this version.
+- Docstrings #1, #3 and #4 from the report join the fixtures once their before/after
+  versions are supplied.
+
+---
+
 # Fix: comment-migrate.py verifies before writing that no code changed (2026-10-20)
 
 Issue #50 · PR #51
@@ -1278,3 +1345,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
 | 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules and `check pending`, grill round separator, commands hand off to the human |
 | 2026-10-18 | (fill in) | Pocock v1.3 retro/pr re-read: `/feat-retro` maintenance command, validator Merge danger section |
+| 2026-11-05 | (fill in) | `comment-migrate.py` regression (cd510f7 undid 55f2256) restored; permanent fixtures in `tests/comment-migrate/`; paragraph reorder, mid-sentence blank report, comment-to-code pinning, `--diff` review step |

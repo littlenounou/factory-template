@@ -1228,7 +1228,9 @@ def discover(targets: list[Path]) -> list[Path]:
                 continue
             if p.is_file():
                 files.append(p)
-    seen, uniq = set(), []
+    # This script is installed into every repo; its docstring shows interleaved comments
+    # on purpose, so it never scans itself.
+    seen, uniq = {Path(__file__).resolve()}, []
     for p in files:
         rp = p.resolve()
         if rp not in seen:
