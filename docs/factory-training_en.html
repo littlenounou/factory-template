@@ -414,6 +414,7 @@ jq --version
       <h3>Maintenance (outside the line)</h3>
       <div class="term"><span class="c"># One-off: migrate legacy interleaved bilingual comments to block form</span>
 <span class="y">/feat-recomment</span>            <span class="c"># no slug; needs a clean git tree; dry-runs first</span>
+<span class="c"># You read the full diff before anything is applied.</span>
 <span class="c"># It only REORDERS comment lines — never translates or rewords.</span>
 <span class="c"># Refused blocks land in comment-migration-report.md for a human.</span>
 python3 .claude/factory/comment-migrate.py --check  <span class="c"># optional CI guard</span>

@@ -415,6 +415,7 @@ jq --version
       <h3>維護指令（產線之外）</h3>
       <div class="term"><span class="c"># 一次性：把舊的交錯式雙語註解轉成區塊形式</span>
 <span class="y">/feat-recomment</span>            <span class="c"># 沒有 slug；需 git tree 乾淨；先跑 dry run</span>
+<span class="c"># 套用前，你會先讀完整份 diff。</span>
 <span class="c"># 它只「重排」註解行——絕不翻譯、不改寫措辭。</span>
 <span class="c"># 不敢動的區塊會列進 comment-migration-report.md 交給人處理。</span>
 python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 CI 檢查</span>

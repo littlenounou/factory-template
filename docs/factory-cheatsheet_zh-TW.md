@@ -67,11 +67,12 @@ research 裡定案。沒有 `state.json`、不動 `.active`,feature 進行中也
 /feat-retro [session|slug]     → 唯讀回顧 session 的工作環境 → retro-report.md
 ```
 
-`/feat-recomment`:沒有 slug、沒有 `state.json`。先確認 git working tree 乾淨、先跑 dry run,再驅動
-`.claude/factory/comment-migrate.py`——該腳本只「重排」註解行,絕不翻譯或改寫措辭,
-也絕不更動程式碼(每個檔案寫入前都會驗證)。
-它不敢動的區塊(混著被註解掉的程式碼、單行中英夾雜、語言分界不明、缺少分隔行)會列進
-`comment-migration-report.md` 交給人處理。加 `--check` 時只要還有交錯就回傳非零 exit code。
+`/feat-recomment`:沒有 slug、沒有 `state.json`。先確認 git working tree 乾淨、先跑 dry run,
+並在套用前把完整 diff 交給你閱讀。它驅動 `.claude/factory/comment-migrate.py`——該腳本只「重排」
+註解行與段落,絕不翻譯或改寫措辭,也絕不更動程式碼(每個檔案寫入前都會驗證)。
+它不敢動的區塊(混著被註解掉的程式碼、單行中英夾雜、語言分界不明、缺少分隔行、缺少翻譯、
+句子中間多出空行)會列進 `comment-migration-report.md` 交給人處理。加 `--check` 時只要還有
+需要遷移或審閱的區塊就回傳非零 exit code。
 
 `/feat-sweep` 是唯讀的:沒有 slug、沒有 `state.json`,feature 進行到一半也能安全執行。
 它對整個 repo 套用刪除測試(最近常改動的程式碼優先),並覆寫 `sweep-report.md`:

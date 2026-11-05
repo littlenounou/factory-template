@@ -68,11 +68,13 @@ The line never commits or opens PRs for you — review and commit yourself at th
 /feat-retro [session|slug]      → read-only retro on a session's environment → retro-report.md
 ```
 
-`/feat-recomment`: no slug, no `state.json`. Guards on a clean git tree, dry-runs first, then drives
-`.claude/factory/comment-migrate.py`, which only REORDERS comment lines — never translates or
-rewords, and never changes code (each file is verified before writing). Blocks it refuses
-(commented-out code, mixed-language lines, unclear language split, missing separator) land in
-`comment-migration-report.md` for a human. `--check` exits non-zero while interleaving remains.
+`/feat-recomment`: no slug, no `state.json`. Guards on a clean git tree, dry-runs first and shows
+the full diff for you to read before applying. It drives `.claude/factory/comment-migrate.py`,
+which only REORDERS comment lines and paragraphs: it never translates or rewords, and never
+changes code (each file is verified before writing). Blocks it refuses (commented-out code,
+mixed-language lines, unclear language split, missing separator, a missing translation, a blank
+line inside a sentence) land in `comment-migration-report.md` for a human. `--check` exits
+non-zero while any block still needs migration or review.
 
 `/feat-sweep` is read-only: no slug, no `state.json`, safe to run mid-feature. It applies the
 deletion test across the repo (recently changed code first) and overwrites `sweep-report.md`

@@ -114,16 +114,18 @@ changing one; edit it in the same PR when you do.
 - **TW term dictionary** — Taiwan mainstream terms only (no Mainland China variants).
 
 Code written before the block rule can be migrated in place with
-`/feat-recomment [path]`, which drives `.claude/factory/comment-migrate.py` — a deterministic
-script that only REORDERS existing comment lines, splitting a line that holds both languages
-at its sentence boundary into two (it never translates or rewords), and leaves
-anything ambiguous for a human, listed in `comment-migration-report.md`. It never changes code:
-before writing a file it checks that only comment lines moved (every language), then, for
-Python, C#, Java, JavaScript and TypeScript, that code and string literals are unchanged
-(Python docstrings excepted). A file that fails either check is not written and goes to the
-report for a human; files in other languages, JSX and TSX get the first check only and are
-listed so their diff gets a closer look. Dry-run by default;
-`--check` exits non-zero when interleaved comments remain, for use as a CI guard.
+`/feat-recomment [path]`, which drives `.claude/factory/comment-migrate.py`: a deterministic
+script that only REORDERS existing comment lines and whole paragraphs, splitting a line that
+holds both languages at its sentence boundary into two (it never translates or rewords), and
+leaves anything ambiguous for a human, listed in `comment-migration-report.md`. It never
+changes code: before writing a file it checks that the code is unchanged, the same comment
+lines are present, and every comment still sits above the same code (every language); for
+Python, C#, Java, JavaScript and TypeScript a tokenizer or lexer also checks that code and
+string literals are unchanged (Python docstrings excepted). A file that fails a check is not
+written and goes to the report for a human. The command shows the full diff (`--diff`) and
+waits for the human to read it before anything is applied. `--check` exits non-zero while
+any block still needs migration or review, for use as a CI guard. Regression fixtures live in
+`tests/comment-migrate/` (template repo only; not installed).
 
 `/feat-docs` (the **doc-writer** agent) produces those user-facing docs with **Mermaid** diagrams
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
