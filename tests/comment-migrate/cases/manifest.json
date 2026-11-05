@@ -76,5 +76,11 @@
     "why": "PR #50: CRLF line endings are kept exactly",
     "expected": "15_crlf_interleaved.expected.py",
     "check": 1
+  },
+  "16_rule_line_between_paragraphs.py": {
+    "why": "a rule line (+===+) between paragraphs is structure: never dropped by a paragraph reorder",
+    "check": 1,
+    "review": 1,
+    "report_contains": "rule line"
   }
 }

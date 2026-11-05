@@ -37,7 +37,7 @@ repo had also been pruned, so no reminder was left.
   line order inside one language never changes.
 - Mid-sentence blank line detection (report only).
 - `--diff FILE`: the exact patch, in `git apply` form, for review before `--apply`.
-- `tests/comment-migrate/run.py`: 15 cases plus 5 direct checks of the safety net. Each
+- `tests/comment-migrate/run.py`: 16 cases plus 5 direct checks of the safety net. Each
   case checks the rewrite, idempotence, the `--check` exit code, the review count and the
   report. Run it before merging any change to `comment-migrate.py`.
 
@@ -49,7 +49,14 @@ repo had also been pruned, so no reminder was left.
   guarantees and refusal reasons.
 
 ## Verified
-- Fixtures: 20/20 (develop at bd2c338: 6/16; 55f2256: 12/18).
+- Fixtures: 21/21 (develop at bd2c338: 6/16; 55f2256: 12/18, before the last case).
+- Stress runs with a Chinese line injected after every comment line: 154 CPython stdlib
+  files (135 rewritten, 2,254 blocks) and 171 npm JS files (166 rewritten): no code, AST
+  or comment-line change, and a second run changes nothing. The JS run's 2 unwritten files
+  hold `//` lines inside template literals, stopped by the lexer check as designed. The
+  stress runs found two bugs, both fixed here: the paragraph reorder needed a second run
+  (passes now repeat until stable), and it dropped a rule line (`+===+`) between paragraphs
+  (now sent to review; the safety check had already refused the write).
 - On the 8 real files from the report (kept out of the repo): the 9 bad changes are gone,
   false alarms drop from 15 to 0, one missed EN/ZH/EN/ZH module docstring is migrated, and
   69 mid-sentence blank lines are reported. Docstring #2 (`_core.py`) before becomes the

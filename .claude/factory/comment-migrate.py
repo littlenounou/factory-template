@@ -388,9 +388,62 @@ def process_run(
     and must hold ONLY comment / docstring lines. Appends the (possibly rewritten)
     lines to `out`. Returns True if changed.
 
-    Two levels, in this order:
+    Passes repeat until the run is stable, so a second run of the script changes
+    nothing: regrouping lines inside each paragraph (pass 1) can leave paragraphs that
+    alternate EN, ZH, EN, ZH, which the paragraph-level reorder then fixes (pass 2).
+    """
+    # Every line a pass can write is an original line, a split half, or a separator,
+    # so the next pass can look each one up again.
+    info: dict[str, tuple[int, str]] = {separator: (run[0][0], "")}
+    for lineno, line, content in run:
+        info.setdefault(line, (lineno, content))
+        if is_mixed(content):
+            for h_line, h_content in split_mixed(line, content) or []:
+                info.setdefault(h_line, (lineno, h_content))
+
+    current = run
+    changed = False
+    seen_changes: set[int] = set()
+    for attempt in range(4):
+        lines_out: list[str] = []
+        pass_findings: list[Finding] = []
+        pass_changed = _process_pass(lines_out, current, separator, path, pass_findings,
+                                     splits, is_python, pin_first, pin_last,
+                                     allow_split=attempt == 0)
+        reviews = [f for f in pass_findings if f.kind == "review"]
+        for f in pass_findings:
+            if f.kind != "review" and f.line not in seen_changes:
+                seen_changes.add(f.line)
+                findings.append(f)
+        if not pass_changed:
+            break
+        changed = True
+        current = [(info[ln][0], ln, info[ln][1]) for ln in lines_out]
+    else:
+        reviews.append(Finding(path, run[0][0], "review",
+                               "comment block did not settle after repeated passes — "
+                               "left as the last pass wrote it; check it by hand"))
+    findings.extend(reviews)
+    out.extend(ln for _, ln, _ in current)
+    return changed
+
+
+def _process_pass(
+    out: list[str],
+    run: list[tuple[int, str, str]],
+    separator: str,
+    path: str,
+    findings: list[Finding],
+    splits: list[Split],
+    is_python: bool,
+    pin_first: bool,
+    pin_last: bool,
+    allow_split: bool,
+) -> bool:
+    """
+    One pass over a run, two levels in this order:
     1. Paragraph level (paragraphs are split by blank lines): a paragraph that
-       interleaves languages line by line is regrouped, as before.
+       interleaves languages line by line is regrouped.
     2. Run level: when every paragraph is single-language and the languages
        alternate in pairs (EN, ZH, EN, ZH), whole paragraphs are reordered to
        EN…EN, separator, ZH…ZH. Paragraphs keep their own lines and order.
@@ -400,7 +453,7 @@ def process_run(
     items: list[tuple[int, str, str]] = []
     split_of: dict[int, tuple[str, int]] = {}
     for lineno, line, content in run:
-        halves = split_mixed(line, content) if is_mixed(content) else None
+        halves = split_mixed(line, content) if allow_split and is_mixed(content) else None
         if halves and not (pin_first and lineno == run[0][0]) \
                 and not (pin_last and lineno == run[-1][0]):
             for h, (h_line, h_content) in enumerate(halves):
@@ -500,17 +553,27 @@ def process_run(
                     lo = paras[g[1]][0]
                     hi = paras[g[2]][-1]
                     return [items[i][1] for i in range(lo, hi + 1)]
-                sep_line = next((items[i][1] for i, k in enumerate(kinds_all)
-                                 if k == "blank" and not items[i][2].strip()), SEP)
+                # The gaps between groups move as they are, so no line is ever dropped.
+                gaps = [[items[i][1] for i in range(paras[a[2]][-1] + 1, paras[b[1]][0])]
+                        for a, b in zip(groups, groups[1:])]
+                gap_ok = all(not items[i][2].strip()
+                             for a, b in zip(groups, groups[1:])
+                             for i in range(paras[a[2]][-1] + 1, paras[b[1]][0]))
                 ordered = [g for g in groups if g[0] == "en"] + [g for g in groups if g[0] == "zh"]
                 new_body: list[str] = []
                 for gi, g in enumerate(ordered):
                     if gi:
-                        new_body.append(sep_line)
+                        new_body += gaps[gi - 1]
                     new_body += span(g)
                 lo, hi = paras[0][0], paras[-1][-1]
                 old_body = [items[i][1] for i in range(lo, hi + 1)]
-                if (pin_first and lo == 0 and new_body[0] != old_body[0]) or \
+                if not gap_ok:
+                    # A rule line (----, +===+) between paragraphs is structure, not a
+                    # separator; reordering around it would change what it divides.
+                    local.append(Finding(path, first_line, "review",
+                                         "paragraphs alternate languages across a rule line "
+                                         "(----, +===+) — reorder by hand", whole[:20]))
+                elif (pin_first and lo == 0 and new_body[0] != old_body[0]) or \
                         (pin_last and hi == len(items) - 1 and new_body[-1] != old_body[-1]):
                     local.append(Finding(path, first_line, "review",
                                          "text shares a line with the docstring quotes and "
