@@ -104,7 +104,7 @@ Run it when a session felt slow or expensive, not on a timer.
 | `jq not found` | Enforcement is actually OFF. Install jq, then continue |
 | `… hook error` … `failed; blocking because onFailure is "block"` | A hook could not run (script missing, `bash` not found), so the tool call was blocked on purpose rather than let through unchecked. If `protect-secrets.sh` is the missing one, Bash **and** Edit/Write are all blocked and Claude cannot repair it. Restore it yourself from a terminal at the repo root: `git checkout -- .claude/` (or re-run the installer). Never fall back to `disableAllHooks` |
 | `… hook error` `Failed with non-blocking status code` … `No such file or directory` | The hook never ran and the call went through: that protection is OFF. `settings.json` predates 2026-10-17 (cwd-relative hook paths that break after a `cd`). Copy the current `.claude/settings.json` + `.claude/hooks/`, confirm `claude --version` is 2.1.295+, restart the session |
-| `/usage` shows orchestrator + Haiku only, zero Sonnet | Routing overridden by env. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL` and settings.json at each scope (see CONVENTIONS "Known issues") |
+| `/usage` shows no Sonnet, or an unexpected model | A routing override beat the frontmatter. Check `echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and the `env` key of each settings.json (user, project, local); see "Routing overrides" in `CLAUDE-rationale.md` |
 | gate shows `(none configured, skipped)` | That command is blank in the manifest; add the script, then fill project.json back in |
 
 ## Non-negotiables

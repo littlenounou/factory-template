@@ -158,6 +158,21 @@ was dropped.
   test-verifier writes real tests, so it is an author, not a Haiku-grade grader.
   Security-sensitive work (an Off-Limits area) is the most classifier-prone: switch that
   builder to `model: opus` for the feature, or keep the work outside the factory.
+  **Routing overrides**, for troubleshooting:
+  - Order since Claude Code v2.1.251 (inside the 2.1.295 floor the hooks need): the Agent
+    call's `model` parameter, then frontmatter `model:`, then `CLAUDE_CODE_SUBAGENT_MODEL`,
+    then the main session's model. The env variable reaches no factory agent, so the
+    template sets no env pin.
+  - Two overrides beat the frontmatter. `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (v2.1.257+,
+    in the shell or in `env` at any settings scope) puts every agent on
+    `CLAUDE_CODE_SUBAGENT_MODEL`, or on the main model when that is unset. A `model` the
+    orchestrating session passes on an Agent call wins too; no command passes one, and it
+    stays unguarded until a run shows it.
+  - `sonnet` is an alias, so no version needs bumping. A cloud provider may map it to an
+    older Sonnet; `ANTHROPIC_DEFAULT_SONNET_MODEL` redirects it.
+  - Symptom: `/usage` shows no Sonnet, or a model the order above does not explain. Check
+    `echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and the `env` key of `~/.claude/settings.json`,
+    `.claude/settings.json` and `.claude/settings.local.json`.
 - **Classifier refusals.** A loop that cannot tell "the classifier said no" from "my code
   is wrong" burns its retry budget rephrasing a refusal — hence the separate token, the ⛔
   heading, and `blocked-classifier` outside the retry count. The API's fallback to another

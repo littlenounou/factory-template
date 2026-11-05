@@ -1,3 +1,41 @@
+# Fix: model-routing notes restored as current facts; env pin not restored (2026-11-05)
+
+Issue #55. cd510f7 ("Redact secrets in pasted evidence", 2026-09-19) silently undid
+5befcc3 (2026-07-17): the `.claude/settings.json` env pin `CLAUDE_CODE_SUBAGENT_MODEL`,
+the CONVENTIONS "Known issues (model routing)" section, two MEMORY.md General rules, the
+README install note and the training-page `/usage` row. Both cheatsheets kept pointing at
+the missing section. Routing kept working: since Claude Code v2.1.251 an agent's
+frontmatter `model:` outranks the env variable.
+
+## Decisions (grilled with the maintainer)
+- **No env pin**, reversing the issue body (premise check in the #55 comments): it would
+  reach no factory agent, and it cannot stop `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`. Agents
+  stay on the frontmatter alias `sonnet`, so no version needs bumping.
+- **Facts go to `CLAUDE-rationale.md`**, not CONVENTIONS: no agent needs them on a run.
+- **The per-call `model` parameter** is recorded, not guarded, until a run shows it.
+- **Provider**: the team uses the Anthropic API and Claude plans, so the cloud alias
+  mapping gets one line.
+- **Installers unchanged** (`env` stays the repo's key); **no MEMORY.md seed rules**;
+  **no README install note**; 5befcc3's pricing, tokenizer and safeguard notes dropped.
+
+## Modified
+- **CLAUDE-rationale.md**: Model routing gains "Routing overrides".
+- **Cheatsheets (EN/zh-TW)**: the `/usage` row points to "Routing overrides".
+- **Training pages (EN/zh-TW)**: the same row is back in the troubleshooting table.
+
+## Verified
+- `install.sh` into a scratch repo whose `settings.json` held
+  `env.CLAUDE_CODE_SUBAGENT_MODEL` and `permissions`: both kept, hooks added.
+- `install.ps1` by reading only (no PowerShell in the build environment): the merge
+  replaces `hooks` and adds missing template keys; the template has no `env`.
+- No file references `CONVENTIONS "Known issues"` any more.
+
+## Upgrade notes for installed repos
+- An `env.CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json` (installs from 2026-07
+  to 2026-09) can stay or go: the frontmatter outranks it.
+- Delete the `[2026-07-09 template]` and `[2026-07-17 template]` lines from `MEMORY.md`
+  General rules if present: they describe the pre-v2.1.251 order.
+
 # Fix: comment-migrate.py regression restored and locked by fixtures (2026-11-05)
 
 A field report from `/feat-recomment` on a Python repo found 9 bad changes and 37 false

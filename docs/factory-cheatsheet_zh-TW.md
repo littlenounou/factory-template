@@ -100,7 +100,7 @@ session id 或某個 slug 的 sessions),檢視的是 agent 的工作環境而不
 | `jq not found` | 強制其實沒開。裝 jq 再繼續 |
 | `… hook error` … `failed; blocking because onFailure is "block"` | hook 無法執行(script 不見、找不到 `bash`),所以刻意擋下這次工具呼叫,而不是讓它未經檢查就放行。若不見的是 `protect-secrets.sh`,Bash **與** Edit/Write 會全部被擋,Claude 無法自行修復——請你在 repo 根目錄的終端機自己還原:`git checkout -- .claude/`(或重跑安裝程式)。絕不改用 `disableAllHooks` 繞過 |
 | `… hook error` `Failed with non-blocking status code` … `沒有此一檔案或目錄` | 該 hook 根本沒執行、指令照樣放行:那道防護等於關閉。`settings.json` 是 2026-10-17 之前的版本(用相對 cwd 的路徑呼叫 hook,一 `cd` 就找不到)。複製最新的 `.claude/settings.json` 與 `.claude/hooks/`,確認 `claude --version` 為 2.1.295 以上,再重開 session |
-| `/usage` 只見編排模型+Haiku,Sonnet 掛零 | 路由被 env 覆蓋。查 `echo $CLAUDE_CODE_SUBAGENT_MODEL` 與各層 settings.json(見 CONVENTIONS「Known issues」) |
+| `/usage` 看不到 Sonnet,或出現非預期的模型 | 有路由覆寫壓過了 frontmatter。查 `echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE` 與各層 settings.json(使用者、專案、local)的 `env`;詳見 `CLAUDE-rationale.md` 的「Routing overrides」 |
 | gate 顯示 `(none configured, skipped)` | manifest 該指令留空;補上 script 後回填 project.json |
 
 ## 鐵則
