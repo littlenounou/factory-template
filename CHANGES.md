@@ -1,3 +1,49 @@
+# Fix: model-routing notes restored as current facts; env pin not restored (2026-11-05)
+
+Issue #55. cd510f7 ("Redact secrets in pasted evidence", 2026-09-19) silently undid
+5befcc3 (2026-07-17): the `.claude/settings.json` env pin `CLAUDE_CODE_SUBAGENT_MODEL`,
+the CONVENTIONS "Known issues (model routing)" section, two MEMORY.md General rules, the
+README install note and the training-page `/usage` row. Both cheatsheets still pointed at
+the missing CONVENTIONS section. Routing kept working because, since Claude Code v2.1.251,
+an agent's frontmatter `model:` outranks the env variable.
+
+## Decisions (grilled with the maintainer)
+- **No env pin.** It would reach no factory agent (all eight set `model: sonnet`), and it
+  does not stop the current trap, `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`. Routing stays on the
+  frontmatter alias `sonnet`: no version to bump. This reverses the issue body's
+  "restore the pin as `claude-sonnet-5-5`"; the premise check is in the #55 comments.
+- **The facts live in `CLAUDE-rationale.md`**, under the Model routing bullet: no agent
+  needs them on a run, so they stay out of the always-loaded CONVENTIONS.
+- **Per-call `model` parameter**: recorded as a gotcha, no command change.
+- **Provider alias**: the team uses the Anthropic API and Claude plans; one line notes
+  that cloud providers may map `sonnet` to an older model.
+- **Installers unchanged**: `env` stays the repo's key. An old pin is harmless.
+- **No MEMORY.md seed rules**; README gets no install note.
+- Stale pricing, tokenizer and Sonnet 5 safeguard notes from 5befcc3 are dropped.
+
+## Modified
+- **CLAUDE-rationale.md**: Model routing gains the known issues: resolution order since
+  v2.1.251 (covered by the 2.1.295 baseline), the `_FORCE` trap, the per-call parameter,
+  the alias and provider note, and the `/usage` symptom with the checks.
+- **Cheatsheets (EN/zh-TW)**: the `/usage` row now checks `_FORCE` and the `env` key of
+  each settings scope, and points to CLAUDE-rationale (the dangling CONVENTIONS reference
+  is gone).
+- **Training pages (EN/zh-TW)**: the same row is back in the troubleshooting table.
+
+## Verified
+- `install.sh` into a scratch repo whose `settings.json` held
+  `env.CLAUDE_CODE_SUBAGENT_MODEL` and `permissions`: both kept, hooks added.
+- `install.ps1`: by reading only (no PowerShell in the build environment). The merge
+  copies template keys absent from the repo and replaces only `hooks`; the template has
+  no `env`, so the repo's `env` is untouched.
+- No file in the repo still references `CONVENTIONS "Known issues"`.
+
+## Upgrade notes for installed repos
+- `env.CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json` (from a 2026-07 to 2026-09
+  install) can stay or go: the frontmatter outranks it.
+- Delete the `[2026-07-09 template]` and `[2026-07-17 template]` lines from
+  `MEMORY.md` General rules if present: they describe the pre-v2.1.251 order.
+
 # Fix: comment-migrate.py regression restored and locked by fixtures (2026-11-05)
 
 A field report from `/feat-recomment` on a Python repo found 9 bad changes and 37 false

@@ -440,6 +440,7 @@ python3 .claude/factory/comment-migrate.py --check  <span class="c"># 選用的 
         <tr><td><span class="dot" style="background:#8a6d00"></span>寫入被 hook 擋下</td><td>設計如此——當前 track 不准碰那個路徑。不要繞過；真有需要，<code>rm .claude/factory/.active</code> 解除（等於離開產線模式）。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>context 感覺臃腫／自己在重複發問</td><td>你正在階段中途——先把它做完。到下一個 <code>/feat-*</code> 步驟之間的邊界時，照 <code>.claude/factory/PHASE-BOUNDARIES.md</code> 的階梯走：continue → <code>/clear</code> → 交接 → 子代理 → <code>/compact</code> 墊底。這裡的預設是 <code>/clear</code>：磁碟上的 artifacts 會把 context 重建起來。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>某次 session 特別慢或特別耗 token</td><td>跑 <code>/feat-retro</code>（唯讀）：找出反覆搜尋、過大的工具輸出、無效指令，並在 <code>retro-report.md</code> 提出環境改善建議。</td></tr>
+        <tr><td><span class="dot" style="background:var(--grid)"></span>/usage 中看不到 Sonnet</td><td>agent 路由被覆蓋（正常情況下 frontmatter 的 <code>model: sonnet</code> 優先）。查 <code>echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE</code> 與各層 settings.json（使用者、專案、local）的 <code>env</code>；詳見 <code>CLAUDE-rationale.md</code>「Routing, refusals, memory and convergence」。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>「jq not found」</td><td>強制機制其實沒開（fail-safe 放行）。裝好 jq 再繼續。</td></tr>
         <tr><td><span class="dot" style="background:var(--grid)"></span>quality-gate 顯示 (none configured, skipped)</td><td>manifest 裡該指令留空。專案補上 test/lint script 後回填 project.json。</td></tr>
       </table>
