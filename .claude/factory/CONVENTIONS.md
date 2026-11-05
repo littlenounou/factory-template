@@ -27,7 +27,8 @@ steps are skipped.
 /feat-docs      <slug>            -> README + guides (EN, then zh-TW)
 /feat-distill   <slug>            -> MEMORY.md      [closing step]
 /feat-status    <slug>            -> where a feature, or an epic, stands
-/feat-recomment [path]  /feat-sweep [path]          (maintenance: no slug, no state.json)
+/feat-recomment [path]  /feat-sweep [path]  /feat-retro [session|slug]
+                                  (maintenance: no slug, no state.json)
 ```
 The human drives the order, one `/feat-*` per step; order, branching and the fix loop live
 in commands and hooks (Rule 9). Each step writes under `<artifactsDir>/<slug>/` and the

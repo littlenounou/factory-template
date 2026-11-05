@@ -7,7 +7,7 @@ behaviour is driven by a per-repo manifest (`.claude/factory/project.json`). Wor
 full-stack, frontend-only, or backend-only projects.
 
 ## Learn more
-- **[Training guide](docs/factory-training_en.html)** — one-page walkthrough of the design
+- **[Training guide](https://littlenounou.github.io/factory-template/factory-training_en.html)** — one-page walkthrough of the design
   philosophy, the assembly line, and the core and advanced mechanisms (for onboarding).
 - **[Cheatsheet](docs/factory-cheatsheet_en.md)** — one-screen quick reference: install,
   command flow, stuck-state table, non-negotiables (for daily use).
@@ -31,7 +31,7 @@ full-stack, frontend-only, or backend-only projects.
 The installer copies `.claude/` into the repo and makes hooks executable. If the repo
 already has a `CLAUDE.md`, it is NOT modified — the installer drops
 `CLAUDE.factory-snippet.md` next to it for you to merge. If there is no `CLAUDE.md`, the
-snippet is copied as a starter. Expected counts after install: 8 agents, 19 commands, 3 hooks.
+snippet is copied as a starter. Expected counts after install: 8 agents, 20 commands, 3 hooks.
 
 Re-running the installer (to upgrade) refreshes the template's files and keeps the repo's own:
 - `.claude/factory/MEMORY.md` is installed only when the repo has none, and never overwritten.
@@ -80,6 +80,7 @@ Re-running the installer (to upgrade) refreshes the template's files and keeps t
 # Maintenance (outside the line — no slug, no state.json)
 /feat-recomment [path]  # migrate legacy interleaved bilingual comments to block form
 /feat-sweep [path]      # read-only sweep for shallow modules -> sweep-report.md
+/feat-retro [session|slug]  # read-only retro on a session's environment -> retro-report.md
 ```
 The design and the reason behind each mechanism (model routing, classifier-refusal
 handling, memory layer, convergence loop included) are in `.claude/factory/CLAUDE-rationale.md`.
@@ -113,11 +114,18 @@ changing one; edit it in the same PR when you do.
 - **TW term dictionary** — Taiwan mainstream terms only (no Mainland China variants).
 
 Code written before the block rule can be migrated in place with
-`/feat-recomment [path]`, which drives `.claude/factory/comment-migrate.py` — a deterministic
-script that only REORDERS existing comment lines (it never translates or rewords) and leaves
-anything ambiguous for a human, listed in `comment-migration-report.md`. It never changes code:
-before writing a file it verifies that only comment / docstring line order changed. Dry-run by default;
-`--check` exits non-zero when interleaved comments remain, for use as a CI guard.
+`/feat-recomment [path]`, which drives `.claude/factory/comment-migrate.py`: a deterministic
+script that only REORDERS existing comment lines and whole paragraphs, splitting a line that
+holds both languages at its sentence boundary into two (it never translates or rewords), and
+leaves anything ambiguous for a human, listed in `comment-migration-report.md`. It never
+changes code: before writing a file it checks that the code is unchanged, the same comment
+lines are present, and every comment still sits above the same code (every language); for
+Python, C#, Java, JavaScript and TypeScript a tokenizer or lexer also checks that code and
+string literals are unchanged (Python docstrings excepted). A file that fails a check is not
+written and goes to the report for a human. The command shows the full diff (`--diff`) and
+waits for the human to read it before anything is applied. `--check` exits non-zero while
+any block still needs migration or review, for use as a CI guard. Regression fixtures live in
+`tests/comment-migrate/` (template repo only; not installed).
 
 `/feat-docs` (the **doc-writer** agent) produces those user-facing docs with **Mermaid** diagrams
 (flowchart / sequence / Gantt / mindmap / class / state). It does NOT move or archive the per-slug
@@ -126,4 +134,6 @@ artifacts — they stay in place as the pipeline's record.
 This template does not auto-commit or open PRs by design. For the PR body, the `pr` skill
 from [mattpocock/skills](https://github.com/mattpocock/skills) (Claude Code plugin
 `mattpocock-skills`) works beside the line: a summary visual, before/after evidence, and a
-merge-danger call. It is not part of the factory and needs no factory changes.
+merge-danger call. It is not part of the factory and needs no factory changes. The
+validator already writes a **Merge danger** section (one-way or two-way door, blast
+radius) at the end of `validation.md`, ready to carry into that PR body.

@@ -1,3 +1,362 @@
+# v1.1.0 (2026-11-05)
+
+Second release. The dated entries between this heading and `# v1.0.0` are part of it.
+No breaking changes: reinstall over v1.0.0 with the installer (it keeps the repo's
+`MEMORY.md` and the non-`hooks` keys of `settings.json`).
+
+## What's new
+- **`/feat-retro [session|slug]`** (#44): read-only retrospective on a session transcript;
+  writes `retro-report.md` with ranked fixes to the agent's environment. 20 commands now.
+- **Validator Merge danger** (#44): every `validation.md` rates the door (one-way or
+  two-way) and the blast radius.
+
+## Fixes
+- **`comment-migrate.py` / `/feat-recomment`** (#49, #50, #53): a mixed-language line is
+  split onto its own line; files keep their line endings; the script verifies before
+  writing that only comment lines moved (tokenize/ast for Python, a built-in lexer for
+  C#, Java, JS and TS); the 2026-09-16 fixes lost in cd510f7 are restored and locked by
+  regression fixtures in `tests/comment-migrate/` (not installed); the command shows the
+  full diff for review before applying.
+- **Model routing notes** (#55): restored as current facts in `CLAUDE-rationale.md`
+  ("Routing overrides"); the cheatsheets' dangling reference is fixed. No env pin.
+
+## Docs
+- `CLAUDE.md` snippet: rules Claude 5.x follows by default pruned (#40).
+- Training guides served by GitHub Pages (#42).
+- Decision recorded: no parallel builds for `/feat-epic` features (#46).
+
+## Upgrade notes
+- An `env.CLAUDE_CODE_SUBAGENT_MODEL` left in `.claude/settings.json` by a 2026-07 to
+  2026-09 install can stay or go: the agents' frontmatter outranks it.
+- Delete the `[2026-07-09 template]` and `[2026-07-17 template]` lines from `MEMORY.md`
+  General rules if present.
+- Review the snippet changes (#40) against your merged `CLAUDE.md` by hand: the installer
+  never edits an existing `CLAUDE.md`.
+
+## Requirements
+Unchanged: Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
+# Fix: model-routing notes restored as current facts; env pin not restored (2026-11-05)
+
+Issue #55. cd510f7 ("Redact secrets in pasted evidence", 2026-09-19) silently undid
+5befcc3 (2026-07-17): the `.claude/settings.json` env pin `CLAUDE_CODE_SUBAGENT_MODEL`,
+the CONVENTIONS "Known issues (model routing)" section, two MEMORY.md General rules, the
+README install note and the training-page `/usage` row. Both cheatsheets kept pointing at
+the missing section. Routing kept working: since Claude Code v2.1.251 an agent's
+frontmatter `model:` outranks the env variable.
+
+## Decisions (grilled with the maintainer)
+- **No env pin**, reversing the issue body (premise check in the #55 comments): it would
+  reach no factory agent, and it cannot stop `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`. Agents
+  stay on the frontmatter alias `sonnet`, so no version needs bumping.
+- **Facts go to `CLAUDE-rationale.md`**, not CONVENTIONS: no agent needs them on a run.
+- **The per-call `model` parameter** is recorded, not guarded, until a run shows it.
+- **Provider**: the team uses the Anthropic API and Claude plans, so the cloud alias
+  mapping gets one line.
+- **Installers unchanged** (`env` stays the repo's key); **no MEMORY.md seed rules**;
+  **no README install note**; 5befcc3's pricing, tokenizer and safeguard notes dropped.
+
+## Modified
+- **CLAUDE-rationale.md**: Model routing gains "Routing overrides".
+- **Cheatsheets (EN/zh-TW)**: the `/usage` row points to "Routing overrides".
+- **Training pages (EN/zh-TW)**: the same row is back in the troubleshooting table.
+
+## Verified
+- `install.sh` into a scratch repo whose `settings.json` held
+  `env.CLAUDE_CODE_SUBAGENT_MODEL` and `permissions`: both kept, hooks added.
+- `install.ps1` by reading only (no PowerShell in the build environment): the merge
+  replaces `hooks` and adds missing template keys; the template has no `env`.
+- No file references `CONVENTIONS "Known issues"` any more.
+
+## Upgrade notes for installed repos
+- An `env.CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json` (installs from 2026-07
+  to 2026-09) can stay or go: the frontmatter outranks it.
+- Delete the `[2026-07-09 template]` and `[2026-07-17 template]` lines from `MEMORY.md`
+  General rules if present: they describe the pre-v2.1.251 order.
+
+# Fix: comment-migrate.py regression restored and locked by fixtures (2026-11-05)
+
+A field report from `/feat-recomment` on a Python repo found 9 bad changes and 37 false
+alarms: the same failures the 2026-09-16 fixes (55f2256) had removed. Cause: cd510f7
+("Redact secrets in pasted evidence", 2026-09-19) restored `comment-migrate.py` and
+`feat-recomment.md` byte for byte to their 2026-08 versions, and nothing re-ran the cases,
+so PR #51 was built on the regressed script. The Watchlist entry recording the bug in that
+repo had also been pruned, so no reminder was left.
+
+## Decisions (grilled with the maintainer)
+- **Restore 55f2256, keep #50/#51.** The restored logic is the base; line-ending handling,
+  byte writes, mixed-line splitting and the C#/Java/JS/TS lexer check are carried over.
+- **Permanent regression fixtures** in `tests/comment-migrate/` (not installed by
+  install.sh). Synthetic: they reproduce the field-report shapes with unrelated text. No
+  file supplied for checking (the report's source files, before/after versions) is ever
+  committed; those are verified outside the repo.
+- **A blank line inside a sentence is reported, never removed.** Moving whole lines is
+  safe; deleting a blank line merges two paragraphs when the guess is wrong.
+- **Paragraph-level reorder only for single-language paragraphs that alternate in pairs**
+  (EN, ZH, EN, ZH). Anything else goes to review. A paragraph holding an English run then
+  a Chinese run (the short form, or text a stray blank cut loose) counts as two parts; a
+  separator is inserted between them only when the whole block reorders.
+- **No temporary `--apply` gate.** The fix and its fixtures land together; the command
+  now always shows the full diff and waits for the human to read it.
+
+## Fixed (comment-migrate.py)
+- Restored from 55f2256: tokenize/ast scanning for Python (a lone closing `"""` no longer
+  opens a fake docstring that swallows code: 5 of the 9 bad changes and most false
+  alarms); continuation-aware classification with CJK punctuation counted as Chinese (the
+  other 4); multi-line English followed directly by Chinese is flagged, so `--check`
+  reports it again.
+- The safety check now pins each comment to the code below it: a comment cannot move past
+  an `assert` unnoticed (the old check compared comment multisets only).
+- Commented-out-code and mixed-language checks ignore identifiers, `code spans` and quoted
+  messages; in Python a line must also parse as code and not read as prose.
+- The script never scans itself (its docstring shows interleaved comments on purpose,
+  which kept `--check` red in every installed repo).
+
+## Added
+- Paragraph-level reorder: EN₁ / ZH₁ / EN₂ / ZH₂ becomes EN₁ / EN₂ / separator / ZH₁ / ZH₂;
+  line order inside one language never changes.
+- Mid-sentence blank line detection (report only).
+- `--diff FILE`: the exact patch, in `git apply` form, for review before `--apply`.
+- `tests/comment-migrate/run.py`: 19 cases plus 5 direct checks of the safety net. Each
+  case checks the rewrite, idempotence, the `--check` exit code, the review count and the
+  report. Run it before merging any change to `comment-migrate.py`.
+
+## Modified
+- **feat-recomment.md**: dry run writes the diff; a REVIEW step shows the whole diff and
+  checks each hunk; apply is done when `git apply -R --check` passes on the reviewed diff;
+  the full list of review reasons (lost in cd510f7) is back, plus the two new ones.
+- **README.md / README_zh-TW.md / cheatsheets / training pages**: diff review, new
+  guarantees and refusal reasons.
+
+## Verified
+- Fixtures: 24/24 (develop at bd2c338: 6/20; 55f2256: 12/22).
+- Stress runs with a Chinese line injected after every comment line: 154 CPython stdlib
+  files (135 rewritten, 2,278 blocks) and 171 npm JS files (166 rewritten): no code, AST
+  or comment-line change, and a second run changes nothing. The JS run's 2 unwritten files
+  hold `//` lines inside template literals, stopped by the lexer check as designed. The
+  stress runs found two bugs, both fixed here: the paragraph reorder needed a second run
+  (passes now repeat until stable), and it dropped a rule line (`+===+`) between paragraphs
+  (now sent to review; the safety check had already refused the write).
+- On the 8 real files from the report (kept out of the repo): the 9 bad changes are gone,
+  false alarms drop from 15 to 0, one missed EN/ZH/EN/ZH module docstring is migrated, and
+  69 mid-sentence blank lines are reported. The four hand-fixed docstrings from the
+  report: #3 and #4 become the hand-fixed versions exactly; #1 and #2 do too, except that
+  their stray blank line is kept and reported. All four hand-fixed versions produce 0
+  changes.
+- The documented workflow end to end in a scratch repo (LF, CRLF, no trailing newline):
+  `git apply -R --check` on the reviewed diff passes after `--apply`.
+
+## Follow-ups
+- In the affected repo: restore the Watchlist entry as `check pending` until it re-runs
+  `/feat-recomment` with this version.
+
+---
+
+# Fix: comment-migrate.py verifies before writing that no code changed (2026-10-20)
+
+Issue #50 · PR #51
+
+`README.md` promised a pre-write check that `comment-migrate.py` never had, and the script
+could change code: `--` lines in a Python SQL string and `//` lines in a TS template literal
+were reordered as comments, U+2028 inside a string split a code line in two, and on Windows
+text-mode writes turned CRLF into `\r\r\n`.
+
+## Decisions (grilled with the maintainer)
+- **Two verification layers, run in dry run and `--apply` alike** so dry-run counts are what
+  apply writes. Layer 1 (every language): with comment regions taken out, every other line
+  is byte-identical; inside them lines only move, gain a separator, or are split (#48).
+  Layer 2: comments may move, code and string literals may not (Python docstrings excepted).
+- **Layer 2 languages**: Python via `tokenize` + `ast`; C#, Java, JS and TS via one built-in
+  lexer, no external tools (Roslyn and JavaParser would need SDKs and downloads). It follows
+  C# verbatim/interpolated/raw strings, Java text blocks, template literals with nested
+  `${}` and regex literals; anything it cannot follow to the end fails verification.
+- **Other languages** are written on layer 1 alone and listed in the report. JSX and TSX are
+  in this group: their text and closing tags are not lexable without a JSX-aware lexer.
+- **A failed file is not written**; it goes to "Needs human review" with the reason, the
+  rest of the run continues, and `--check` exits non-zero.
+- **The scanner was not made smarter**: strings it mistakes for comments are caught by
+  layer 2 instead.
+- A file with mixed line endings goes to review instead of being rewritten.
+- Regression tests were written, run and deleted (not committed); the PR lists the cases.
+
+## Modified
+- **comment-migrate.py**: lines split on the file's own line ending (not `splitlines()`),
+  files written as bytes, both verification layers, two new report metrics and a
+  "Verified by line check only" section.
+- **feat-recomment.md**: step 2 reports unwritten and line-check-only files; step 4 covers
+  a file that failed verification.
+- **README.md / docs/README_zh-TW.md**: describe the two checks.
+
+Out of scope, next issue: a single `中文。English… 又是中文` line is not detected by `--check`.
+
+---
+
+# Fix: /feat-recomment splits a mixed-language line onto its own line (2026-10-20)
+
+Issue #49 · PR #48
+
+A comment line holding both languages (a Chinese sentence followed by the start of the next
+English sentence) was refused by `comment-migrate.py` and left for a hand fix. With no rule
+for splitting a line, the hand fix glued the English tail onto the end of the previous
+English line and re-wrapped the lines after it.
+
+## Modified
+- **comment-migrate.py**: a mixed line with ONE clean sentence boundary (full-width
+  `。！？；` then English, or `. ! ? : ;` then Chinese) is split into two lines that share
+  the original prefix; the tail starts its own line, nothing is re-wrapped, text is kept
+  word for word. Lines without such a boundary still go to human review, and the review
+  sample now shows the whole paragraph (up to 20 lines, was 6) so both languages are visible.
+- **feat-recomment.md** (step 4): the same rule for hand fixes: split at the language
+  boundary, the moved part starts its own new line, never join or re-wrap.
+- **README.md / docs/README_zh-TW.md**: describe the line split.
+
+---
+
+# Decision recorded: no parallel builds for /feat-epic features (2026-10-18)
+
+Issue #46 · PR #47
+
+Evaluated applying `implement-spec`'s frontier to the `/feat-new` lines a cleared
+`/feat-epic` hands off. Not adopted; the reasons are in `CLAUDE-rationale.md` so the next
+upstream sync does not reopen it.
+
+## Modified
+- **CLAUDE-rationale.md**: Pocock provenance gains the decision and when to revisit it.
+
+No behaviour change: agent, command and hook files are untouched.
+
+---
+
+# Pocock v1.3 retro/pr re-read: /feat-retro and Merge danger (2026-10-18)
+
+Issue #44 · PR #45
+
+A second read of upstream `retro` and `pr` (both still in `in-progress/`). The 2026-10-07
+sync took `retro`'s mechanical/judgement split into `/feat-distill`; distill reads feature
+artifacts only, so `retro`'s environment categories, which need the session transcript,
+were still uncovered.
+
+## Decisions (grilled with the maintainer)
+- **New maintenance command `/feat-retro [session|slug]`**, shaped like `/feat-sweep`:
+  user-invoked, read-only, one overwritten `retro-report.md`, at most 7 candidates by
+  severity, each with evidence, the target file and how it loads, and the effect.
+- **Categories**: navigation, tool economy, no-ops, information access, and guardrail
+  wiring (a configured lint/test command that is broken or that no CI job or pre-commit
+  hook runs). Code mistakes are routed to `/feat-distill`, and a blank command stays
+  distill's `no guardrail` entry.
+- **Default source**: the most recent session in the repo; a session id or a slug narrows it.
+- **No Watchlist entries**: MEMORY.md keeps its single writer; the committed report's git
+  history is the trend.
+- **Reads, never re-runs**: guardrail wiring is judged from the session's
+  `quality-gate.sh` output and the CI/pre-commit config.
+- **Validator Merge danger**: door (one-way/two-way) and blast radius, from `pr`.
+- Not taken: a factory-written PR body (the upstream `pr` skill plus Merge danger is
+  enough for now) and plain-language PR/retro variants (reviewers are engineers;
+  pipeline artifacts stay English).
+
+## Changed during implementation
+The plan put a one-way door at 🟠 by default. An open 🟠 sends `/feat-validate` to
+`/feat-fix`, fails the `/feat-ship` goal and stops `/feat-distill`, so every migration
+would block a clean feature. Merge danger is therefore a section outside the 🔴/🟠/⚪
+scale, and `/feat-validate` repeats a one-way verdict to the user.
+
+## Added
+- **.claude/commands/feat-retro.md**.
+
+## Modified
+- **validator.md**: closing **Merge danger** section.
+- **feat-validate.md**: step 4 repeats a one-way door to the user.
+- **CONVENTIONS.md**: `/feat-retro` in the pipeline block's maintenance line.
+- **CLAUDE-rationale.md**: Maintenance commands entry for `/feat-retro`, the reason Merge
+  danger sits outside the scale, and a Pocock provenance line.
+- **install.sh / install.ps1**: expected commands 19 → 20.
+- **README.md / docs/README_zh-TW.md**: command count, maintenance list, Merge danger note
+  beside the `pr` pointer.
+- **factory-cheatsheet_{en,zh-TW}.md**: maintenance list, a `/feat-retro` paragraph, and the
+  stuck table: the validate-clean row mentions a one-way door, plus a new row pointing a
+  slow or token-heavy session to `/feat-retro`.
+- **factory-training_{en,zh-TW}.html**: commands spec 19 → 20, a `/feat-retro` block in
+  Maintenance, the `/feat-validate` station describes Merge danger, and the stuck table
+  gets the same two changes as the cheatsheets. Station count and house rules unchanged.
+
+## Unchanged, checked
+`feat-distill.md`, `memory-distiller.md`, `MEMORY.md` (single writer holds), hooks,
+`feat-ship.md` (its goal counts only 🔴/🟠, which Merge danger is not), `feat-status.md`.
+
+---
+
+# Training guides published with GitHub Pages (2026-10-17)
+
+Issue #42 · PR #43
+
+GitHub's file view shows `.html` as source, so the README's training-guide links opened
+markup instead of the page. `docs/` is now meant to be served by GitHub Pages.
+
+## Modified
+- **docs/.nojekyll** (new, empty): Pages publishes `docs/` as-is, without a Jekyll build.
+- **README.md**, **docs/README_zh-TW.md**: the training-guide links point at the Pages URLs
+  (`https://littlenounou.github.io/factory-template/factory-training_{en,zh-TW}.html`).
+
+## Kept, deliberately
+The cheatsheets still name `docs/factory-training_*.html` by path: they are read in a
+checked-out repo, where the file opens in a browser.
+
+## Manual step
+Pages is a repo setting: **Settings → Pages → Deploy from a branch → `main` / `/docs`**. The
+new links resolve once Pages is on and this change reaches `main`.
+
+# CLAUDE.md snippet: no-op rules pruned (2026-10-17)
+
+Issue #40 · PR #41
+
+The snippet still carried rules that restate what Claude Code and current (5.x) models do
+by default. Under `WRITING-FOR-AGENTS.md` (No-ops) such a sentence is deleted whole, and the
+saving repeats: the main session and every factory agent reload `CLAUDE.md` on every run.
+
+## Decisions (grilled with the maintainer)
+- **Rule 2 (Read Before You Write) retired.** The Edit tool already refuses a file not
+  read in the session; reading a caller before changing an interface is default behaviour.
+- **Rule 10 (Checkpoint) retired.** The task list shows done and remaining work, Rule 0
+  reports what was verified, and inside the factory each `/feat-*` step is the checkpoint.
+- **Rule 3 trimmed to one line**: with several reasonable readings, list them and let the
+  user choose. This is stricter than the default, which decides low-stakes ambiguity alone.
+- **Rule 6 trimmed to one line**: reproduce a bug with a failing test, then fix it. The
+  plan template and the weak/strong instruction table are gone.
+- **Rule 8 keeps its heading, with the anti-pattern exception only.** Following existing
+  conventions is default behaviour.
+- **No renumbering.** Retired numbers are never reused; Rules 5, 7 and 9 are cited by
+  number in `CONVENTIONS.md`, agents and the cheatsheets.
+
+## Modified
+- **CLAUDE.factory-snippet.md**: "How to Read This File" and the opening blockquote
+  removed; the closing paragraph is now an HTML comment (human-facing, stripped before
+  loading), which also notes the retired numbers; EXPLORE line reads "Rules 0, 1 and 9".
+- **.claude/factory/EXPLORE-MODE.md**: Rule 10 row and Rule 2 "still on" line removed;
+  the Rule 6 row now reads "Disabled: a fix may skip the reproduction test".
+- **.claude/factory/CLAUDE-rationale.md**: Rule 2 and Rule 10 entries replaced by a
+  "Retired: Rules 2 and 10" entry; Rules 3, 6 and 8 say what was trimmed and why; "Rules 0,
+  1 and 9" in the EXPLORE entry. Its "no pointer reaches it" line is now true: both
+  snippet paragraphs that pointed at it were agent-loaded text and are gone.
+
+## Kept, deliberately
+Rules 0, 1, 4, 5, 7 and 9, Context Health, the EXPLORE pointer and Project-Specific Rules.
+Rule 4 stays because over-engineering was a documented tendency of the 4.5 generation and
+there is no evidence yet that 5.x outgrew it. *Tech Stack* is read by `/feat-init` on a
+greenfield repo.
+
+## Compatibility
+A repo whose `CLAUDE.md` came from an older snippet keeps Rules 2 and 10 until someone
+edits it; a reinstall only refreshes `.claude/factory/`. After one, that repo's Rule 10 has
+no EXPLORE weakening row and applies at full strength in EXPLORE Mode. Harmless; delete the
+two rules from the repo's `CLAUDE.md` to match.
+
+## Follow-ups (not in this pass)
+- The no-op test is model-relative: watch the next few features for a behaviour that
+  regressed after its rule went, and restore it as a paired guardrail if one did.
+- *Test and Build Commands* may duplicate `project.json` (Cache test). Decide separately.
+
+---
+
 # v1.0.0 (2026-10-17)
 
 First release. `main` had never been tagged; v1.0.0 is `develop` as of PR #36, merged to
@@ -1072,3 +1431,5 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-08-14 | (fill in) | writing-for-agents pass: prohibitions rephrased positively, rationale/EXPLORE Mode/phase-boundary ladder disclosed to companion files, changelog moved here |
 | 2026-09-16 | (fill in) | `comment-migrate.py` correctness fixes: tokenize/ast Python scanning, continuation-aware classification, pre-write safety check |
 | 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules and `check pending`, grill round separator, commands hand off to the human |
+| 2026-10-18 | (fill in) | Pocock v1.3 retro/pr re-read: `/feat-retro` maintenance command, validator Merge danger section |
+| 2026-11-05 | (fill in) | `comment-migrate.py` regression (cd510f7 undid 55f2256) restored; permanent fixtures in `tests/comment-migrate/`; paragraph reorder, mid-sentence blank report, comment-to-code pinning, `--diff` review step |

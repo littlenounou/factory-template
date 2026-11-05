@@ -42,6 +42,14 @@ Write `<artifactsDir>/<slug>/validation.md`. Classify every finding:
 - ⚪ **Minor** — opinion-based; optional.
 Every finding must cite `path:line` and say which track owns the fix. If clean, say so explicitly.
 
+Close `validation.md` with a **Merge danger** section, outside the 🔴/🟠/⚪ scale (it is
+a reading aid for the human reviewer, not a finding, so it never triggers a fix loop):
+- **Door:** `one-way` when merging is hard to walk back (a data migration, a destructive
+  or irreversible operation, a public API or schema change that consumers will build on),
+  else `two-way`. For a one-way door, name what cannot be undone, with `path:line`.
+- **Blast radius:** one word for the widest scope the change can affect (e.g. `module`,
+  `service`, `consumers`, `data`), then one line on what breaks if it is wrong.
+
 Every `classifier-refusal` marker in an input artifact, and any refusal you meet while reviewing, goes in `validation.md` under a separate **⛔ Classifier-refusal** heading (owner: human), outside the 🔴/🟠/⚪ scale (CONVENTIONS.md, Classifier refusals).
 
 End with ✅ Verified / ⚠️ Skipped-Uncertain / ❓ Needs-human-input.

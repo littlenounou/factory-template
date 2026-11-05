@@ -25,15 +25,12 @@ than quiet about delivery.
 either original — it leaves future engineers permanently unsure which direction is
 correct.
 
-## Rule 2 — Read Before You Write
-
-Without context, AI is most likely to make changes that look reasonable on the surface but
-violate the existing design. Reading first is the cheapest line of defense.
-
 ## Rule 3 — Think Before Coding
 
-AI's most common failure mode is filling in blanks without confirmation. This rule forces
-explicit reasoning.
+AI's most common failure mode is filling in blanks without confirmation. Current models
+already state assumptions and stop when confused, so the rule keeps only the stricter half:
+when a request has several reasonable readings, the user picks one, not the model. By
+default a model decides low-stakes ambiguity itself.
 
 ## Rule 4 — Simplicity First, With Room for Reasonable Preparation
 
@@ -49,7 +46,10 @@ technical debt accumulate forever — disclosure is the necessary compromise.
 ## Rule 6 — Goal-Driven Execution
 
 Strong success criteria let AI loop independently to completion. Weak criteria ("make it
-work") require constant clarification.
+work") require constant clarification. Planning a multi-step task is what the task list
+already does, so the rule keeps one instruction that is not the default order: reproduce a
+bug with a failing test before fixing it. The failing test proves the fix addresses the
+reported bug and not a neighbouring one.
 
 ## Rule 7 — Tests Verify Intent, Not Just Behavior
 
@@ -61,17 +61,25 @@ pass (wrong path). This rule is the structural defense against reward-hacking.
 
 Blind compliance lets AI propagate bad habits. But unilateral "improvement" fragments
 style and breaks team consistency. Surfacing without acting is the lowest-impact
-compromise.
+compromise. Following the existing convention is default model behaviour, so the rule
+states only the exception.
 
 ## Rule 9 — Use the Model Only for Judgment Calls
 
 AI is good at interpretation work, not guarantee work. Putting AI in the wrong slot makes
 systems hard to debug and hard to trust.
 
-## Rule 10 — Checkpoint After Every Significant Step
+## Retired: Rules 2 and 10
 
-The most dangerous failure in long tasks is stacking on top of errors. Checkpoints catch
-errors early and prevent contamination of later steps.
+Both restated what the harness and current models already do (2026-10-17, #40), and a
+sentence that restates the default pays context load on every agent run to say nothing
+(`WRITING-FOR-AGENTS.md`, No-ops). Rule 2 (Read Before You Write): Claude Code's Edit tool
+refuses a file not read in the session, and reading callers before changing an interface is
+default behaviour. Rule 10 (Checkpoint After Every Significant Step): the task list tracks
+done and remaining work where the user can see it, Rule 0 reports what was verified, and
+inside the factory every `/feat-*` step is a checkpoint. The numbers are not reused, so
+references to Rules 5, 7 and 9 elsewhere stay valid. If a retired behaviour regresses,
+restore it as a paired guardrail.
 
 ## Context Health — phase boundaries
 
@@ -93,7 +101,7 @@ still the things the agent can actually observe.
 ## EXPLORE Mode
 
 Exploration needs *more* honesty than production work, not less: a misleading prototype
-conclusion poisons every decision built on it. That is why Rules 0, 1, 2 and 9 cannot be
+conclusion poisons every decision built on it. That is why Rules 0, 1 and 9 cannot be
 switched off in any mode, while the test and scope discipline can be.
 
 Promotion from prototype to production is an explicit decision, not a silent upgrade —
@@ -150,6 +158,21 @@ was dropped.
   test-verifier writes real tests, so it is an author, not a Haiku-grade grader.
   Security-sensitive work (an Off-Limits area) is the most classifier-prone: switch that
   builder to `model: opus` for the feature, or keep the work outside the factory.
+  **Routing overrides**, for troubleshooting:
+  - Order since Claude Code v2.1.251 (inside the 2.1.295 floor the hooks need): the Agent
+    call's `model` parameter, then frontmatter `model:`, then `CLAUDE_CODE_SUBAGENT_MODEL`,
+    then the main session's model. The env variable reaches no factory agent, so the
+    template sets no env pin.
+  - Two overrides beat the frontmatter. `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (v2.1.257+,
+    in the shell or in `env` at any settings scope) puts every agent on
+    `CLAUDE_CODE_SUBAGENT_MODEL`, or on the main model when that is unset. A `model` the
+    orchestrating session passes on an Agent call wins too; no command passes one, and it
+    stays unguarded until a run shows it.
+  - `sonnet` is an alias, so no version needs bumping. A cloud provider may map it to an
+    older Sonnet; `ANTHROPIC_DEFAULT_SONNET_MODEL` redirects it.
+  - Symptom: `/usage` shows no Sonnet, or a model the order above does not explain. Check
+    `echo $CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and the `env` key of `~/.claude/settings.json`,
+    `.claude/settings.json` and `.claude/settings.local.json`.
 - **Classifier refusals.** A loop that cannot tell "the classifier said no" from "my code
   is wrong" burns its retry budget rephrasing a refusal — hence the separate token, the ⛔
   heading, and `blocked-classifier` outside the retry count. The API's fallback to another
@@ -192,6 +215,17 @@ was dropped.
   mechanical and reviewable, and it refuses a dirty tree so the change lands as one commit.
 - `/feat-sweep` reports shallow modules only; the smells baseline stays with the
   validator, on per-feature diffs. Cadence is the human's; no step prompts for it.
+- `/feat-retro` reads session transcripts, which no feature artifact records: a file the
+  agent searched for fourteen times leaves no trace in `verification.md`, so `/feat-distill`
+  cannot see it. It is user-invoked and report-only because an agent that reflects on its
+  own runs unprompted tends to nitpick and drift; the human picks what to apply. It
+  keeps no Watchlist entries, so MEMORY.md keeps its single writer; the committed
+  report's git history is the trend. It reads the session's gate output instead of
+  re-running checks, so it stays read-only.
+- The validator's **Merge danger** section sits outside the 🔴/🟠/⚪ scale on purpose: an
+  open 🟠 sends `/feat-validate` to `/feat-fix`, fails the `/feat-ship` goal and stops
+  `/feat-distill`, while a one-way door (a migration, say) is a property of the change,
+  not a defect to fix. It is surfaced to the human instead.
 
 ## Pocock provenance
 Adapted from mattpocock/skills (MIT), verified against the repo and the author's own posts
@@ -225,3 +259,15 @@ baseline and deletion test, and the prompt-style rules.
   `/feat-epic` already splits large work into features), `pr` as a factory step (the
   upstream skill runs beside the line, see README), and the repo-wide em-dash sweep (new
   English lines follow the punctuation rule instead).
+- v1.3 `retro` and `pr` re-read (2026-10-18): `/feat-retro` takes `retro`'s environment
+  categories that the distill prevention pass does not cover (navigation, tool economy,
+  no-ops, information access) plus "a configured check that is broken or unwired";
+  the validator's Merge danger takes `pr`'s door and blast-radius call. Still not
+  adopted: `implement-spec`, and a factory-written PR body.
+- `implement-spec` applied to `/feat-epic`'s hand-off (2026-10-18), building the features
+  with no `after:` in parallel worktrees: not adopted. Only build through fix would run
+  in parallel, since grill and the ⏸ story/spec gates stay sequential and human, so little
+  time is saved. It would add worktree handling, conflicts between feature PRs, and one
+  MEMORY.md per worktree, which breaks its single writer. Sequential order also lets each
+  feature's research read the previous feature's merged code and lessons. Revisit when an
+  epic has many independent features and build time is the measured bottleneck.

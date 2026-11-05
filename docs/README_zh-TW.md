@@ -6,7 +6,7 @@
 清單檔（`.claude/factory/project.json`）驅動。全端、純前端、純後端專案皆適用。
 
 ## 延伸閱讀
-- **[訓練指南](factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線，以及核心與
+- **[訓練指南](https://littlenounou.github.io/factory-template/factory-training_zh-TW.html)** — 單頁導覽：設計哲學、裝配線，以及核心與
   進階機制（供新人上手）。
 - **[速查表](factory-cheatsheet_zh-TW.md)** — 單一畫面快速參考：安裝、命令流程、卡住狀態對照表、
   不可妥協事項（供日常使用）。
@@ -28,7 +28,7 @@
 ```
 安裝程式會把 `.claude/` 複製進 repo，並讓 hooks 具備執行權限。若 repo 已有 `CLAUDE.md`，
 它**不會**被修改——安裝程式會把 `CLAUDE.factory-snippet.md` 放在旁邊供你自行合併。若沒有
-`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、19 個 commands、
+`CLAUDE.md`，則直接以該 snippet 作為起始檔。安裝後的預期數量：8 個 agents、20 個 commands、
 3 個 hooks。
 
 重新執行安裝程式（升級）會更新模板的檔案，並保留 repo 自己的檔案：
@@ -75,6 +75,7 @@
 # 維護指令（產線之外——無 slug、無 state.json）
 /feat-recomment [path]  # 把舊的交錯式雙語註解轉成區塊形式
 /feat-sweep [path]      # 唯讀掃描淺模組 -> sweep-report.md
+/feat-retro [session|slug]  # 唯讀回顧 session 的工作環境 -> retro-report.md
 ```
 整體設計與每個機制背後的理由（包括模型路由、classifier 拒絕處理、記憶層、收斂迴圈），
 請見 `.claude/factory/CLAUDE-rationale.md`。
@@ -106,11 +107,14 @@ PR 內一併更新它。
 - **台灣術語辭典** — 只用台灣主流用語（不使用中國大陸的變體）。
 
 在區塊規則之前寫下的程式碼，可用 `/feat-recomment [path]` 就地遷移，該命令驅動
-`.claude/factory/comment-migrate.py` —— 一支確定性腳本，只**重新排序**既有的註解行
-（絕不翻譯或改寫），任何有疑義的部分都留給人處理，並列在
-`comment-migration-report.md` 內。它不會更動程式碼：寫入檔案前會先驗證，
-只有註解／docstring 行的順序改變。預設為 dry-run；`--check` 在仍有交錯註解時以非零狀態
-結束，可作為 CI 守門。
+`.claude/factory/comment-migrate.py` —— 一支確定性腳本，只**重新排序**既有的註解行與整個段落，
+並把同時含兩種語言的單行在句子邊界拆成兩行（絕不翻譯或改寫），任何有疑義的部分都留給人處理，並列在
+`comment-migration-report.md` 內。它不會更動程式碼：寫入檔案前，先檢查程式碼沒有改變、註解行
+完全相同，且每段註解仍位於同一段程式碼上方（所有語言）；Python、C#、Java、JavaScript 與
+TypeScript 再由 tokenizer 或 lexer 檢查程式碼與字串常值都沒有改變（Python docstring 除外）。
+任一項檢查失敗的檔案不會寫入，而是列在報告中交給人處理。此命令會先產出完整 diff（`--diff`），
+等人讀完才套用。`--check` 在仍有需要遷移或審閱的區塊時以非零狀態結束，可作為 CI 守門。
+迴歸測試案例位於 `tests/comment-migrate/`（僅在 template repo 中，不會安裝）。
 
 `/feat-docs`（**doc-writer** agent）會用 **Mermaid** 圖表產出上述面向使用者的文件
 （flowchart／sequence／Gantt／mindmap／class／state）。它**不會**移動或封存各 slug 的產出物
@@ -120,4 +124,5 @@ PR 內一併更新它。
 本模板刻意不自動 commit，也不自動開 PR。PR 描述可搭配
 [mattpocock/skills](https://github.com/mattpocock/skills) 的 `pr` skill（Claude Code
 plugin `mattpocock-skills`），它在產線之外運作：摘要圖示、修改前後的證據，以及合併風險判斷。
-它不屬於工廠產線，也不需要修改任何工廠設定。
+它不屬於工廠產線，也不需要修改任何工廠設定。validator 已在 `validation.md` 結尾寫出
+**Merge danger** 段落（one-way 或 two-way door、影響範圍），可直接帶進 PR 描述。
