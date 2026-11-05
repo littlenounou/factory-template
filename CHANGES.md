@@ -1,3 +1,41 @@
+# v1.1.0 (2026-11-05)
+
+Second release. The dated entries between this heading and `# v1.0.0` are part of it.
+No breaking changes: reinstall over v1.0.0 with the installer (it keeps the repo's
+`MEMORY.md` and the non-`hooks` keys of `settings.json`).
+
+## What's new
+- **`/feat-retro [session|slug]`** (#44): read-only retrospective on a session transcript;
+  writes `retro-report.md` with ranked fixes to the agent's environment. 20 commands now.
+- **Validator Merge danger** (#44): every `validation.md` rates the door (one-way or
+  two-way) and the blast radius.
+
+## Fixes
+- **`comment-migrate.py` / `/feat-recomment`** (#49, #50, #53): a mixed-language line is
+  split onto its own line; files keep their line endings; the script verifies before
+  writing that only comment lines moved (tokenize/ast for Python, a built-in lexer for
+  C#, Java, JS and TS); the 2026-09-16 fixes lost in cd510f7 are restored and locked by
+  regression fixtures in `tests/comment-migrate/` (not installed); the command shows the
+  full diff for review before applying.
+- **Model routing notes** (#55): restored as current facts in `CLAUDE-rationale.md`
+  ("Routing overrides"); the cheatsheets' dangling reference is fixed. No env pin.
+
+## Docs
+- `CLAUDE.md` snippet: rules Claude 5.x follows by default pruned (#40).
+- Training guides served by GitHub Pages (#42).
+- Decision recorded: no parallel builds for `/feat-epic` features (#46).
+
+## Upgrade notes
+- An `env.CLAUDE_CODE_SUBAGENT_MODEL` left in `.claude/settings.json` by a 2026-07 to
+  2026-09 install can stay or go: the agents' frontmatter outranks it.
+- Delete the `[2026-07-09 template]` and `[2026-07-17 template]` lines from `MEMORY.md`
+  General rules if present.
+- Review the snippet changes (#40) against your merged `CLAUDE.md` by hand: the installer
+  never edits an existing `CLAUDE.md`.
+
+## Requirements
+Unchanged: Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
 # Fix: model-routing notes restored as current facts; env pin not restored (2026-11-05)
 
 Issue #55. cd510f7 ("Redact secrets in pasted evidence", 2026-09-19) silently undid
