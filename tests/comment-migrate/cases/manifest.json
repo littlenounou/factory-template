@@ -55,5 +55,26 @@
     "why": "A2: one EN line + one ZH line is the allowed short form",
     "check": 0,
     "review": 0
+  },
+  "12_csharp_interleaved.cs": {
+    "why": "C# line comments are migrated and pass the lexer check",
+    "expected": "12_csharp_interleaved.expected.cs",
+    "check": 1
+  },
+  "13_ts_template_literal.ts": {
+    "why": "lines inside a template literal look like comments; the lexer check must stop the rewrite",
+    "check": 1,
+    "review": 1,
+    "report_contains": "lexer"
+  },
+  "14_mixed_line_split.py": {
+    "why": "PR #51: a line holding one EN and one ZH sentence is split at the boundary, text kept word for word",
+    "expected": "14_mixed_line_split.expected.py",
+    "check": 1
+  },
+  "15_crlf_interleaved.py": {
+    "why": "PR #50: CRLF line endings are kept exactly",
+    "expected": "15_crlf_interleaved.expected.py",
+    "check": 1
   }
 }
