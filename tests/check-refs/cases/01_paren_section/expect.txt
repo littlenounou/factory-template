@@ -1,0 +1,1 @@
+no section "Harvest calendar" in CONVENTIONS.md

@@ -1,3 +1,42 @@
+# CI: template repo checks catch silently removed content (2026-11-07)
+
+Issue #59. cd510f7 silently undid unrelated content twice (#53: the comment-migrate
+fixes; #55: the model-routing notes, leaving both cheatsheets pointing at the deleted
+CONVENTIONS "Known issues") and dropped `install.sh`'s executable bit; no check failed,
+because the repo had no CI. Template repo only: nothing new is installed.
+
+## Decisions (grilled with the maintainer)
+- **Scope**: doc cross-references, the comment-migrate fixtures, `bash -n` / Python
+  compile, an `install.sh` smoke test. shellcheck and a pwsh parse of `install.ps1`
+  deferred (neither runs in the local build environment).
+- **Cross-reference**: a named section must be a heading or bold label of the named file
+  (prefix match; bare stems like `CONVENTIONS` resolve); links, anchors, `@import`s and
+  backticked repo paths must exist; EN/zh-TW pairs must keep the same structure.
+  `CHANGES.md` is not checked.
+- **Python 3 standard library and bash**, no new dependency; one CI action
+  (`actions/checkout`).
+- **Triggers**: PRs into and pushes to `develop` and `main`, plus manual runs. Every check
+  runs; any failure fails the job. Making it a required check is the maintainer's setting.
+- **No ignore marker**: a false positive is fixed in the doc or the checker.
+- **Recorded in the README only**, not in `CLAUDE-rationale.md` or the cheatsheets, which
+  target repos receive without this CI.
+
+## Added
+- `tests/run-all.sh`: the single entry for CI and local runs.
+- `tests/check-refs.py` with 15 synthetic self-test cases in `tests/check-refs/cases/`
+  (one clean tree, one broken tree per reference form).
+- `tests/install-smoke.sh`: fresh install and reinstall into a scratch repo, executable
+  bits, and the counts both installers expect.
+- `.github/workflows/template-checks.yml`.
+- README (EN/zh-TW): "Template repo checks".
+
+## Verified
+- `bash tests/run-all.sh` passes on the branch.
+- Renaming the "Routing overrides" label fails on both cheatsheets; restoring it passes.
+- Clearing `install.sh`'s executable bit fails the smoke test; restoring it passes.
+- The cd510f7 tree: `check-refs.py --root` reports the cheatsheets' `CONVENTIONS "Known
+  issues"` (EN and zh-TW); the fixtures pass 5 of 20 against its `comment-migrate.py`.
+
 # v1.1.0 (2026-11-05)
 
 Second release. The dated entries between this heading and `# v1.0.0` are part of it.

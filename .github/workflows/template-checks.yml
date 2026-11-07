@@ -1,0 +1,21 @@
+# Checks for the template repo itself (not installed into target repos).
+# Same entry as a local run: bash tests/run-all.sh
+name: Template checks
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run every template check
+        run: bash tests/run-all.sh
