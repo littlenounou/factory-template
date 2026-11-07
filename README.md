@@ -137,3 +137,19 @@ from [mattpocock/skills](https://github.com/mattpocock/skills) (Claude Code plug
 merge-danger call. It is not part of the factory and needs no factory changes. The
 validator already writes a **Merge danger** section (one-way or two-way door, blast
 radius) at the end of `validation.md`, ready to carry into that PR body.
+
+## Template repo checks
+These guard the template itself and are not installed. `bash tests/run-all.sh` runs every
+check and exits 1 if any fails; CI (`.github/workflows/template-checks.yml`) runs the same
+script on each pull request and push to `develop` or `main`. Requires Python 3 (standard
+library only), `bash` and `jq`.
+- **Cross-references** (`tests/check-refs.py`; the reference forms are listed at its top):
+  every section a doc names exists in the named file; links, anchors, `@import`s and
+  backticked repo paths exist; each English doc and its zh-TW translation keep the same
+  structure. `CHANGES.md` is skipped. `--root DIR` checks another tree, such as an old commit.
+- **Regression fixtures** for `comment-migrate.py` (`tests/comment-migrate/`).
+- **Syntax** of every `.sh` (`bash -n`) and `.py` file.
+- **`install.sh` smoke test** (`tests/install-smoke.sh`): fresh install and reinstall into a
+  scratch repo, the executable bits, and the counts both installers expect.
+
+Fix a false positive in the doc or in the checker.
