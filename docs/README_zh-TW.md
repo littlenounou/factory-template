@@ -126,3 +126,18 @@ TypeScript 再由 tokenizer 或 lexer 檢查程式碼與字串常值都沒有改
 plugin `mattpocock-skills`），它在產線之外運作：摘要圖示、修改前後的證據，以及合併風險判斷。
 它不屬於工廠產線，也不需要修改任何工廠設定。validator 已在 `validation.md` 結尾寫出
 **Merge danger** 段落（one-way 或 two-way door、影響範圍），可直接帶進 PR 描述。
+
+## Template repo 檢查
+這些檢查只守護模板本身，不會安裝。`bash tests/run-all.sh` 會跑完所有檢查，任一項失敗即以 1
+結束；CI（`.github/workflows/template-checks.yml`）在每個以 `develop` 或 `main` 為目標的
+pull request、以及推送到這兩個分支時執行同一支腳本。需要 Python 3（僅用標準函式庫）、`bash`
+與 `jq`。
+- **交叉引用**（`tests/check-refs.py`；可辨識的引用形式列在檔案開頭）：文件指名的段落必須存在於
+  所指的檔案中；連結、錨點、`@import` 與反引號內的 repo 路徑必須存在；每份英文文件與其 zh-TW
+  翻譯的結構必須一致。`CHANGES.md` 不檢查。`--root DIR` 可檢查另一份目錄樹，例如舊的 commit。
+- **迴歸測試案例**：`comment-migrate.py` 的案例（`tests/comment-migrate/`）。
+- **語法**：所有 `.sh`（`bash -n`）與 `.py` 檔。
+- **`install.sh` 煙霧測試**（`tests/install-smoke.sh`）：在暫存 repo 中全新安裝與重新安裝、
+  執行權限，以及兩支安裝程式預期的數量。
+
+遇到誤判時，修正文件或檢查程式。
