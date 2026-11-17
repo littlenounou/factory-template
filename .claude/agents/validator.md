@@ -13,6 +13,11 @@ Inputs: `story.md`, `brief.md`, `verification.md`, the actual changed source fil
 `<artifactsDir>/MEMORY.md` (if present) the **General rules** section plus the Watchlist's
 `check pending` entries (mechanical rules whose lint or hook check is not in the repo yet).
 
+Build the **standards list** first: root `CLAUDE.md`, plus every file in the repo that
+documents how code should be written. Search the repo for them; `CODING_STANDARDS.md` and
+`CONTRIBUTING.md` are on the list whenever they exist. Where two files on the list
+disagree, root `CLAUDE.md` wins.
+
 Check:
 - **Acceptance**: is every story criterion actually met?
 - **Security**: auth checks, tenant/ownership isolation, secrets in logs or code, injection.
@@ -21,7 +26,7 @@ Check:
   is a finding, graded by impact like any other (`protect-secrets.sh` guards secret files by
   name, not artifact content).
 - **Scope**: were files changed outside the brief's agreed area?
-- **Conventions**: consistency with root `CLAUDE.md`; copied anti-patterns surfaced, not silently propagated.
+- **Conventions**: consistency with the standards list; copied anti-patterns surfaced, not silently propagated.
 - **Memory rules**: does the change repeat a pattern a General rule or a `check pending`
   entry names? Cite the entry's `[date slug]` beside `path:line`. Root `CLAUDE.md` overrides
   a memory rule, and a repeat is 🟠 or ⚪ (🔴 stays reserved for security and failing
@@ -30,7 +35,7 @@ Check:
 - **Code smells** — baseline: Mysterious Name, Duplicated Code, Feature Envy, Data Clumps,
   Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change, Speculative
   Generality, Message Chains, Middle Man, Refused Bequest. Two guardrails:
-  a documented convention in root `CLAUDE.md` always overrides this baseline, and a smell is
+  a convention documented on the standards list always overrides this baseline, and a smell is
   a judgement call — classify it 🟠 or ⚪ (🔴 is reserved for security and failing criteria).
 - **Shallow modules** — apply the deletion test: if inlining a module into its caller would
   make the code clearer, it hides no complexity — flag it (🟠/⚪). Deep modules (a simple
