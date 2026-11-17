@@ -1,3 +1,13 @@
+# TW terminology: 36 more dictionary terms (2026-11-17)
+
+Issue #66
+
+`.claude/factory/terminology-zh-tw.md` section 3 gains 36 Taiwan terms: the three senses
+of Fixture (測試資料 / 共用測試環境 / 治具), Excel terms (活頁簿, 儲存格, 列, 欄, …),
+file and system terms (資料夾, 副檔名, 處理序, 控制代碼, …), UI terms (訊息方塊,
+對話方塊, 控制項, …) and build / version-control terms (建置, 原始碼, 提交, 版本控制, …).
+Existing entries are unchanged. Reinstall to pick it up; nothing else changes.
+
 # v1.1.1 (2026-11-17)
 
 Patch release. The dated entries between this heading and `# v1.1.0` are part of it.
