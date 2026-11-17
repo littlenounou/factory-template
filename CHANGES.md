@@ -1,3 +1,26 @@
+# v1.1.1 (2026-11-17)
+
+Patch release. The dated entries between this heading and `# v1.1.0` are part of it.
+No breaking changes: reinstall over v1.1.0 with the installer (it keeps the repo's
+`MEMORY.md` and the non-`hooks` keys of `settings.json`).
+
+## What's new
+- **Pocock v1.3.2 sync** (#62): grill questions are worded so that "yes" accepts the
+  recommended answer; the validator checks Conventions (and exempts smells) against a
+  standards list, root `CLAUDE.md` plus the repo's `CODING_STANDARDS.md` /
+  `CONTRIBUTING.md` and other coding-standards files, with root `CLAUDE.md` winning a
+  conflict; snippet Rule 6 asks for a forced red to be diffed against a pristine copy.
+- **Template repo CI** (#59): `bash tests/run-all.sh` and a required `checks` job guard
+  this repo against silently removed content. Template repo only; nothing new is
+  installed.
+
+## Upgrade notes
+- Add the Rule 6 sentence to your merged `CLAUDE.md` by hand: the installer never edits
+  an existing `CLAUDE.md`.
+
+## Requirements
+Unchanged: Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
 # Pocock v1.3.2 sync: grill "yes" rule, validator standards list, proven forced red (2026-11-13)
 
 Issue #62
