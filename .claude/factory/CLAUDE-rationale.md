@@ -49,7 +49,10 @@ Strong success criteria let AI loop independently to completion. Weak criteria (
 work") require constant clarification. Planning a multi-step task is what the task list
 already does, so the rule keeps one instruction that is not the default order: reproduce a
 bug with a failing test before fixing it. The failing test proves the fix addresses the
-reported bug and not a neighbouring one.
+reported bug and not a neighbouring one. A red that was forced by editing code or a
+fixture proves that only when the edit took effect: an edit that never landed leaves a
+test failing for some other reason, which then passes for "bug reproduced". Hence the
+diff against a pristine copy.
 
 ## Rule 7 — Tests Verify Intent, Not Just Behavior
 
@@ -271,3 +274,14 @@ baseline and deletion test, and the prompt-style rules.
   MEMORY.md per worktree, which breaks its single writer. Sequential order also lets each
   feature's research read the previous feature's merged code and lessons. Revisit when an
   epic has many independent features and build time is the measured bottleneck.
+- v1.3.2 re-sync (2026-11-13): the grill round's "yes accepts the recommendation" wording,
+  from `grilling`; the validator's standards list, from `code-review` (the repo's own
+  `CODING_STANDARDS.md` or `CONTRIBUTING.md` used to go unread, so a change could break a
+  written rule and still pass Conventions); the forced-red diff in Rule 6, from
+  `diagnosing-bugs`. The smells guardrail follows the standards list, so Conventions and
+  Code smells cannot rule differently on the same line. Not adopted: "start each subagent
+  in a fresh context window". Claude Code's Explore and every factory agent already start
+  in a fresh context, so the sentence would change no run here. Also not adopted, because
+  the factory has no matching step or they were declined before: the changes to
+  chief-of-staff, teach, handoff, implement, to-tickets, wayfinder, the tracker
+  templates, setup-matt-pocock-skills and wizard.

@@ -91,6 +91,8 @@ and formatting stay exactly as you found them, including pre-existing dead code.
 ### Rule 6 — Goal-Driven Execution
 
 To fix a bug, **first write a test that reproduces it and fails**, then make it pass.
+If you forced the failure by mutating code or a fixture, diff against a pristine copy to
+prove the mutation landed before you trust the red.
 
 ---
 

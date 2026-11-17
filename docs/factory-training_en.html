@@ -225,7 +225,7 @@ footer{margin-top:70px;border-top:3px solid var(--ink)}
     </div>
     <div class="stage" data-n="03">
       <div class="row"><span class="cmdname">/feat-grill</span><span class="badge human">⏸ interview</span><span class="out">→ decisions.md</span></div>
-      <p>Runs in the main session, because a subagent cannot hold a multi-turn interview. It maps the open decisions as a design tree and asks <b>round by round</b>: each round is the whole <em>frontier</em> — every question whose prerequisites are already settled — as one numbered list, each with a recommended answer, so you can reply by number. Questions the codebase can answer are researched in the background instead of asked. <code>/feat-story</code> is gated on the output: the story consumes settled decisions, never open questions.</p>
+      <p>Runs in the main session, because a subagent cannot hold a multi-turn interview. It maps the open decisions as a design tree and asks <b>round by round</b>: each round is the whole <em>frontier</em> — every question whose prerequisites are already settled — as one numbered list, each with a recommended answer and worded so that "yes" accepts it, so you can reply by number. Questions the codebase can answer are researched in the background instead of asked. <code>/feat-story</code> is gated on the output: the story consumes settled decisions, never open questions.</p>
     </div>
     <div class="stage gate" data-n="">
       <div class="row"><span class="cmdname">/feat-story</span><span class="badge human">⏸ human approval</span><span class="out">→ story.md</span></div>

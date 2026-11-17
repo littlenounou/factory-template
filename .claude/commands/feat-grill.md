@@ -22,7 +22,7 @@ Grill step for feature `$1`, in the MAIN session (a subagent cannot hold an inte
      ---
 
      A horizontal rule separates consecutive questions; the last one in a round ends at
-     its ➡️ line.
+     its ➡️ line. Word each question so that "yes" accepts your recommended answer.
 
    - If a question can be answered from `research.md` or by reading the codebase
      (read-only), read instead of asking. Dispatch such fact-finding to the built-in
