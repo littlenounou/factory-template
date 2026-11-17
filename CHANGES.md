@@ -1,3 +1,74 @@
+# v1.1.1 (2026-11-17)
+
+Patch release. The dated entries between this heading and `# v1.1.0` are part of it.
+No breaking changes: reinstall over v1.1.0 with the installer (it keeps the repo's
+`MEMORY.md` and the non-`hooks` keys of `settings.json`).
+
+## What's new
+- **Pocock v1.3.2 sync** (#62): grill questions are worded so that "yes" accepts the
+  recommended answer; the validator checks Conventions (and exempts smells) against a
+  standards list, root `CLAUDE.md` plus the repo's `CODING_STANDARDS.md` /
+  `CONTRIBUTING.md` and other coding-standards files, with root `CLAUDE.md` winning a
+  conflict; snippet Rule 6 asks for a forced red to be diffed against a pristine copy.
+- **Template repo CI** (#59): `bash tests/run-all.sh` and a required `checks` job guard
+  this repo against silently removed content. Template repo only; nothing new is
+  installed.
+
+## Upgrade notes
+- Add the Rule 6 sentence to your merged `CLAUDE.md` by hand: the installer never edits
+  an existing `CLAUDE.md`.
+
+## Requirements
+Unchanged: Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
+# Pocock v1.3.2 sync: grill "yes" rule, validator standards list, proven forced red (2026-11-13)
+
+Issue #62
+
+Pocock baseline: mattpocock/skills v1.3.2
+
+Upstream mattpocock/skills v1.3.1 → v1.3.2 (tag 2026-10-29) is a patch release with no
+breaking changes, renames or removals. Three of its changes apply to the factory.
+
+## Decisions (grilled with the maintainer)
+- **"Yes" accepts the recommendation** (`grilling`): each grill question is worded so that
+  a bare "yes" takes the recommended answer. `/feat-epic` inherits it through its pointer
+  to the grill round shape.
+- **Validator standards list** (`code-review`): the validator searches the repo for every
+  file that documents how code should be written and checks Conventions against all of
+  them. `CODING_STANDARDS.md` and `CONTRIBUTING.md` are on the list whenever they exist.
+  Root `CLAUDE.md` wins a conflict. `tools:` is unchanged.
+- **Smells guardrail follows the list**: a convention documented on the standards list
+  overrides the smells baseline. With the old wording (root `CLAUDE.md` only), Conventions
+  and Code smells could rule differently on the same line. The 🟠/⚪ guardrail is unchanged.
+- **Forced red is proven** (`diagnosing-bugs`): one sentence in Rule 6 of the snippet, not
+  in `test-verifier.md`. Bug reproduction is done by builders and the main session, and
+  the test-verifier is hook-limited to test directories.
+- **Training pages only**: the EN and zh-TW training pages describe the grill round, so
+  they gain the "yes" half-sentence. The cheatsheets do not describe the question shape
+  and stay as they are.
+- Not taken: "start each subagent in a fresh context window" (Explore and the factory
+  agents already do; recorded in `CLAUDE-rationale.md` so the next sync does not reopen
+  it); the changes to chief-of-staff, teach, handoff, implement, to-tickets, wayfinder,
+  the tracker templates, setup-matt-pocock-skills and wizard; the upstream README's
+  install wording (the plugin name `mattpocock-skills` is unchanged).
+
+## Modified
+- `.claude/commands/feat-grill.md`: step 3, one sentence after the question shape.
+- `.claude/agents/validator.md`: a standards-list paragraph after Inputs; **Conventions**
+  and the first smells guardrail point at the list.
+- `CLAUDE.factory-snippet.md`: Rule 6 gains the forced-red sentence.
+- `.claude/factory/CLAUDE-rationale.md`: Rule 6 reason; "Pocock provenance" v1.3.2 entry.
+- `docs/factory-training_en.html`, `docs/factory-training_zh-TW.html`: the `/feat-grill`
+  stage.
+
+## Upgrade note
+A repo that copied the snippet into its own `CLAUDE.md` adds the Rule 6 sentence by hand;
+the installer does not rewrite an existing `CLAUDE.md`.
+
+## Verified
+- `bash tests/run-all.sh` passes on the branch, including the EN/zh-TW structure check.
+
 # CI: template repo checks catch silently removed content (2026-11-07)
 
 Issue #59. cd510f7 silently undid unrelated content twice (#53: the comment-migrate
@@ -1472,3 +1543,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-10-07 | (fill in) | Pocock v1.3.1 sync: distill prevention pass (mechanical lessons become proposed checks), validator reads MEMORY.md General rules and `check pending`, grill round separator, commands hand off to the human |
 | 2026-10-18 | (fill in) | Pocock v1.3 retro/pr re-read: `/feat-retro` maintenance command, validator Merge danger section |
 | 2026-11-05 | (fill in) | `comment-migrate.py` regression (cd510f7 undid 55f2256) restored; permanent fixtures in `tests/comment-migrate/`; paragraph reorder, mid-sentence blank report, comment-to-code pinning, `--diff` review step |
+| 2026-11-13 | (fill in) | Pocock v1.3.2 sync: grill questions worded so "yes" accepts the recommendation, validator standards list (`CODING_STANDARDS.md` / `CONTRIBUTING.md`), Rule 6 forced-red diff |
