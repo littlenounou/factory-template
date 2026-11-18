@@ -1,0 +1,3 @@
+# Installed with .claude/ so the target repo keeps its hook scripts LF too: a CRLF
+# checkout (Git for Windows, core.autocrlf=true) makes bash fail and the hooks block.
+*.sh text eol=lf

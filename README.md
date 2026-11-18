@@ -19,7 +19,10 @@ full-stack, frontend-only, or backend-only projects.
   an older version.
 - `bash` and `jq` available on PATH (hooks use them). On Windows, run Claude Code from
   Git Bash or WSL so the hooks execute; install `jq`. Without `jq`, hooks fail safe
-  (allow) and print a notice — i.e. enforcement is skipped, nothing breaks.
+  (allow) and print a notice — i.e. enforcement is skipped, nothing breaks. Under Git
+  Bash the hooks accept Windows paths (`C:\repo\src\a.ts`, any drive-letter case) and the
+  CRLF output of a native `jq.exe`; `.claude/.gitattributes` keeps the hook scripts LF
+  when the repo is checked out with `core.autocrlf=true`.
 
 ## Install into a repo
 ```
@@ -42,6 +45,9 @@ Re-running the installer (to upgrade) refreshes the template's files and keeps t
   old file is saved as `.claude/settings.json.bak`; re-add any hooks of your own from it. If it
   cannot be merged (`jq` missing for `install.sh`, or the file is not valid JSON), it is backed
   up to the same `.bak` and replaced, with a warning.
+
+`.claude/.gitattributes` belongs to the template and is overwritten on every install. It
+only pins `*.sh` to LF; the repo's root `.gitattributes` is never touched.
 
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md`: add its two `@import` lines near
@@ -151,5 +157,9 @@ library only), `bash` and `jq`.
 - **Syntax** of every `.sh` (`bash -n`) and `.py` file.
 - **`install.sh` smoke test** (`tests/install-smoke.sh`): fresh install and reinstall into a
   scratch repo, the executable bits, and the counts both installers expect.
+- **Hooks smoke test** (`tests/hooks-smoke.sh`): the same `scope-track.sh`,
+  `protect-secrets.sh` and `quality-gate.sh` cases run natively and in a simulated Git Bash
+  (backslash paths, CRLF `jq` output), plus a `core.autocrlf=true` checkout of an installed
+  repo that must keep the hook scripts LF.
 
 Fix a false positive in the doc or in the checker.

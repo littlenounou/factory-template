@@ -17,7 +17,9 @@
   該次工具呼叫，而不是略過檢查。安裝程式偵測到較舊版本時會提出警告。
 - PATH 上要有 `bash` 與 `jq`（hooks 會用到）。在 Windows 上請從 Git Bash 或 WSL 啟動
   Claude Code 以便 hooks 能執行，並安裝 `jq`。缺少 `jq` 時 hooks 會安全降級（放行）並印出
-  提示——亦即略過強制檢查，不會壞掉任何東西。
+  提示——亦即略過強制檢查，不會壞掉任何東西。在 Git Bash 下，hooks 接受 Windows 路徑
+  （`C:\repo\src\a.ts`，磁碟代號大小寫不拘）以及原生 `jq.exe` 的 CRLF 輸出；
+  `.claude/.gitattributes` 讓 repo 以 `core.autocrlf=true` checkout 時，hook script 仍維持 LF。
 
 ## 安裝進 repo
 ```
@@ -38,6 +40,9 @@
   （`permissions`、`env`…）都保留。若你的 `hooks` 與模板不同，舊檔會另存為
   `.claude/settings.json.bak`，請從中補回你自己的 hooks。無法合併時（`install.sh` 缺少
   `jq`，或檔案不是有效的 JSON），會先備份成同一個 `.bak` 再整份取代，並印出警告。
+
+`.claude/.gitattributes` 屬於模板，每次安裝都會被覆蓋。它只把 `*.sh` 固定為 LF；repo
+根目錄的 `.gitattributes` 不會被動到。
 
 ## 在 repo 內的首次設定（3 步驟）
 1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`：在檔案上方加入它的兩行 `@import`
@@ -139,5 +144,8 @@ pull request、以及推送到這兩個分支時執行同一支腳本。需要 P
 - **語法**：所有 `.sh`（`bash -n`）與 `.py` 檔。
 - **`install.sh` 煙霧測試**（`tests/install-smoke.sh`）：在暫存 repo 中全新安裝與重新安裝、
   執行權限，以及兩支安裝程式預期的數量。
+- **Hooks 煙霧測試**（`tests/hooks-smoke.sh`）：同一組 `scope-track.sh`、`protect-secrets.sh`
+  與 `quality-gate.sh` 案例，分別以原生環境與模擬的 Git Bash（反斜線路徑、CRLF 的 `jq` 輸出）
+  執行；另外以 `core.autocrlf=true` checkout 一個已安裝的 repo，hook script 必須維持 LF。
 
 遇到誤判時，修正文件或檢查程式。
