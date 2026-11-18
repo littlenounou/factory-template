@@ -1,8 +1,10 @@
 # =============================================================
 # .gitattributes
+# Default to LF line endings; only the few files that must run on Windows use CRLF
 # 預設強制使用 LF 換行；僅少數必須在 Windows 執行的檔案使用 CRLF
 # =============================================================
 
+# ── Global default: auto-detect text files, normalise to LF ──
 # ── 全域預設：自動偵測文字檔，統一正規化為 LF ─────────────────
 * text=auto eol=lf
 
@@ -52,6 +54,7 @@
 *.cs        text eol=lf
 *.csx       text eol=lf
 *.csproj    text eol=lf
+# *.sln: see the CRLF exceptions below (Visual Studio rewrites it with CRLF on every save)
 # *.sln 見下方 CRLF 例外：Visual Studio 每次存檔都會改回 CRLF
 
 # ── Go ────────────────────────────────────────────────────────
@@ -99,6 +102,7 @@ Gemfile.lock text eol=lf
 *.psm1      text eol=lf
 *.psd1      text eol=lf
 
+# ── Config / data formats ────────────────────────────────────
 # ── 設定 / 資料格式 ───────────────────────────────────────────
 *.json      text eol=lf
 *.jsonc     text eol=lf
@@ -129,6 +133,7 @@ Makefile        text eol=lf
 *.cmake         text eol=lf
 CMakeLists.txt  text eol=lf
 
+# ── Documents ────────────────────────────────────────────────
 # ── 文件 ──────────────────────────────────────────────────────
 *.md        text eol=lf
 *.mdx       text eol=lf
@@ -136,10 +141,12 @@ CMakeLists.txt  text eol=lf
 *.rst       text eol=lf
 *.adoc      text eol=lf
 *.tex       text eol=lf
+# CSV is data: a field may contain line breaks, so no line-ending conversion
 # CSV 是資料：欄位內可能含有換行，不做換行轉換
 *.csv       -text
 *.sql       text eol=lf
 
+# ── Web / front end ──────────────────────────────────────────
 # ── Web / 前端 ────────────────────────────────────────────────
 *.html      text eol=lf
 *.htm       text eol=lf
@@ -150,17 +157,21 @@ CMakeLists.txt  text eol=lf
 *.less      text eol=lf
 *.svg       text eol=lf
 
+# ── Exceptions that must use CRLF (Windows runtime) ──────────
 # ── 必須使用 CRLF 的例外（Windows 執行環境）───────────────────
 *.bat       text eol=crlf
 *.cmd       text eol=crlf
 *.sln       text eol=crlf
+# VBA exported modules: the VBE import needs CRLF
 # VBA 匯出模組：VBE 匯入需要 CRLF
 *.bas       text eol=crlf
 *.cls       text eol=crlf
 *.frm       text eol=crlf
 
+# ── Binary files (no line-ending conversion) ─────────────────
 # ── 二進位檔（不做換行轉換）──────────────────────────────────
 
+# Images
 # 圖片
 *.png       binary
 *.jpg       binary
@@ -173,6 +184,7 @@ CMakeLists.txt  text eol=lf
 *.tif       binary
 *.avif      binary
 
+# Audio / video
 # 影音
 *.mp3       binary
 *.mp4       binary
@@ -183,6 +195,7 @@ CMakeLists.txt  text eol=lf
 *.wav       binary
 *.flac      binary
 
+# Office documents
 # 辦公文件
 *.pdf       binary
 *.doc       binary
@@ -199,6 +212,7 @@ CMakeLists.txt  text eol=lf
 *.accdb     binary
 *.mdb       binary
 
+# Archives
 # 壓縮檔
 *.zip       binary
 *.tar       binary
@@ -208,6 +222,7 @@ CMakeLists.txt  text eol=lf
 *.7z        binary
 *.rar       binary
 
+# Build output / binary executables
 # 編譯產出 / 二進位執行檔
 *.exe       binary
 *.dll       binary
@@ -229,6 +244,7 @@ CMakeLists.txt  text eol=lf
 *.jks       binary
 *.keystore  binary
 
+# Fonts
 # 字型
 *.ttf       binary
 *.otf       binary
@@ -236,6 +252,7 @@ CMakeLists.txt  text eol=lf
 *.woff2     binary
 *.eot       binary
 
+# Design files
 # 設計稿
 *.psd       binary
 *.ai        binary
@@ -243,6 +260,7 @@ CMakeLists.txt  text eol=lf
 *.fig       binary
 *.xd        binary
 
+# Databases
 # 資料庫
 *.db        binary
 *.sqlite    binary
