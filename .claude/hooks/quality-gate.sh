@@ -4,6 +4,8 @@
 # commands from .claude/factory/project.json. Exits non-zero on the first failure.
 set -uo pipefail
 command -v jq >/dev/null 2>&1 || { echo "quality-gate: jq required." >&2; exit 1; }
+# jq.exe on Windows ends each -r line with CRLF; drop the CR (a no-op elsewhere).
+jqr() { jq -r "$@" | tr -d '\r'; }
 # Repo root: the cwd's git top level; if the cwd has left the repo, the session's
 # project dir (same resolution as scope-track.sh).
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
@@ -20,9 +22,9 @@ cd "$ROOT" || { echo "quality-gate: cannot cd to $ROOT" >&2; exit 1; }
 
 run_track() {
   t="$1"
-  [ "$(jq -r ".tracks.$t.enabled // false" "$PROJ")" = "true" ] || return 0
+  [ "$(jqr ".tracks.$t.enabled // false" "$PROJ")" = "true" ] || return 0
   for phase in typecheck lint test; do
-    cmd="$(jq -r ".tracks.$t.commands.$phase // \"\"" "$PROJ")"
+    cmd="$(jqr ".tracks.$t.commands.$phase // \"\"" "$PROJ")"
     [ -z "$cmd" ] && { echo "── [$t] $phase: (none configured, skipped)"; continue; }
     echo "── [$t] $phase: $cmd"
     if ! ( cd "$ROOT" && eval "$cmd" ); then echo "quality-gate: [$t] $phase FAILED" >&2; return 1; fi

@@ -1,3 +1,46 @@
+# Windows hooks: backslash paths, CRLF jq output, CRLF checkouts (2026-11-19)
+
+Issue #68
+
+On Windows, `scope-track.sh` and `protect-secrets.sh` mis-handled three things, and
+`quality-gate.sh` one of them. Reproduced with a simulated Git Bash; Linux and macOS
+behaviour is unchanged (the new test runs every case natively too).
+
+## Fixed
+- **Backslash paths and drive-letter case** (`scope-track.sh`): Claude passes
+  `C:\x\repo\src\a.ts` while git reports `C:/x/repo`, so no repo-relative path was found.
+  With a step active every write was blocked, artifacts included; with none,
+  `protectedDirs` were never enforced. Under Git Bash, MSYS2 or Cygwin (`uname -s`) paths
+  are now compared with `/` separators, `/c/` and `/cygdrive/c/` read as `c:/`, and case
+  ignored. Elsewhere the comparison stays exact and case-sensitive.
+- **Backslash secret paths** (`protect-secrets.sh`): `SECRET_RE` accepts `/` or `\` before
+  a file name, so `C:\repo\.env` and `config\secrets.json` are blocked.
+- **CRLF from native `jq.exe`** (all three hooks): every `jq -r` value had a trailing `\r`.
+  `scope-track.sh` blocked everything, `protect-secrets.sh` allowed `Write .env` and
+  `git add .env`, and `quality-gate.sh` skipped every track and passed. Each `jq -r` now
+  goes through `tr -d '\r'`; `scope-track.sh` strips it from `.active` too.
+- **CRLF checkouts**: with Git for Windows' default `core.autocrlf=true` the hook scripts
+  were checked out CRLF, bash failed on `set -o pipefail\r`, and `onFailure: "block"`
+  blocked every Edit, Write and Bash call. A root `.gitattributes` and an installed
+  `.claude/.gitattributes` keep `*.sh` LF.
+
+## Added
+- `tests/hooks-smoke.sh`, run by `tests/run-all.sh`.
+- `.gitattributes`, `.claude/.gitattributes`.
+
+## Modified
+- `.claude/hooks/scope-track.sh`, `.claude/hooks/protect-secrets.sh`,
+  `.claude/hooks/quality-gate.sh`.
+- `README.md`, `docs/README_zh-TW.md`: Windows requirement note, hooks smoke test.
+
+## Upgrade notes
+- Refresh the template checkout first: an older Windows clone may hold CRLF scripts, and
+  the installers copy files as they are. Delete its `.claude/hooks/*.sh` and run
+  `git checkout -- .claude/hooks` (or clone again), then reinstall.
+- In a target repo already checked out with CRLF hooks: commit `.claude/.gitattributes`,
+  run `git add --renormalize .claude/hooks`, delete the three `.sh` files and run
+  `git checkout -- .claude/hooks`.
+
 # TW terminology: 36 more dictionary terms (2026-11-17)
 
 Issue #66
@@ -1554,3 +1597,4 @@ grill interview (mandatory, standalone command) + tracer-bullet slices + smells 
 | 2026-10-18 | (fill in) | Pocock v1.3 retro/pr re-read: `/feat-retro` maintenance command, validator Merge danger section |
 | 2026-11-05 | (fill in) | `comment-migrate.py` regression (cd510f7 undid 55f2256) restored; permanent fixtures in `tests/comment-migrate/`; paragraph reorder, mid-sentence blank report, comment-to-code pinning, `--diff` review step |
 | 2026-11-13 | (fill in) | Pocock v1.3.2 sync: grill questions worded so "yes" accepts the recommendation, validator standards list (`CODING_STANDARDS.md` / `CONTRIBUTING.md`), Rule 6 forced-red diff |
+| 2026-11-19 | (fill in) | Windows hooks: backslash paths and drive-letter case, CRLF `jq.exe` output, LF-pinned hook scripts; `tests/hooks-smoke.sh` |
