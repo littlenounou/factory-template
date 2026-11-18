@@ -47,7 +47,8 @@ overrides the target repo's own root rules, so it only pins what bash needs.
 ## Modified
 - `.claude/hooks/scope-track.sh`, `.claude/hooks/protect-secrets.sh`,
   `.claude/hooks/quality-gate.sh`.
-- `README.md`, `docs/README_zh-TW.md`: Windows requirement note, hooks smoke test.
+- `README.md`, `docs/README_zh-TW.md`: Windows requirement note, hooks smoke test, and a
+  note that the installed `.claude/.gitattributes` is template-owned and overwritten.
 
 ## Upgrade notes
 - Refresh the template checkout first: an older Windows clone may hold CRLF scripts, and

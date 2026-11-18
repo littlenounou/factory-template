@@ -41,6 +41,9 @@
   `.claude/settings.json.bak`，請從中補回你自己的 hooks。無法合併時（`install.sh` 缺少
   `jq`，或檔案不是有效的 JSON），會先備份成同一個 `.bak` 再整份取代，並印出警告。
 
+`.claude/.gitattributes` 屬於模板，每次安裝都會被覆蓋。它只把 `*.sh` 固定為 LF；repo
+根目錄的 `.gitattributes` 不會被動到。
+
 ## 在 repo 內的首次設定（3 步驟）
 1. 把 `CLAUDE.factory-snippet.md` 合併進你的 `CLAUDE.md`：在檔案上方加入它的兩行 `@import`
    （`CONVENTIONS.md` 與 `terminology-zh-tw.md`），合併就只有這樣。若你讓 snippet 直接當起始檔

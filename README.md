@@ -46,6 +46,9 @@ Re-running the installer (to upgrade) refreshes the template's files and keeps t
   cannot be merged (`jq` missing for `install.sh`, or the file is not valid JSON), it is backed
   up to the same `.bak` and replaced, with a warning.
 
+`.claude/.gitattributes` belongs to the template and is overwritten on every install. It
+only pins `*.sh` to LF; the repo's root `.gitattributes` is never touched.
+
 ## First-time setup in the repo (3 steps)
 1. Merge `CLAUDE.factory-snippet.md` into your `CLAUDE.md`: add its two `@import` lines near
    the top (`CONVENTIONS.md` and `terminology-zh-tw.md`). That is the whole merge. Skip if you
