@@ -24,9 +24,25 @@ behaviour is unchanged (the new test runs every case natively too).
   blocked every Edit, Write and Bash call. A root `.gitattributes` and an installed
   `.claude/.gitattributes` keep `*.sh` LF.
 
+## Root `.gitattributes`
+The template repo adopts the team's standard root `.gitattributes` (`* text=auto eol=lf`,
+per-extension LF, binaries marked), reviewed and adjusted first:
+- `*.sln` moves to the CRLF exceptions: Visual Studio writes CRLF on every save.
+- `*.bas`, `*.cls`, `*.frm` (VBA exports) are CRLF: the VBE import expects it.
+- `*.csv` is `-text`: line-ending conversion also rewrites line breaks inside quoted
+  fields, i.e. the data. `eol=lf`, `eol=crlf` and `text=auto` all convert; only `-text`
+  keeps the bytes.
+- More binaries: `*.xlsm`, `*.xlsb`, `*.xltm`, `*.xlam`, `*.frx`, `*.accdb`, `*.mdb`,
+  `*.pdb`, `*.snk`, `*.jks`, `*.keystore`.
+
+`git add --renormalize .` changes no tracked file. The fixture override in
+`tests/comment-migrate/cases/.gitattributes` (`-text`) still wins for the CRLF cases. The
+installed `.claude/.gitattributes` stays one line (`*.sh text eol=lf`): a subdirectory file
+overrides the target repo's own root rules, so it only pins what bash needs.
+
 ## Added
 - `tests/hooks-smoke.sh`, run by `tests/run-all.sh`.
-- `.gitattributes`, `.claude/.gitattributes`.
+- `.gitattributes` (the team standard, adjusted as above), `.claude/.gitattributes`.
 
 ## Modified
 - `.claude/hooks/scope-track.sh`, `.claude/hooks/protect-secrets.sh`,
