@@ -41,6 +41,7 @@ run "comment-migrate fixtures"    python3 -I tests/comment-migrate/run.py
 run "shell syntax"                shell_syntax
 run "python syntax"               python_syntax
 run "install.sh smoke test"       bash tests/install-smoke.sh
+run "hooks smoke test"            bash tests/hooks-smoke.sh
 
 echo
 if [ "${#failed[@]}" -eq 0 ]; then

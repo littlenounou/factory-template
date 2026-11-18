@@ -1,0 +1,267 @@
+# =============================================================
+# .gitattributes
+# Default to LF line endings; only the few files that must run on Windows use CRLF
+# 預設強制使用 LF 換行；僅少數必須在 Windows 執行的檔案使用 CRLF
+# =============================================================
+
+# ── Global default: auto-detect text files, normalise to LF ──
+# ── 全域預設：自動偵測文字檔，統一正規化為 LF ─────────────────
+* text=auto eol=lf
+
+
+# ── Python ───────────────────────────────────────────────────
+*.py        text eol=lf
+*.pyw       text eol=lf
+*.pyx       text eol=lf
+*.pxd       text eol=lf
+*.pyi       text eol=lf
+
+# ── JavaScript / TypeScript ───────────────────────────────────
+*.js        text eol=lf
+*.mjs       text eol=lf
+*.cjs       text eol=lf
+*.jsx       text eol=lf
+*.ts        text eol=lf
+*.mts       text eol=lf
+*.cts       text eol=lf
+*.tsx       text eol=lf
+
+# ── Web Framework Components ──────────────────────────────────
+*.vue       text eol=lf
+*.svelte    text eol=lf
+*.astro     text eol=lf
+
+# ── Java / JVM ────────────────────────────────────────────────
+*.java      text eol=lf
+*.kt        text eol=lf
+*.kts       text eol=lf
+*.scala     text eol=lf
+*.sbt       text eol=lf
+*.groovy    text eol=lf
+*.gradle    text eol=lf
+
+# ── C / C++ ───────────────────────────────────────────────────
+*.c         text eol=lf
+*.h         text eol=lf
+*.cpp       text eol=lf
+*.hpp       text eol=lf
+*.cc        text eol=lf
+*.hh        text eol=lf
+*.cxx       text eol=lf
+*.hxx       text eol=lf
+
+# ── C# ────────────────────────────────────────────────────────
+*.cs        text eol=lf
+*.csx       text eol=lf
+*.csproj    text eol=lf
+# *.sln: see the CRLF exceptions below (Visual Studio rewrites it with CRLF on every save)
+# *.sln 見下方 CRLF 例外：Visual Studio 每次存檔都會改回 CRLF
+
+# ── Go ────────────────────────────────────────────────────────
+*.go        text eol=lf
+
+# ── Rust ──────────────────────────────────────────────────────
+*.rs        text eol=lf
+
+# ── PHP ───────────────────────────────────────────────────────
+*.php       text eol=lf
+
+# ── Ruby ──────────────────────────────────────────────────────
+*.rb        text eol=lf
+*.rake      text eol=lf
+*.gemspec   text eol=lf
+Gemfile     text eol=lf
+Gemfile.lock text eol=lf
+
+# ── Swift ─────────────────────────────────────────────────────
+*.swift     text eol=lf
+
+# ── Dart ──────────────────────────────────────────────────────
+*.dart      text eol=lf
+
+# ── Lua ───────────────────────────────────────────────────────
+*.lua       text eol=lf
+
+# ── Elixir ────────────────────────────────────────────────────
+*.ex        text eol=lf
+*.exs       text eol=lf
+
+# ── Haskell ───────────────────────────────────────────────────
+*.hs        text eol=lf
+*.lhs       text eol=lf
+
+# ── R ─────────────────────────────────────────────────────────
+*.r         text eol=lf
+*.R         text eol=lf
+
+# ── Shell ─────────────────────────────────────────────────────
+*.sh        text eol=lf
+
+# ── PowerShell ────────────────────────────────────────────────
+*.ps1       text eol=lf
+*.psm1      text eol=lf
+*.psd1      text eol=lf
+
+# ── Config / data formats ────────────────────────────────────
+# ── 設定 / 資料格式 ───────────────────────────────────────────
+*.json      text eol=lf
+*.jsonc     text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.toml      text eol=lf
+*.xml       text eol=lf
+*.xsl       text eol=lf
+*.xslt      text eol=lf
+*.xsd       text eol=lf
+*.ini       text eol=lf
+*.cfg       text eol=lf
+*.conf      text eol=lf
+*.env       text eol=lf
+*.env.example text eol=lf
+*.properties text eol=lf
+
+# ── Infrastructure / DevOps ───────────────────────────────────
+Dockerfile      text eol=lf
+Dockerfile.*    text eol=lf
+*.dockerfile    text eol=lf
+.dockerignore   text eol=lf
+Makefile        text eol=lf
+*.mk            text eol=lf
+*.tf            text eol=lf
+*.tfvars        text eol=lf
+*.hcl           text eol=lf
+*.cmake         text eol=lf
+CMakeLists.txt  text eol=lf
+
+# ── Documents ────────────────────────────────────────────────
+# ── 文件 ──────────────────────────────────────────────────────
+*.md        text eol=lf
+*.mdx       text eol=lf
+*.txt       text eol=lf
+*.rst       text eol=lf
+*.adoc      text eol=lf
+*.tex       text eol=lf
+# CSV is data: a field may contain line breaks, so no line-ending conversion
+# CSV 是資料：欄位內可能含有換行，不做換行轉換
+*.csv       -text
+*.sql       text eol=lf
+
+# ── Web / front end ──────────────────────────────────────────
+# ── Web / 前端 ────────────────────────────────────────────────
+*.html      text eol=lf
+*.htm       text eol=lf
+*.xhtml     text eol=lf
+*.css       text eol=lf
+*.scss      text eol=lf
+*.sass      text eol=lf
+*.less      text eol=lf
+*.svg       text eol=lf
+
+# ── Exceptions that must use CRLF (Windows runtime) ──────────
+# ── 必須使用 CRLF 的例外（Windows 執行環境）───────────────────
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.sln       text eol=crlf
+# VBA exported modules: the VBE import needs CRLF
+# VBA 匯出模組：VBE 匯入需要 CRLF
+*.bas       text eol=crlf
+*.cls       text eol=crlf
+*.frm       text eol=crlf
+
+# ── Binary files (no line-ending conversion) ─────────────────
+# ── 二進位檔（不做換行轉換）──────────────────────────────────
+
+# Images
+# 圖片
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.webp      binary
+*.bmp       binary
+*.tiff      binary
+*.tif       binary
+*.avif      binary
+
+# Audio / video
+# 影音
+*.mp3       binary
+*.mp4       binary
+*.mov       binary
+*.avi       binary
+*.mkv       binary
+*.webm      binary
+*.wav       binary
+*.flac      binary
+
+# Office documents
+# 辦公文件
+*.pdf       binary
+*.doc       binary
+*.docx      binary
+*.xls       binary
+*.xlsx      binary
+*.ppt       binary
+*.pptx      binary
+*.xlsm      binary
+*.xlsb      binary
+*.xltm      binary
+*.xlam      binary
+*.frx       binary
+*.accdb     binary
+*.mdb       binary
+
+# Archives
+# 壓縮檔
+*.zip       binary
+*.tar       binary
+*.gz        binary
+*.bz2       binary
+*.xz        binary
+*.7z        binary
+*.rar       binary
+
+# Build output / binary executables
+# 編譯產出 / 二進位執行檔
+*.exe       binary
+*.dll       binary
+*.so        binary
+*.dylib     binary
+*.a         binary
+*.lib       binary
+*.out       binary
+*.o         binary
+*.obj       binary
+*.class     binary
+*.jar       binary
+*.war       binary
+*.ear       binary
+*.wasm      binary
+*.pyc       binary
+*.pdb       binary
+*.snk       binary
+*.jks       binary
+*.keystore  binary
+
+# Fonts
+# 字型
+*.ttf       binary
+*.otf       binary
+*.woff      binary
+*.woff2     binary
+*.eot       binary
+
+# Design files
+# 設計稿
+*.psd       binary
+*.ai        binary
+*.sketch    binary
+*.fig       binary
+*.xd        binary
+
+# Databases
+# 資料庫
+*.db        binary
+*.sqlite    binary
+*.sqlite3   binary
