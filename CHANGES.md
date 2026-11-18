@@ -1,3 +1,31 @@
+# v1.1.2 (2026-11-19)
+
+Patch release. The dated entries between this heading and `# v1.1.1` are part of it.
+No breaking changes: reinstall over v1.1.1 with the installer (it keeps the repo's
+`MEMORY.md` and the non-`hooks` keys of `settings.json`).
+
+## What's new
+- **Windows hooks** (#68): `scope-track.sh`, `protect-secrets.sh` and `quality-gate.sh`
+  work under Git Bash: backslash paths and drive-letter case are handled, CRLF output from
+  a native `jq.exe` is stripped, and the installed `.claude/.gitattributes` keeps the hook
+  scripts LF under `core.autocrlf=true`. Linux and macOS behaviour is unchanged;
+  `tests/hooks-smoke.sh` runs every case natively and in a simulated Git Bash.
+- **Root `.gitattributes`** (#68): the template repo adopts the team standard, adjusted
+  (`*.sln` and VBA exports CRLF, `*.csv -text`, more binaries, bilingual comments).
+  Template repo only; it is not installed.
+- **TW terminology** (#66): 36 more terms in `terminology-zh-tw.md` section 3.
+
+## Upgrade notes
+- Windows: refresh an older clone of the template before reinstalling (it may hold CRLF
+  hook scripts), and in a target repo already checked out with CRLF hooks, commit
+  `.claude/.gitattributes`, run `git add --renormalize .claude/hooks`, then check the hooks
+  out again. Details under the Windows hooks entry below.
+- `.claude/.gitattributes` is new and template-owned: it is overwritten on every install.
+  The repo's root `.gitattributes` is never touched.
+
+## Requirements
+Unchanged: Claude Code 2.1.295 or later; `bash` and `jq` on PATH.
+
 # Windows hooks: backslash paths, CRLF jq output, CRLF checkouts (2026-11-19)
 
 Issue #68
